@@ -17,16 +17,17 @@ interface ReviewModalProps {
 
 export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProps) {
   const group = court.groups.find(g => g.id === groupId);
-  const [fun, setFun] = useState(0);
-  const [arrangement, setArrangement] = useState(0);
-  const [travel, setTravel] = useState(0);
-  const [floor, setFloor] = useState<FloorType | undefined>();
-  const [light, setLight] = useState<LightLevel | undefined>();
-  const [air, setAir] = useState<AirType | undefined>();
-  const [crowd, setCrowd] = useState<CrowdLevel | undefined>();
-  const [shuttle, setShuttle] = useState<ShuttleType | undefined>();
-  const [shuttleBrand, setShuttleBrand] = useState('');
-  const [notes, setNotes] = useState('');
+  const existing = group?.reviews[0];
+  const [fun, setFun] = useState(existing?.fun ?? 0);
+  const [arrangement, setArrangement] = useState(existing?.arrangement ?? 0);
+  const [travel, setTravel] = useState(existing?.travel ?? 0);
+  const [floor, setFloor] = useState<FloorType | undefined>(existing?.floor);
+  const [light, setLight] = useState<LightLevel | undefined>(existing?.light);
+  const [air, setAir] = useState<AirType | undefined>(existing?.air);
+  const [crowd, setCrowd] = useState<CrowdLevel | undefined>(existing?.crowd);
+  const [shuttle, setShuttle] = useState<ShuttleType | undefined>(existing?.shuttle);
+  const [shuttleBrand, setShuttleBrand] = useState(existing?.shuttleBrand ?? '');
+  const [notes, setNotes] = useState(existing?.notes ?? '');
 
   if (!group) return null;
 
@@ -46,7 +47,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
         {/* Header */}
         <div className="px-5 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center justify-between mb-0.5">
-            <h3 className="text-lg font-bold text-gray-800">รีวิวก๊วน</h3>
+            <h3 className="text-lg font-bold text-gray-800">{existing ? 'แก้ไขรีวิว' : 'รีวิวก๊วน'}</h3>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
           </div>
           <p className="text-xs text-gray-400">{group.name} · {court.name}</p>

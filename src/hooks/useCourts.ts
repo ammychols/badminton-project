@@ -72,7 +72,7 @@ export function useCourts() {
         ? {
             ...c,
             groups: c.groups.map(g =>
-              g.id === groupId ? { ...g, reviews: [...g.reviews, newReview] } : g
+              g.id === groupId ? { ...g, reviews: [newReview] } : g
             ),
           }
         : c

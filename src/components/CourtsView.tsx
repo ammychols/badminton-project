@@ -147,13 +147,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   );
 }
 
+function Stars({ val }: { val: number }) {
+  return <span className="text-yellow-400 tracking-tight">{'★'.repeat(val)}{'☆'.repeat(5 - val)}</span>;
+}
+
 function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () => void; onReview: () => void }) {
-  const last = group.reviews[group.reviews.length - 1];
-  const starBadges = group.reviews.length > 0 ? [
-    { label: '🎉', val: Math.round(group.reviews.reduce((s, r) => s + r.fun, 0) / group.reviews.length) },
-    { label: '🤝', val: Math.round(group.reviews.reduce((s, r) => s + r.arrangement, 0) / group.reviews.length) },
-    { label: '🚗', val: Math.round(group.reviews.reduce((s, r) => s + r.travel, 0) / group.reviews.length) },
-  ] : [];
+  const review = group.reviews[0];
 
   return (
     <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
@@ -164,15 +163,10 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
             <p className="font-medium text-sm text-gray-800">{group.name}</p>
             <p className="text-xs text-green-600 mt-0.5">🕐 {group.startTime} – {group.endTime} น.</p>
           </div>
-          {group.reviews.length > 0 && (
-            <span className="text-xs bg-white border border-gray-200 text-gray-400 px-2 py-0.5 rounded-full flex-shrink-0">
-              {group.reviews.length} รีวิว
-            </span>
-          )}
         </div>
 
         {/* Day pills */}
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1 flex-wrap mb-2">
           {(Object.keys(DAY_LABELS) as DayOfWeek[]).map(day => (
             <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               group.days.includes(day) ? 'bg-green-100 text-green-700' : 'text-gray-300'
@@ -180,28 +174,44 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
           ))}
         </div>
 
-        {/* Review badges */}
-        {starBadges.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {starBadges.map(({ label, val }) => (
-              <span key={label} className="bg-white border border-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                {label} {'★'.repeat(val)}{'☆'.repeat(5 - val)}
-              </span>
-            ))}
-            {last?.floor && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[last.floor]}</span>}
-            {last?.light && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{LIGHT_LABELS[last.light]}</span>}
-            {last?.air && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[last.air]}</span>}
-            {last?.crowd && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{CROWD_LABELS[last.crowd]}</span>}
-            {last?.shuttle && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{SHUTTLE_LABELS[last.shuttle]}</span>}
-            {last?.shuttleBrand && <span className="bg-white border border-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{last.shuttleBrand}</span>}
+        {/* Review section */}
+        {review ? (
+          <div className="bg-white rounded-lg border border-gray-100 px-3 py-2 flex flex-col gap-1.5">
+            {/* Star rows */}
+            <div className="grid grid-cols-3 gap-x-2 gap-y-1">
+              {[
+                { icon: '🎉', label: 'ความสนุก', val: review.fun },
+                { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
+                { icon: '🚗', label: 'การเดินทาง', val: review.travel },
+              ].map(({ icon, label, val }) => (
+                <div key={label} className="flex flex-col">
+                  <span className="text-xs text-gray-400">{icon} {label}</span>
+                  <Stars val={val} />
+                </div>
+              ))}
+            </div>
+            {/* Choice chips */}
+            {(review.floor || review.light || review.air || review.crowd || review.shuttle || review.shuttleBrand) && (
+              <div className="flex flex-wrap gap-1 pt-1 border-t border-gray-100">
+                {review.floor && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[review.floor]}</span>}
+                {review.light && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{LIGHT_LABELS[review.light]}</span>}
+                {review.air && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[review.air]}</span>}
+                {review.crowd && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{CROWD_LABELS[review.crowd]}</span>}
+                {review.shuttle && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">🪶 {SHUTTLE_LABELS[review.shuttle]}</span>}
+                {review.shuttleBrand && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{review.shuttleBrand}</span>}
+              </div>
+            )}
+            {review.notes && <p className="text-xs text-gray-500 pt-1 border-t border-gray-100 italic">"{review.notes}"</p>}
           </div>
+        ) : (
+          <p className="text-xs text-gray-400 text-center py-1">ยังไม่มีรีวิว</p>
         )}
       </div>
 
       {/* Action bar */}
       <div className="flex border-t border-gray-100 bg-white">
         <button onClick={onReview} className="flex-1 py-2 text-xs font-medium text-green-600 hover:bg-green-50 transition-colors">
-          + รีวิว
+          {review ? '✏️ แก้ไขรีวิว' : '+ รีวิว'}
         </button>
         <div className="w-px bg-gray-100" />
         <button
