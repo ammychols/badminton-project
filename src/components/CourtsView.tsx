@@ -180,8 +180,13 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   );
 }
 
-function Stars({ val }: { val: number }) {
-  return <span className="text-yellow-400 tracking-tight">{'★'.repeat(val)}{'☆'.repeat(5 - val)}</span>;
+function MiniStars({ val }: { val: number }) {
+  return (
+    <span className="text-sm leading-none">
+      <span className="text-yellow-400">{'★'.repeat(val)}</span>
+      <span className="text-gray-200">{'★'.repeat(5 - val)}</span>
+    </span>
+  );
 }
 
 function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm: () => void; onCancel: () => void }) {
@@ -208,67 +213,54 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
-      {/* Header: name + days + delete */}
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
       <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <p className="font-medium text-sm text-gray-800">{group.name}</p>
+          <div className="flex items-center gap-1.5 flex-wrap mb-1">
+            <span className="font-semibold text-sm text-gray-800">{group.name}</span>
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
               <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
               </span>
             ))}
           </div>
-          <p className="text-xs text-green-600 mt-1">{group.startTime} – {group.endTime} น.</p>
+          <span className="text-xs text-green-600">{group.startTime} – {group.endTime} น.</span>
         </div>
         <button
           onClick={() => setConfirming(true)}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-base"
-        >
-          ×
-        </button>
+          className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-lg leading-none"
+        >×</button>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-gray-100 mx-3" />
-
-      {/* Review section */}
-      <div className="px-3 py-2 flex-1">
+      {/* Review */}
+      <div className="border-t border-gray-100">
         {review ? (
-          <div className="flex flex-col gap-1.5">
-            <div className="grid grid-cols-3 gap-x-2 gap-y-1">
-              {[
-                { label: '🎉 ความสนุก', val: review.fun },
-                { label: '🤝 การจัดมือ', val: review.arrangement },
-                { label: '🚗 การเดินทาง', val: review.travel },
-              ].map(({ label, val }) => (
-                <div key={label} className="flex flex-col">
-                  <span className="text-xs text-gray-400">{label}</span>
-                  <Stars val={val} />
-                </div>
-              ))}
-            </div>
-            {review.notes && <p className="text-xs text-gray-500 italic">"{review.notes}"</p>}
+          <div className="px-3 py-2.5 flex flex-col gap-1.5">
+            {[
+              { icon: '🎉', label: 'ความสนุก', val: review.fun },
+              { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
+              { icon: '🚗', label: 'การเดินทาง', val: review.travel },
+            ].map(({ icon, label, val }) => (
+              <div key={label} className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">{icon} {label}</span>
+                <MiniStars val={val} />
+              </div>
+            ))}
+            {review.notes && (
+              <p className="text-xs text-gray-400 italic pt-1 border-t border-gray-100">"{review.notes}"</p>
+            )}
+            <button onClick={onReview} className="text-xs text-green-600 hover:text-green-700 font-medium transition-colors pt-0.5">
+              แก้ไขรีวิว
+            </button>
           </div>
         ) : (
-          <button
-            onClick={onReview}
-            className="w-full py-2.5 rounded-lg border border-dashed border-green-300 text-green-600 text-xs font-medium hover:bg-green-50 transition-colors"
-          >
+          <button onClick={onReview} className="w-full py-3 text-xs text-green-600 font-medium hover:bg-green-50 transition-colors">
             + เพิ่มรีวิว
           </button>
         )}
       </div>
 
-      {/* Footer */}
-      {review && (
-        <div className="border-t border-gray-100 px-3 py-1.5">
-          <button onClick={onReview} className="text-xs text-green-600 font-medium hover:text-green-700 transition-colors py-0.5">
-            แก้ไขรีวิว
-          </button>
-        </div>
-      )}
       {confirming && (
         <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
       )}
