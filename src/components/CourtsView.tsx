@@ -219,6 +219,11 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap mb-1">
             <span className="font-semibold text-sm text-gray-800">{group.name}</span>
+            {group.level && (
+              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-800 text-white">
+                {group.level}
+              </span>
+            )}
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
               <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}

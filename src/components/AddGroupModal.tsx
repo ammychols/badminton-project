@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DayOfWeek, DAY_LABELS } from '../types';
+import { DayOfWeek, DAY_LABELS, GroupLevel, ALL_LEVELS } from '../types';
 
 interface AddGroupModalProps {
   courtName: string;
@@ -10,6 +10,7 @@ interface AddGroupModalProps {
     days: DayOfWeek[];
     startTime: string;
     endTime: string;
+    level?: GroupLevel;
     notes?: string;
   }) => void;
 }
@@ -21,6 +22,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
   const [days, setDays] = useState<DayOfWeek[]>(defaultDay ? [defaultDay] : []);
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('12:00');
+  const [level, setLevel] = useState<GroupLevel | undefined>();
   const [notes, setNotes] = useState('');
 
   const toggleDay = (day: DayOfWeek) => {
@@ -31,7 +33,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
 
   const handleSave = () => {
     if (!name.trim() || days.length === 0) return;
-    onSave({ name: name.trim(), days, startTime, endTime, notes: notes.trim() || undefined });
+    onSave({ name: name.trim(), days, startTime, endTime, level, notes: notes.trim() || undefined });
     onClose();
   };
 
@@ -69,6 +71,24 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
                 }`}
               >
                 {DAY_LABELS[day]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">มือ (ระดับ)</label>
+          <div className="flex gap-2 flex-wrap">
+            {ALL_LEVELS.map(lv => (
+              <button
+                key={lv}
+                type="button"
+                onClick={() => setLevel(level === lv ? undefined : lv)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  level === lv ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {lv}
               </button>
             ))}
           </div>

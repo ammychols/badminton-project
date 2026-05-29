@@ -9,6 +9,9 @@ export interface Court {
   createdAt: string;
 }
 
+export type GroupLevel = 'BB' | 'BG' | 'N-' | 'N' | 'S' | 'P';
+export const ALL_LEVELS: GroupLevel[] = ['BB', 'BG', 'N-', 'N', 'S', 'P'];
+
 export interface Group {
   id: string;
   courtId: string;
@@ -16,6 +19,7 @@ export interface Group {
   days: DayOfWeek[];
   startTime: string;
   endTime: string;
+  level?: GroupLevel;
   notes?: string;
   reviews: Review[];
 }
