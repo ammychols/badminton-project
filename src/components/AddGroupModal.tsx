@@ -51,7 +51,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="เช่น ก๊วนเช้าวันเสาร์"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
 
@@ -81,7 +81,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
               type="time"
               value={startTime}
               onChange={e => setStartTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
           <div className="flex-1">
@@ -90,7 +90,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
               type="time"
               value={endTime}
               onChange={e => setEndTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
         </div>
@@ -102,7 +102,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
             onChange={e => setNotes(e.target.value)}
             placeholder=""
             rows={2}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
         </div>
 

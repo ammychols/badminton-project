@@ -82,7 +82,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={mapsAvailable ? 'พิมชื่อสนาม...' : 'กำลังโหลด Google Maps...'}
               disabled={!mapsAvailable}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50 disabled:bg-gray-50"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50 disabled:bg-gray-50"
             />
             {searchQuery.length > 0 && (
               <button
@@ -121,7 +121,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="เช่น สนามแบดโก้วเฮง"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
 
@@ -132,7 +132,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
             value={address}
             onChange={e => setAddress(e.target.value)}
             placeholder="เช่น ลาดพร้าว กรุงเทพฯ"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
 

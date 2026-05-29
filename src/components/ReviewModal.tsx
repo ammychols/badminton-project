@@ -94,7 +94,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
                 value={shuttleBrand}
                 onChange={e => setShuttleBrand(e.target.value)}
                 placeholder="ยี่ห้อ / รุ่น เช่น RSL No.1"
-                className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
               />
             </div>
           </div>
@@ -105,7 +105,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
             onChange={e => setNotes(e.target.value)}
             placeholder=""
             rows={2}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
         </div>
 
