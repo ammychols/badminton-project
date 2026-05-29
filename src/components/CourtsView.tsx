@@ -182,9 +182,9 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
           <div className="bg-white rounded-lg border border-gray-100 px-3 py-2 flex flex-col gap-1.5">
             <div className="grid grid-cols-3 gap-x-2 gap-y-1">
               {[
-                { label: 'ความสนุก', val: review.fun },
-                { label: 'การจัดมือ', val: review.arrangement },
-                { label: 'การเดินทาง', val: review.travel },
+                { label: '🎉 ความสนุก', val: review.fun },
+                { label: '🤝 การจัดมือ', val: review.arrangement },
+                { label: '🚗 การเดินทาง', val: review.travel },
               ].map(({ label, val }) => (
                 <div key={label} className="flex flex-col">
                   <span className="text-xs text-gray-400">{label}</span>
