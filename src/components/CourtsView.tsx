@@ -172,24 +172,35 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
 
   return (
     <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
-      <div className="px-3 pt-3 pb-2 flex-1">
-        {/* Name + time */}
-        {/* Name + day pills on same row */}
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <p className="font-medium text-sm text-gray-800">{group.name}</p>
-          <div className="flex gap-1 flex-wrap justify-end flex-shrink-0">
+      {/* Header: name + days + delete */}
+      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <p className="font-medium text-sm text-gray-800">{group.name}</p>
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
               <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
               </span>
             ))}
           </div>
+          <p className="text-xs text-green-600 mt-1">{group.startTime} – {group.endTime} น.</p>
         </div>
-        <p className="text-xs text-green-600 mb-3">{group.startTime} – {group.endTime} น.</p>
+        <button
+          onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?\nการลบไม่สามารถกู้คืนได้`)) onDelete(); }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-base"
+          title="ลบก๊วน"
+        >
+          ×
+        </button>
+      </div>
 
-        {/* Review section */}
+      {/* Divider */}
+      <div className="border-t border-gray-100 mx-3" />
+
+      {/* Review section */}
+      <div className="px-3 py-2 flex-1">
         {review ? (
-          <div className="bg-white rounded-lg border border-gray-100 px-3 py-2 flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <div className="grid grid-cols-3 gap-x-2 gap-y-1">
               {[
                 { label: '🎉 ความสนุก', val: review.fun },
@@ -202,7 +213,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
                 </div>
               ))}
             </div>
-            {review.notes && <p className="text-xs text-gray-500 pt-1 border-t border-gray-100 italic">"{review.notes}"</p>}
+            {review.notes && <p className="text-xs text-gray-500 italic">"{review.notes}"</p>}
           </div>
         ) : (
           <button
@@ -214,20 +225,16 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         )}
       </div>
 
-      {/* Action bar */}
-      <div className="flex items-center justify-between border-t border-gray-100 bg-white px-3 py-1.5">
-        {review ? (
-          <button onClick={onReview} className="text-xs text-green-600 font-medium hover:text-green-700 transition-colors py-1">
-            ✏️ แก้ไขรีวิว
+      {/* Footer */}
+      {review && (
+        <div className="border-t border-gray-100 px-3 py-1.5">
+          <button onClick={onReview} className="text-xs text-green-600 font-medium hover:text-green-700 transition-colors py-0.5">
+            แก้ไขรีวิว
           </button>
-        ) : <div />}
-        <button
-          onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?\nการลบไม่สามารถกู้คืนได้`)) onDelete(); }}
-          className="text-xs text-gray-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
-        >
-          ลบก๊วน
-        </button>
-      </div>
+        </div>
+      )}
+    </div>
+  );
     </div>
   );
 }
