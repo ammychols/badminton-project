@@ -15,6 +15,8 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [selected, setSelected] = useState<{ placeId: string; description: string } | null>(null);
+  const [lat, setLat] = useState<number | undefined>();
+  const [lng, setLng] = useState<number | undefined>();
   const [mapsAvailable, setMapsAvailable] = useState(isMapsReady());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -48,7 +50,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchQuery, mapsAvailable]);
 
-  const handleSelectPlace = (prediction: any) => {
+  const handleSelectPlace = async (prediction: any) => {
     const mainText = prediction.mainText?.text ?? '';
     const fullText = prediction.text?.text ?? '';
     setSelected({ placeId: prediction.placeId, description: fullText });
@@ -56,11 +58,19 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
     setAddress(fullText);
     setResults([]);
     setSearchQuery('');
+
+    try {
+      const { Place } = await (window as any).google.maps.importLibrary('places') as any;
+      const place = new Place({ id: prediction.placeId });
+      await place.fetchFields({ fields: ['location'] });
+      const loc = place.location;
+      if (loc) { setLat(loc.lat()); setLng(loc.lng()); }
+    } catch {}
   };
 
   const handleSave = () => {
     if (!name.trim()) return;
-    onSave({ name: name.trim(), address: address.trim(), placeId: selected?.placeId });
+    onSave({ name: name.trim(), address: address.trim(), placeId: selected?.placeId, lat, lng });
     onClose();
   };
 
