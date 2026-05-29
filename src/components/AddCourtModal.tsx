@@ -13,7 +13,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [results, setResults] = useState<google.maps.places.AutocompletePrediction[]>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [selected, setSelected] = useState<{ placeId: string; description: string } | null>(null);
   const [mapsAvailable, setMapsAvailable] = useState(isMapsReady());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -32,23 +32,28 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!searchQuery.trim() || !isMapsReady()) { setResults([]); return; }
 
-    debounceRef.current = setTimeout(() => {
-      const service = new window.google.maps.places.AutocompleteService();
-      service.getPlacePredictions(
-        { input: searchQuery, componentRestrictions: { country: 'th' } },
-        (predictions, status) => {
-          setResults(status === 'OK' && predictions ? predictions : []);
-        }
-      );
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const { AutocompleteSuggestion } = await (window as any).google.maps.importLibrary('places');
+        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input: searchQuery,
+          includedRegionCodes: ['th'],
+        });
+        setResults(suggestions.map((s: any) => s.placePrediction));
+      } catch {
+        setResults([]);
+      }
     }, 300);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchQuery, mapsAvailable]);
 
-  const handleSelectPlace = (prediction: google.maps.places.AutocompletePrediction) => {
-    setSelected({ placeId: prediction.place_id, description: prediction.description });
-    setName(prediction.structured_formatting.main_text);
-    setAddress(prediction.description);
+  const handleSelectPlace = (prediction: any) => {
+    const mainText = prediction.mainText?.text ?? prediction.text?.text ?? '';
+    const fullText = prediction.text?.text ?? '';
+    setSelected({ placeId: prediction.placeId, description: fullText });
+    setName(mainText);
+    setAddress(fullText);
     setResults([]);
     setSearchQuery('');
   };
@@ -92,14 +97,14 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
             <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden shadow-lg">
               {results.map(r => (
                 <button
-                  key={r.place_id}
+                  key={r.placeId}
                   onClick={() => handleSelectPlace(r)}
                   className="w-full text-left px-3 py-2.5 text-sm hover:bg-green-50 border-b border-gray-100 last:border-0 flex items-start gap-2"
                 >
                   <span className="text-green-500 mt-0.5 flex-shrink-0">📍</span>
                   <div>
-                    <p className="font-medium text-gray-800">{r.structured_formatting.main_text}</p>
-                    <p className="text-xs text-gray-400">{r.structured_formatting.secondary_text}</p>
+                    <p className="font-medium text-gray-800">{r.mainText?.text ?? r.text?.text}</p>
+                    <p className="text-xs text-gray-400">{r.secondaryText?.text ?? ''}</p>
                   </div>
                 </button>
               ))}
