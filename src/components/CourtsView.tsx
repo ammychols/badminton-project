@@ -260,7 +260,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
               </div>
             ))}
             {review.notes && (
-              <p className="text-xs text-gray-400 italic pt-1 border-t border-gray-100">"{review.notes}"</p>
+              <p className="text-xs text-gray-500 pt-1 border-t border-gray-100">{review.notes}</p>
             )}
             <button onClick={onReview} className="text-xs text-green-600 hover:text-green-700 font-medium transition-colors pt-0.5">
               แก้ไขรีวิว
