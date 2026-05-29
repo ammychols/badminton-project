@@ -77,21 +77,11 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
         <div className="flex gap-3 mb-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">เวลาเริ่ม</label>
-            <input
-              type="time"
-              value={startTime}
-              onChange={e => setStartTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
-            />
+            <TimePicker value={startTime} onChange={setStartTime} />
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">เวลาเลิก</label>
-            <input
-              type="time"
-              value={endTime}
-              onChange={e => setEndTime(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400"
-            />
+            <TimePicker value={endTime} onChange={setEndTime} />
           </div>
         </div>
 
@@ -114,6 +104,28 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
           บันทึกก๊วน
         </button>
       </div>
+    </div>
+  );
+}
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = ['00', '15', '30', '45'];
+const SELECT_CLS = 'flex-1 border border-gray-200 rounded-xl px-2 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 bg-white appearance-none text-center';
+
+function TimePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [h, m] = value.split(':');
+  const nearestMin = MINUTES.reduce((prev, cur) =>
+    Math.abs(parseInt(cur) - parseInt(m)) < Math.abs(parseInt(prev) - parseInt(m)) ? cur : prev
+  );
+  return (
+    <div className="flex gap-1 items-center">
+      <select value={h} onChange={e => onChange(`${e.target.value}:${m}`)} className={SELECT_CLS}>
+        {HOURS.map(hh => <option key={hh} value={hh}>{hh}</option>)}
+      </select>
+      <span className="text-gray-400 font-medium">:</span>
+      <select value={nearestMin} onChange={e => onChange(`${h}:${e.target.value}`)} className={SELECT_CLS}>
+        {MINUTES.map(mm => <option key={mm} value={mm}>{mm}</option>)}
+      </select>
     </div>
   );
 }
