@@ -34,7 +34,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
 ];
 
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onAddReview }: CourtsViewProps) {
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
 
