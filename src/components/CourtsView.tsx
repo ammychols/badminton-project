@@ -10,16 +10,46 @@ interface CourtsViewProps {
   onAddReview: (courtId: string, groupId: string) => void;
 }
 
+const TODAY_MAP: Record<number, DayOfWeek | 'all'> = { 0: 'SUN', 1: 'MON', 2: 'TUE', 3: 'WED', 4: 'THU', 5: 'FRI', 6: 'SAT' };
+const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
+  { key: 'all', label: 'ทั้งหมด' },
+  { key: 'MON', label: 'จ' },
+  { key: 'TUE', label: 'อ' },
+  { key: 'WED', label: 'พ' },
+  { key: 'THU', label: 'พฤ' },
+  { key: 'FRI', label: 'ศ' },
+  { key: 'SAT', label: 'ส' },
+  { key: 'SUN', label: 'อา' },
+];
+
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
   const [expandedCourt, setExpandedCourt] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">🏟️ สนามของฉัน</h2>
         <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
           + เพิ่มสนาม
         </button>
+      </div>
+
+      {/* Day filter tabs */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-5 scrollbar-none">
+        {DAY_TABS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setSelectedDay(key)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              selectedDay === key
+                ? 'bg-green-600 text-white'
+                : 'bg-white border border-gray-200 text-gray-500 hover:border-green-300 hover:text-green-600'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {courts.length === 0 ? (
@@ -30,7 +60,11 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {courts.map(court => (
+          {courts.map(court => {
+            const visibleGroups = selectedDay === 'all'
+              ? court.groups
+              : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
+            return (
             <div key={court.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
               {/* Court header */}
@@ -45,28 +79,25 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   <p className="font-semibold text-gray-800 truncate">{court.name}</p>
                   <p className="text-xs text-gray-400 truncate">{court.address}</p>
                 </div>
-                <div className="flex items-center gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
-                  <span className="text-xs text-gray-400 mr-1">{court.groups.length} ก๊วน</span>
-                  <button
-                    onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors"
-                  >🗑️</button>
-                  <div className="w-8 h-8 flex items-center justify-center text-gray-400">
-                    {expandedCourt === court.id ? '▲' : '▼'}
-                  </div>
+                <div className="flex items-center gap-2 flex-shrink-0 text-gray-400">
+                  <span className="text-xs">{court.groups.length} ก๊วน</span>
+                  <span className="text-sm">{expandedCourt === court.id ? '▲' : '▼'}</span>
                 </div>
               </div>
 
               {/* Expanded content */}
               {expandedCourt === court.id && (
+                <>
                 <div className="border-t border-gray-100">
                   <div className="flex flex-col sm:flex-row">
                     {/* Groups */}
                     <div className="flex-1 px-4 py-3 flex flex-col gap-2">
-                      {court.groups.length === 0 && (
-                        <p className="text-xs text-gray-400 text-center py-2">ยังไม่มีก๊วน</p>
+                      {visibleGroups.length === 0 && (
+                        <p className="text-xs text-gray-400 text-center py-2">
+                          {selectedDay === 'all' ? 'ยังไม่มีก๊วน' : 'ไม่มีก๊วนในวันนี้'}
+                        </p>
                       )}
-                      {court.groups.map(group => (
+                      {visibleGroups.map(group => (
                         <GroupCard
                           key={group.id}
                           group={group}
@@ -97,9 +128,19 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     </div>
                   </div>
                 </div>
+                <div className="border-t border-gray-100 px-4 py-2 flex justify-end">
+                  <button
+                    onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
+                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    ลบสนาม
+                  </button>
+                </div>
+                </>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
