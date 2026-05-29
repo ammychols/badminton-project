@@ -23,11 +23,15 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
 ];
 
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
-  const [expandedCourt, setExpandedCourt] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
 
+  const filteredCourts = selectedDay === 'all'
+    ? courts
+    : courts.filter(court => court.groups.some(g => g.days.includes(selectedDay as DayOfWeek)));
+
   return (
-    <div className="p-4 max-w-none mx-auto">
+    <div className="p-4">
+      {/* Top bar */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">สนามของฉัน</h2>
         <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
@@ -52,56 +56,70 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         ))}
       </div>
 
+      {/* Empty states */}
       {courts.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <div className="text-5xl mb-3">🏟️</div>
-          <p>ยังไม่มีสนาม</p>
-          <p className="text-sm mt-1">กดปุ่ม + เพิ่มสนาม เพื่อเริ่มต้น</p>
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-base">ยังไม่มีสนาม</p>
+          <p className="text-sm mt-1">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
         </div>
-      ) : courts.filter(court =>
-            selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek))
-          ).length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+      ) : filteredCourts.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
           <p>ไม่มีก๊วนในวันนี้</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {courts.filter(court =>
-            selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek))
-          ).map(court => {
+        <div className="flex flex-col gap-4">
+          {filteredCourts.map(court => {
             const visibleGroups = selectedDay === 'all'
               ? court.groups
               : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
+
             return (
-            <div key={court.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div key={court.id} className="bg-white rounded-2xl shadow-sm border border-gray-100">
 
-              {/* Court header */}
-              <div
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => setExpandedCourt(expandedCourt === court.id ? null : court.id)}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-800 truncate">{court.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{court.address}</p>
+                {/* Court header */}
+                <div className="flex items-start justify-between gap-3 px-4 py-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-800">{court.name}</p>
+                    {court.address && (
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
+                    )}
+                    {court.address && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.address || court.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-500 hover:underline mt-1 inline-block"
+                      >
+                        เปิด Google Maps ↗
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                      className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
+                    >
+                      + เพิ่มก๊วน
+                    </button>
+                    <button
+                      onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
+                      className="text-xs text-red-400 hover:text-red-600 transition-colors px-1"
+                    >
+                      ลบ
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0 text-gray-400">
-                  <span className="text-xs">{court.groups.length} ก๊วน</span>
-                  <span className="text-sm">{expandedCourt === court.id ? '▲' : '▼'}</span>
-                </div>
-              </div>
 
-              {/* Expanded content */}
-              {expandedCourt === court.id && (
-                <>
-                <div className="border-t border-gray-100">
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Groups */}
-                    <div className="flex-1 px-4 py-3 flex flex-col gap-2">
-                      {visibleGroups.length === 0 && (
-                        <p className="text-xs text-gray-400 text-center py-2">
-                          {selectedDay === 'all' ? 'ยังไม่มีก๊วน' : 'ไม่มีก๊วนในวันนี้'}
-                        </p>
-                      )}
+                {/* Groups grid */}
+                <div className="border-t border-gray-100 px-4 py-3">
+                  {court.groups.length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-3">
+                      ยังไม่มีก๊วน — กด "+ เพิ่มก๊วน" ด้านบน
+                    </p>
+                  ) : visibleGroups.length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-3">ไม่มีก๊วนในวันนี้</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {visibleGroups.map(group => (
                         <GroupCard
                           key={group.id}
@@ -110,40 +128,10 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                           onReview={() => onAddReview(court.id, group.id)}
                         />
                       ))}
-                      <button
-                        onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                        className="w-full mt-1 border border-dashed border-green-300 text-green-600 text-sm py-2 rounded-xl hover:bg-green-50 transition-colors"
-                      >
-                        + เพิ่มก๊วน
-                      </button>
                     </div>
-
-                    {/* Google Map */}
-                    <div className="sm:w-56 h-44 sm:h-auto sm:border-l border-t sm:border-t-0 border-gray-100 flex-shrink-0">
-                      <iframe
-                        title={court.name}
-                        width="100%"
-                        height="100%"
-                        className="sm:rounded-r-2xl"
-                        style={{ border: 0, minHeight: '160px' }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(court.address || court.name)}&output=embed&z=15`}
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
-                <div className="border-t border-gray-100 px-4 py-2 flex justify-end">
-                  <button
-                    onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
-                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    ลบสนาม
-                  </button>
-                </div>
-                </>
-              )}
-            </div>
+              </div>
             );
           })}
         </div>
@@ -160,18 +148,14 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
   const review = group.reviews[0];
 
   return (
-    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-      <div className="px-3 pt-3 pb-2">
+    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+      <div className="px-3 pt-3 pb-2 flex-1">
         {/* Name + time */}
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <div>
-            <p className="font-medium text-sm text-gray-800">{group.name}</p>
-            <p className="text-xs text-green-600 mt-0.5">{group.startTime} – {group.endTime} น.</p>
-          </div>
-        </div>
+        <p className="font-medium text-sm text-gray-800">{group.name}</p>
+        <p className="text-xs text-green-600 mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
 
         {/* Day pills */}
-        <div className="flex gap-1 flex-wrap mb-2">
+        <div className="flex gap-1 flex-wrap mb-3">
           {(Object.keys(DAY_LABELS) as DayOfWeek[]).map(day => (
             <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               group.days.includes(day) ? 'bg-green-100 text-green-700' : 'text-gray-300'
@@ -182,7 +166,6 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         {/* Review section */}
         {review ? (
           <div className="bg-white rounded-lg border border-gray-100 px-3 py-2 flex flex-col gap-1.5">
-            {/* Star rows */}
             <div className="grid grid-cols-3 gap-x-2 gap-y-1">
               {[
                 { label: 'ความสนุก', val: review.fun },
@@ -195,7 +178,6 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
                 </div>
               ))}
             </div>
-            {/* Choice chips */}
             {(review.floor || review.light || review.air || review.crowd || review.shuttle || review.shuttleBrand) && (
               <div className="flex flex-wrap gap-1 pt-1 border-t border-gray-100">
                 {review.floor && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[review.floor]}</span>}
@@ -209,21 +191,21 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
             {review.notes && <p className="text-xs text-gray-500 pt-1 border-t border-gray-100 italic">"{review.notes}"</p>}
           </div>
         ) : (
-          <p className="text-xs text-gray-400 text-center py-1">ยังไม่มีรีวิว</p>
+          <p className="text-xs text-gray-400 text-center py-2">ยังไม่มีรีวิว</p>
         )}
       </div>
 
       {/* Action bar */}
       <div className="flex border-t border-gray-100 bg-white">
         <button onClick={onReview} className="flex-1 py-2 text-xs font-medium text-green-600 hover:bg-green-50 transition-colors">
-          {review ? '✏️ แก้ไขรีวิว' : '+ รีวิว'}
+          {review ? 'แก้ไขรีวิว' : '+ รีวิว'}
         </button>
         <div className="w-px bg-gray-100" />
         <button
           onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?`)) onDelete(); }}
-          className="w-10 flex items-center justify-center text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-sm"
+          className="w-10 flex items-center justify-center text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-xs"
         >
-          🗑️
+          ลบ
         </button>
       </div>
     </div>

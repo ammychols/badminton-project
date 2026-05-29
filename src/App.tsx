@@ -42,7 +42,10 @@ export default function App() {
       </main>
 
       {modal?.type === 'addCourt' && (
-        <AddCourtModal onClose={closeModal} onSave={data => { addCourt(data); closeModal(); }} />
+        <AddCourtModal onClose={closeModal} onSave={data => {
+          const newCourt = addCourt(data);
+          setModal({ type: 'addGroup', courtId: newCourt.id });
+        }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
         <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { addGroup(modal.courtId!, data); closeModal(); }} />
