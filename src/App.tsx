@@ -15,7 +15,9 @@ interface ModalState {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('today');
+  const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('active-tab') as Tab) || 'today');
+
+  const handleSetTab = (t: Tab) => { localStorage.setItem('active-tab', t); setTab(t); };
   const [modal, setModal] = useState<ModalState | null>(null);
 
   const {
@@ -70,13 +72,13 @@ export default function App() {
             icon="🏸"
             label="วันนี้"
             active={tab === 'today'}
-            onClick={() => setTab('today')}
+            onClick={() => handleSetTab('today')}
           />
           <TabButton
             icon="🏟️"
             label="สนาม"
             active={tab === 'courts'}
-            onClick={() => setTab('courts')}
+            onClick={() => handleSetTab('courts')}
           />
         </div>
       </nav>
