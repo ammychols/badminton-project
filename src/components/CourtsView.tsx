@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, LIGHT_LABELS, AIR_LABELS, CROWD_LABELS, SHUTTLE_LABELS } from '../types';
+import { CourtsMap } from './CourtsMap';
 
 interface CourtsViewProps {
   courts: Court[];
@@ -24,6 +25,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
 
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const filteredCourts = selectedDay === 'all'
     ? courts
@@ -34,9 +36,26 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {/* Top bar */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">สนามของฉัน</h2>
-        <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
-          + เพิ่มสนาม
-        </button>
+        <div className="flex items-center gap-2">
+          {/* List / Map toggle */}
+          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              รายการ
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-3 py-1.5 font-medium transition-colors ${viewMode === 'map' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              แผนที่
+            </button>
+          </div>
+          <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+            + เพิ่มสนาม
+          </button>
+        </div>
       </div>
 
       {/* Day filter tabs */}
@@ -56,8 +75,11 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         ))}
       </div>
 
-      {/* Empty states */}
-      {courts.length === 0 ? (
+      {/* Map view */}
+      {viewMode === 'map' && <CourtsMap courts={courts} />}
+
+      {/* List view */}
+      {viewMode === 'list' && (courts.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-base">ยังไม่มีสนาม</p>
           <p className="text-sm mt-1">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
@@ -83,16 +105,6 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     {court.address && (
                       <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
                     )}
-                    {court.address && (
-                      <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.address || court.name)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-500 hover:underline mt-1 inline-block"
-                      >
-                        เปิด Google Maps ↗
-                      </a>
-                    )}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
@@ -110,10 +122,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   </div>
                 </div>
 
-                {/* Body: groups + map */}
-                <div className="border-t border-gray-100 flex">
-                  {/* Groups */}
-                  <div className="flex-1 px-4 py-3 min-w-0">
+                {/* Groups */}
+                <div className="border-t border-gray-100 px-4 py-3">
+                  <div className="flex-1 min-w-0">
                     {court.groups.length === 0 ? (
                       <p className="text-xs text-gray-400 text-center py-3">
                         ยังไม่มีก๊วน — กด "+ เพิ่มก๊วน" ด้านบน
@@ -133,25 +144,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                       </div>
                     )}
                   </div>
-
-                  {/* Map — desktop only */}
-                  <div className="hidden md:block w-64 flex-shrink-0 border-l border-gray-100">
-                    <iframe
-                      title={court.name}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0, minHeight: '200px' }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(court.address || court.name)}&output=embed&z=15`}
-                    />
-                  </div>
                 </div>
               </div>
             );
           })}
         </div>
-      )}
+      ))}
     </div>
   );
 }
