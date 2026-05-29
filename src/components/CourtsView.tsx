@@ -110,26 +110,42 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   </div>
                 </div>
 
-                {/* Groups grid */}
-                <div className="border-t border-gray-100 px-4 py-3">
-                  {court.groups.length === 0 ? (
-                    <p className="text-xs text-gray-400 text-center py-3">
-                      ยังไม่มีก๊วน — กด "+ เพิ่มก๊วน" ด้านบน
-                    </p>
-                  ) : visibleGroups.length === 0 ? (
-                    <p className="text-xs text-gray-400 text-center py-3">ไม่มีก๊วนในวันนี้</p>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {visibleGroups.map(group => (
-                        <GroupCard
-                          key={group.id}
-                          group={group}
-                          onDelete={() => onDeleteGroup(court.id, group.id)}
-                          onReview={() => onAddReview(court.id, group.id)}
-                        />
-                      ))}
-                    </div>
-                  )}
+                {/* Body: groups + map */}
+                <div className="border-t border-gray-100 flex">
+                  {/* Groups */}
+                  <div className="flex-1 px-4 py-3 min-w-0">
+                    {court.groups.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-3">
+                        ยังไม่มีก๊วน — กด "+ เพิ่มก๊วน" ด้านบน
+                      </p>
+                    ) : visibleGroups.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-3">ไม่มีก๊วนในวันนี้</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {visibleGroups.map(group => (
+                          <GroupCard
+                            key={group.id}
+                            group={group}
+                            onDelete={() => onDeleteGroup(court.id, group.id)}
+                            onReview={() => onAddReview(court.id, group.id)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Map — desktop only */}
+                  <div className="hidden md:block w-64 flex-shrink-0 border-l border-gray-100">
+                    <iframe
+                      title={court.name}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0, minHeight: '200px' }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(court.address || court.name)}&output=embed&z=15`}
+                    />
+                  </div>
                 </div>
               </div>
             );
