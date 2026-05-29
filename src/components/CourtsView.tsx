@@ -35,6 +35,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
 
   const filteredCourts = selectedDay === 'all'
     ? courts
@@ -123,7 +124,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                       + เพิ่มก๊วน
                     </button>
                     <button
-                      onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
+                      onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
                       className="text-xs text-red-400 hover:text-red-600 transition-colors px-1"
                     >
                       ลบ
@@ -159,6 +160,22 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           })}
         </div>
       ))}
+      {confirmDeleteCourt && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteCourt(null)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+            <p className="text-base font-semibold text-gray-800 mb-1">ลบสนาม</p>
+            <p className="text-sm text-gray-400 mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmDeleteCourt(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+                ยกเลิก
+              </button>
+              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+                ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -167,8 +184,28 @@ function Stars({ val }: { val: number }) {
   return <span className="text-yellow-400 tracking-tight">{'★'.repeat(val)}{'☆'.repeat(5 - val)}</span>;
 }
 
+function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={onCancel}>
+      <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+        <p className="text-base font-semibold text-gray-800 mb-1">ลบก๊วน</p>
+        <p className="text-sm text-gray-400 mb-5">"{name}"</p>
+        <div className="flex gap-2">
+          <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            ยกเลิก
+          </button>
+          <button onClick={onConfirm} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+            ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () => void; onReview: () => void }) {
   const review = group.reviews[0];
+  const [confirming, setConfirming] = useState(false);
 
   return (
     <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
@@ -186,9 +223,8 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
           <p className="text-xs text-green-600 mt-1">{group.startTime} – {group.endTime} น.</p>
         </div>
         <button
-          onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?\nการลบไม่สามารถกู้คืนได้`)) onDelete(); }}
+          onClick={() => setConfirming(true)}
           className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-base"
-          title="ลบก๊วน"
         >
           ×
         </button>
@@ -232,6 +268,9 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
             แก้ไขรีวิว
           </button>
         </div>
+      )}
+      {confirming && (
+        <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
       )}
     </div>
   );
