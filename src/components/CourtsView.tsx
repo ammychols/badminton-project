@@ -165,17 +165,18 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
     <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
       <div className="px-3 pt-3 pb-2 flex-1">
         {/* Name + time */}
-        <p className="font-medium text-sm text-gray-800">{group.name}</p>
-        <p className="text-xs text-green-600 mt-1 mb-2">{group.startTime} – {group.endTime} น.</p>
-
-        {/* Day pills — active days only */}
-        <div className="flex gap-1 flex-wrap mb-3">
-          {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
-            <span key={day} className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
-              {DAY_LABELS[day]}
-            </span>
-          ))}
+        {/* Name + day pills on same row */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <p className="font-medium text-sm text-gray-800">{group.name}</p>
+          <div className="flex gap-1 flex-wrap justify-end flex-shrink-0">
+            {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
+              <span key={day} className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
+                {DAY_LABELS[day]}
+              </span>
+            ))}
+          </div>
         </div>
+        <p className="text-xs text-green-600 mb-3">{group.startTime} – {group.endTime} น.</p>
 
         {/* Review section */}
         {review ? (
