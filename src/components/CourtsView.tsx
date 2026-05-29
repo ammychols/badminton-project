@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, LIGHT_LABELS, AIR_LABELS, CROWD_LABELS, SHUTTLE_LABELS } from '../types';
+import { Court, Group, DAY_LABELS, DayOfWeek } from '../types';
 import { CourtsMap } from './CourtsMap';
 
 interface CourtsViewProps {
@@ -202,16 +202,6 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
                 </div>
               ))}
             </div>
-            {(review.floor || review.light || review.air || review.crowd || review.shuttle || review.shuttleBrand) && (
-              <div className="flex flex-wrap gap-1 pt-1 border-t border-gray-100">
-                {review.floor && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[review.floor]}</span>}
-                {review.light && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{LIGHT_LABELS[review.light]}</span>}
-                {review.air && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[review.air]}</span>}
-                {review.crowd && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{CROWD_LABELS[review.crowd]}</span>}
-                {review.shuttle && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{SHUTTLE_LABELS[review.shuttle]}</span>}
-                {review.shuttleBrand && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{review.shuttleBrand}</span>}
-              </div>
-            )}
             {review.notes && <p className="text-xs text-gray-500 pt-1 border-t border-gray-100 italic">"{review.notes}"</p>}
           </div>
         ) : (
