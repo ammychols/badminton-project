@@ -9,9 +9,10 @@ interface CourtsViewProps {
   onAddGroup: (courtId: string) => void;
   onDeleteCourt: (courtId: string) => void;
   onDeleteGroup: (courtId: string, groupId: string) => void;
+  onAddReview: (courtId: string, groupId: string) => void;
 }
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup }: CourtsViewProps) {
+export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
   const [expandedCourt, setExpandedCourt] = useState<string | null>(null);
 
   return (
@@ -60,6 +61,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                           key={group.id}
                           group={group}
                           onDelete={() => onDeleteGroup(court.id, group.id)}
+                          onReview={() => onAddReview(court.id, group.id)}
                         />
                       ))}
                       <div className="flex gap-2 mt-3">
@@ -102,7 +104,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   );
 }
 
-function GroupCard({ group, onDelete }: { group: Group; onDelete: () => void }) {
+function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () => void; onReview: () => void }) {
   const avg = getAverageScore(group.reviews);
 
   return (
@@ -132,8 +134,14 @@ function GroupCard({ group, onDelete }: { group: Group; onDelete: () => void }) 
           <StarRating value={Math.round(avg)} readonly size="sm" />
           <p className="text-xs text-gray-400">{group.reviews.length} รีวิว</p>
           <button
+            onClick={onReview}
+            className="text-xs text-green-500 mt-1 hover:text-green-700 block"
+          >
+            + รีวิว
+          </button>
+          <button
             onClick={onDelete}
-            className="text-xs text-red-400 mt-1 hover:text-red-600"
+            className="text-xs text-red-400 mt-1 hover:text-red-600 block"
           >
             ลบ
           </button>

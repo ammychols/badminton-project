@@ -58,6 +58,7 @@ export default function App() {
             onAddGroup={courtId => setModal({ type: 'addGroup', courtId })}
             onDeleteCourt={deleteCourt}
             onDeleteGroup={deleteGroup}
+            onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
           />
         )}
       </main>
