@@ -166,7 +166,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
       <div className="px-3 pt-3 pb-2 flex-1">
         {/* Name + time */}
         <p className="font-medium text-sm text-gray-800">{group.name}</p>
-        <p className="text-xs text-gray-400 mt-1 mb-2">{group.startTime} – {group.endTime} น.</p>
+        <p className="text-xs text-green-600 mt-1 mb-2">{group.startTime} – {group.endTime} น.</p>
 
         {/* Day pills */}
         <div className="flex gap-1 flex-wrap mb-3">
