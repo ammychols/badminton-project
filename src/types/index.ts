@@ -30,13 +30,30 @@ export const DAY_FULL_LABELS: Record<DayOfWeek, string> = {
   MON: 'จันทร์', TUE: 'อังคาร', WED: 'พุธ', THU: 'พฤหัส', FRI: 'ศุกร์', SAT: 'เสาร์', SUN: 'อาทิตย์',
 };
 
+export type FloorType = 'concrete' | 'wood' | 'rubber';
+export type LightLevel = 'bright' | 'medium' | 'dim';
+export type AirType = 'aircon' | 'fan' | 'stuffy';
+export type CrowdLevel = 'no-wait' | 'some-wait' | 'long-wait';
+export type ShuttleType = 'free' | 'for-sale' | 'bring-own';
+
+export const FLOOR_LABELS: Record<FloorType, string> = { concrete: 'พื้นปูน', wood: 'พื้นไม้', rubber: 'พื้นยาง' };
+export const LIGHT_LABELS: Record<LightLevel, string> = { bright: 'สว่าง', medium: 'ปานกลาง', dim: 'มืด' };
+export const AIR_LABELS: Record<AirType, string> = { aircon: 'มีแอร์', fan: 'พัดลม', stuffy: 'ถ่ายเทน้อย' };
+export const CROWD_LABELS: Record<CrowdLevel, string> = { 'no-wait': 'ไม่ต้องรอ', 'some-wait': 'รอบ้าง', 'long-wait': 'รอนาน' };
+export const SHUTTLE_LABELS: Record<ShuttleType, string> = { free: 'มีแจก', 'for-sale': 'มีขาย', 'bring-own': 'ต้องพกเอง' };
+
 export interface Review {
   id: string;
   groupId: string;
-  date: string; // ISO date
-  fun: number;          // 1-5 ดาว ความสนุก
-  arrangement: number;  // 1-5 ดาว การจัดมือ
-  travel: number;       // 1-5 ดาว การเดินทาง
+  date: string;
+  fun: number;
+  arrangement: number;
+  travel: number;
+  floor?: FloorType;
+  light?: LightLevel;
+  air?: AirType;
+  crowd?: CrowdLevel;
+  shuttle?: ShuttleType;
   notes?: string;
 }
 
