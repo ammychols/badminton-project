@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Court, Group, DAY_LABELS, DayOfWeek } from '../types';
-import { getAverageScore } from '../utils';
-import { StarRating } from './StarRating';
+import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, LIGHT_LABELS, AIR_LABELS, CROWD_LABELS, SHUTTLE_LABELS } from '../types';
 
 interface CourtsViewProps {
   courts: Court[];
@@ -105,7 +103,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
 }
 
 function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () => void; onReview: () => void }) {
-  const avg = getAverageScore(group.reviews);
+  const last = group.reviews[group.reviews.length - 1];
+  const starBadges = group.reviews.length > 0 ? [
+    { label: '🎉', val: Math.round(group.reviews.reduce((s, r) => s + r.fun, 0) / group.reviews.length) },
+    { label: '🤝', val: Math.round(group.reviews.reduce((s, r) => s + r.arrangement, 0) / group.reviews.length) },
+    { label: '🚗', val: Math.round(group.reviews.reduce((s, r) => s + r.travel, 0) / group.reviews.length) },
+  ] : [];
 
   return (
     <div className="mt-3 bg-gray-50 rounded-xl p-3">
@@ -129,20 +132,22 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
               </span>
             ))}
           </div>
+          {starBadges.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {starBadges.map(({ label, val }) => (
+                <span key={label} className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                  {label} {'★'.repeat(val)}{'☆'.repeat(5 - val)}
+                </span>
+              ))}
+              {last?.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[last.floor]}</span>}
+              {last?.air && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[last.air]}</span>}
+            </div>
+          )}
         </div>
         <div className="text-right">
-          <StarRating value={Math.round(avg)} readonly size="sm" />
           <p className="text-xs text-gray-400">{group.reviews.length} รีวิว</p>
-          <button
-            onClick={onReview}
-            className="text-xs text-green-500 mt-1 hover:text-green-700 block"
-          >
-            + รีวิว
-          </button>
-          <button
-            onClick={onDelete}
-            className="text-xs text-red-400 mt-1 hover:text-red-600 block"
-          >
+          <button onClick={onReview} className="text-xs text-green-500 mt-1 hover:text-green-700 block">+ รีวิว</button>
+          <button onClick={onDelete} className="text-xs text-red-400 mt-1 hover:text-red-600 block">
             ลบ
           </button>
         </div>

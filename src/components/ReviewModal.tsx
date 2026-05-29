@@ -31,7 +31,6 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
   if (!group) return null;
 
   const canSave = fun > 0 && arrangement > 0 && travel > 0;
-  const avgScore = canSave ? ((fun + arrangement + travel) / 3).toFixed(1) : '-';
 
   const handleSave = () => {
     if (!canSave) return;
@@ -110,13 +109,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
         </div>
 
         {/* Footer */}
-        <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex-shrink-0 flex items-center gap-3">
-          {canSave && (
-            <div className="bg-green-50 rounded-xl px-4 py-2 text-center flex-shrink-0">
-              <p className="text-xs text-gray-400">คะแนน</p>
-              <p className="text-xl font-bold text-green-600">{avgScore}</p>
-            </div>
-          )}
+        <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex-shrink-0">
           <button
             onClick={handleSave}
             disabled={!canSave}
