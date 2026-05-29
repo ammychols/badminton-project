@@ -113,7 +113,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
           <button
             onClick={handleSave}
             disabled={!canSave}
-            className="flex-1 bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
+            className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
           >
             บันทึกรีวิว
           </button>
