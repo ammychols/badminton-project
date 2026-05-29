@@ -10,7 +10,7 @@ interface AddGroupModalProps {
     days: DayOfWeek[];
     startTime: string;
     endTime: string;
-    level?: GroupLevel;
+    levels?: GroupLevel[];
     notes?: string;
   }) => void;
 }
@@ -22,7 +22,9 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
   const [days, setDays] = useState<DayOfWeek[]>(defaultDay ? [defaultDay] : []);
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('12:00');
-  const [level, setLevel] = useState<GroupLevel | undefined>();
+  const [levels, setLevels] = useState<GroupLevel[]>([]);
+  const toggleLevel = (lv: GroupLevel) =>
+    setLevels(prev => prev.includes(lv) ? prev.filter(l => l !== lv) : [...prev, lv]);
   const [notes, setNotes] = useState('');
 
   const toggleDay = (day: DayOfWeek) => {
@@ -33,7 +35,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
 
   const handleSave = () => {
     if (!name.trim() || days.length === 0) return;
-    onSave({ name: name.trim(), days, startTime, endTime, level, notes: notes.trim() || undefined });
+    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, notes: notes.trim() || undefined });
     onClose();
   };
 
@@ -83,9 +85,9 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
               <button
                 key={lv}
                 type="button"
-                onClick={() => setLevel(level === lv ? undefined : lv)}
+                onClick={() => toggleLevel(lv)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  level === lv ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  levels.includes(lv) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {lv}

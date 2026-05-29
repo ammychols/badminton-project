@@ -19,7 +19,7 @@ export interface Group {
   days: DayOfWeek[];
   startTime: string;
   endTime: string;
-  level?: GroupLevel;
+  levels?: GroupLevel[];
   notes?: string;
   reviews: Review[];
 }
