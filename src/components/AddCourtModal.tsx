@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AddCourtModalProps {
   onClose: () => void;
   onSave: (data: { name: string; address: string; lat?: number; lng?: number; placeId?: string }) => void;
+}
+
+function isMapsReady() {
+  return typeof window !== 'undefined' && !!(window as any).google?.maps?.places;
 }
 
 export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
@@ -12,11 +16,22 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<google.maps.places.AutocompletePrediction[]>([]);
   const [selected, setSelected] = useState<{ placeId: string; description: string } | null>(null);
-  const mapsAvailable = typeof window !== 'undefined' && !!(window as any).google?.maps?.places;
+  const [mapsAvailable, setMapsAvailable] = useState(isMapsReady());
+
+  // Poll until Google Maps JS API is loaded
+  useEffect(() => {
+    if (mapsAvailable) return;
+    const interval = setInterval(() => {
+      if (isMapsReady()) {
+        setMapsAvailable(true);
+        clearInterval(interval);
+      }
+    }, 300);
+    return () => clearInterval(interval);
+  }, [mapsAvailable]);
 
   const searchPlaces = async () => {
-    if (!searchQuery.trim()) return;
-    if (!mapsAvailable) return;
+    if (!searchQuery.trim() || !isMapsReady()) return;
     setSearching(true);
 
     const service = new window.google.maps.places.AutocompleteService();
@@ -26,6 +41,8 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
         setSearching(false);
         if (status === 'OK' && predictions) {
           setResults(predictions);
+        } else {
+          setResults([]);
         }
       }
     );
@@ -37,11 +54,6 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
     setAddress(prediction.description);
     setResults([]);
     setSearchQuery('');
-  };
-
-  const handleManualAdd = () => {
-    // กรณีไม่ใช้ Google Maps
-    setSelected(null);
   };
 
   const handleSave = () => {
@@ -67,7 +79,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">ค้นหาจาก Google Maps</label>
           {!mapsAvailable && (
             <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-2">
-              ยังไม่ได้ตั้งค่า Google Maps API Key — กรอกชื่อสนามด้านล่างแทนได้เลย
+              กำลังโหลด Google Maps... หรือกรอกชื่อสนามด้านล่างแทนได้เลย
             </p>
           )}
           <div className="flex gap-2">
@@ -77,8 +89,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
               onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && searchPlaces()}
               placeholder="ค้นหาชื่อสนาม..."
-              disabled={!mapsAvailable}
-              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-40 disabled:bg-gray-50"
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
             />
             <button
               onClick={searchPlaces}
