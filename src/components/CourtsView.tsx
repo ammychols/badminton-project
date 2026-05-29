@@ -70,7 +70,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                           + เพิ่มก๊วน
                         </button>
                         <button
-                          onClick={() => onDeleteCourt(court.id)}
+                          onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
                           className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-xl hover:bg-red-100 transition-colors"
                         >
                           ลบสนาม
@@ -128,7 +128,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         <div className="text-right flex-shrink-0 ml-2">
           <p className="text-xs text-gray-400">{group.reviews.length} รีวิว</p>
           <button onClick={onReview} className="text-xs text-green-500 mt-1 hover:text-green-700 block">+ รีวิว</button>
-          <button onClick={onDelete} className="text-xs text-red-400 mt-1 hover:text-red-600 block">ลบ</button>
+          <button onClick={() => { if (confirm(`ลบก๊วน "${group.name}" ?`)) onDelete(); }} className="text-xs text-red-400 mt-1 hover:text-red-600 block">ลบ</button>
         </div>
       </div>
 
