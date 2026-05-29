@@ -154,6 +154,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
         >
           บันทึกสนาม
         </button>
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { DayOfWeek, DAY_LABELS, GroupLevel, ALL_LEVELS } from '../types';
 interface AddGroupModalProps {
   courtName: string;
   defaultDay?: DayOfWeek;
+  initialValues?: { name: string; days: DayOfWeek[]; startTime: string; endTime: string; levels?: GroupLevel[]; notes?: string };
   onClose: () => void;
   onSave: (data: {
     name: string;
@@ -17,15 +18,15 @@ interface AddGroupModalProps {
 
 const ALL_DAYS: DayOfWeek[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGroupModalProps) {
-  const [name, setName] = useState('');
-  const [days, setDays] = useState<DayOfWeek[]>(defaultDay ? [defaultDay] : []);
-  const [startTime, setStartTime] = useState('08:00');
-  const [endTime, setEndTime] = useState('12:00');
-  const [levels, setLevels] = useState<GroupLevel[]>([]);
+export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, onSave }: AddGroupModalProps) {
+  const [name, setName] = useState(initialValues?.name ?? '');
+  const [days, setDays] = useState<DayOfWeek[]>(initialValues?.days ?? (defaultDay ? [defaultDay] : []));
+  const [startTime, setStartTime] = useState(initialValues?.startTime ?? '08:00');
+  const [endTime, setEndTime] = useState(initialValues?.endTime ?? '12:00');
+  const [levels, setLevels] = useState<GroupLevel[]>(initialValues?.levels ?? []);
   const toggleLevel = (lv: GroupLevel) =>
     setLevels(prev => prev.includes(lv) ? prev.filter(l => l !== lv) : [...prev, lv]);
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState(initialValues?.notes ?? '');
 
   const toggleDay = (day: DayOfWeek) => {
     setDays(prev =>
@@ -43,7 +44,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
       <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-bold text-gray-800">เพิ่มก๊วน</h3>
+          <h3 className="text-lg font-bold text-gray-800">{initialValues ? 'แก้ไขก๊วน' : 'เพิ่มก๊วน'}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
         <p className="text-xs text-gray-400 mb-4">{courtName}</p>
@@ -123,7 +124,7 @@ export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGro
           disabled={!name.trim() || days.length === 0}
           className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
         >
-          บันทึกก๊วน
+          {initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
         </button>
       </div>
     </div>

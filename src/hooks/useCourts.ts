@@ -49,6 +49,14 @@ export function useCourts() {
     return newGroup;
   };
 
+  const updateGroup = (courtId: string, groupId: string, data: Partial<import('../types').Group>) => {
+    setCourts(prev => prev.map(c =>
+      c.id === courtId
+        ? { ...c, groups: c.groups.map(g => g.id === groupId ? { ...g, ...data } : g) }
+        : c
+    ));
+  };
+
   const deleteGroup = (courtId: string, groupId: string) => {
     setCourts(prev => prev.map(c =>
       c.id === courtId
@@ -79,5 +87,5 @@ export function useCourts() {
     ));
   };
 
-  return { courts, addCourt, updateCourt, deleteCourt, addGroup, deleteGroup, addReview };
+  return { courts, addCourt, updateCourt, deleteCourt, addGroup, updateGroup, deleteGroup, addReview };
 }

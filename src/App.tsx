@@ -8,7 +8,7 @@ import { ReviewModal } from './components/ReviewModal';
 import { DayOfWeek } from './types';
 
 interface ModalState {
-  type: 'addCourt' | 'addGroup' | 'review';
+  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review';
   courtId?: string;
   groupId?: string;
   defaultDay?: DayOfWeek;
@@ -16,10 +16,11 @@ interface ModalState {
 
 export default function App() {
   const [modal, setModal] = useState<ModalState | null>(null);
-  const { courts, addCourt, deleteCourt, addGroup, deleteGroup, addReview } = useCourts();
+  const { courts, addCourt, deleteCourt, addGroup, updateGroup, deleteGroup, addReview } = useCourts();
 
   const closeModal = () => setModal(null);
   const activeCourt = modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined;
+  const activeGroup = activeCourt && modal?.groupId ? activeCourt.groups.find(g => g.id === modal.groupId) : undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,6 +38,7 @@ export default function App() {
           onAddGroup={(courtId, defaultDay) => setModal({ type: 'addGroup', courtId, defaultDay })}
           onDeleteCourt={deleteCourt}
           onDeleteGroup={deleteGroup}
+          onEditGroup={(courtId, groupId) => setModal({ type: 'editGroup', courtId, groupId })}
           onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
         />
       </main>
@@ -49,6 +51,14 @@ export default function App() {
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
         <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { addGroup(modal.courtId!, data); closeModal(); }} />
+      )}
+      {modal?.type === 'editGroup' && modal.courtId && modal.groupId && activeCourt && activeGroup && (
+        <AddGroupModal
+          courtName={activeCourt.name}
+          initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes }}
+          onClose={closeModal}
+          onSave={data => { updateGroup(modal.courtId!, modal.groupId!, data); closeModal(); }}
+        />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (
         <ReviewModal

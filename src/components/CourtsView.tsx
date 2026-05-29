@@ -8,6 +8,7 @@ interface CourtsViewProps {
   onAddGroup: (courtId: string, defaultDay?: DayOfWeek) => void;
   onDeleteCourt: (courtId: string) => void;
   onDeleteGroup: (courtId: string, groupId: string) => void;
+  onEditGroup: (courtId: string, groupId: string) => void;
   onAddReview: (courtId: string, groupId: string) => void;
 }
 
@@ -32,7 +33,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
@@ -147,6 +148,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                             key={group.id}
                             group={group}
                             onDelete={() => onDeleteGroup(court.id, group.id)}
+                            onEdit={() => onEditGroup(court.id, group.id)}
                             onReview={() => onAddReview(court.id, group.id)}
                           />
                         ))}
@@ -207,7 +209,7 @@ function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm:
   );
 }
 
-function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () => void; onReview: () => void }) {
+function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDelete: () => void; onEdit: () => void; onReview: () => void }) {
   const review = group.reviews[0];
   const [confirming, setConfirming] = useState(false);
 
@@ -231,10 +233,16 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
           </div>
           <span className="text-xs text-green-600">{group.startTime} – {group.endTime} น.</span>
         </div>
-        <button
-          onClick={() => setConfirming(true)}
-          className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-lg leading-none"
-        >×</button>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={onEdit}
+            className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm"
+          >✎</button>
+          <button
+            onClick={() => setConfirming(true)}
+            className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-lg leading-none"
+          >×</button>
+        </div>
       </div>
 
       {/* Review */}
