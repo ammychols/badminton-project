@@ -235,6 +235,4 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
       )}
     </div>
   );
-    </div>
-  );
 }
