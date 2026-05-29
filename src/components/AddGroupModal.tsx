@@ -99,7 +99,7 @@ export function AddGroupModal({ courtName, onClose, onSave }: AddGroupModalProps
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="เช่น ค่าคอร์ต 80 บาท, มีขนแจก"
+            placeholder=""
             rows={2}
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
