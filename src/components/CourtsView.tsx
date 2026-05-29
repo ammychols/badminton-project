@@ -29,7 +29,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800">🏟️ สนามของฉัน</h2>
+        <h2 className="text-xl font-bold text-gray-800">สนามของฉัน</h2>
         <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
           + เพิ่มสนาม
         </button>
@@ -72,9 +72,6 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => setExpandedCourt(expandedCourt === court.id ? null : court.id)}
               >
-                <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0 text-xl">
-                  🏸
-                </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-800 truncate">{court.name}</p>
                   <p className="text-xs text-gray-400 truncate">{court.address}</p>
@@ -161,7 +158,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         <div className="flex items-start justify-between gap-2 mb-2">
           <div>
             <p className="font-medium text-sm text-gray-800">{group.name}</p>
-            <p className="text-xs text-green-600 mt-0.5">🕐 {group.startTime} – {group.endTime} น.</p>
+            <p className="text-xs text-green-600 mt-0.5">{group.startTime} – {group.endTime} น.</p>
           </div>
         </div>
 
@@ -180,12 +177,12 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
             {/* Star rows */}
             <div className="grid grid-cols-3 gap-x-2 gap-y-1">
               {[
-                { icon: '🎉', label: 'ความสนุก', val: review.fun },
-                { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
-                { icon: '🚗', label: 'การเดินทาง', val: review.travel },
-              ].map(({ icon, label, val }) => (
+                { label: 'ความสนุก', val: review.fun },
+                { label: 'การจัดมือ', val: review.arrangement },
+                { label: 'การเดินทาง', val: review.travel },
+              ].map(({ label, val }) => (
                 <div key={label} className="flex flex-col">
-                  <span className="text-xs text-gray-400">{icon} {label}</span>
+                  <span className="text-xs text-gray-400">{label}</span>
                   <Stars val={val} />
                 </div>
               ))}
@@ -197,7 +194,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
                 {review.light && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{LIGHT_LABELS[review.light]}</span>}
                 {review.air && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[review.air]}</span>}
                 {review.crowd && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{CROWD_LABELS[review.crowd]}</span>}
-                {review.shuttle && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">🪶 {SHUTTLE_LABELS[review.shuttle]}</span>}
+                {review.shuttle && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{SHUTTLE_LABELS[review.shuttle]}</span>}
                 {review.shuttleBrand && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{review.shuttleBrand}</span>}
               </div>
             )}

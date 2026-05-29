@@ -59,9 +59,9 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
           {/* Star ratings — compact rows */}
           <div className="flex flex-col gap-2.5">
             {[
-              { label: '🎉 ความสนุก', desc: 'บรรยากาศ คนในก๊วน', val: fun, set: setFun },
-              { label: '🤝 การจัดมือ', desc: 'ระดับพอกัน เล่นได้เต็มที่', val: arrangement, set: setArrangement },
-              { label: '🚗 การเดินทาง', desc: 'ใกล้ สะดวก จอดรถง่าย', val: travel, set: setTravel },
+              { label: 'ความสนุก', desc: 'บรรยากาศ คนในก๊วน', val: fun, set: setFun },
+              { label: 'การจัดมือ', desc: 'ระดับพอกัน เล่นได้เต็มที่', val: arrangement, set: setArrangement },
+              { label: 'การเดินทาง', desc: 'ใกล้ สะดวก จอดรถง่าย', val: travel, set: setTravel },
             ].map(({ label, desc, val, set }) => (
               <div key={label} className="flex items-center justify-between">
                 <div>
@@ -75,12 +75,12 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
 
           {/* Choice chips — 2 per row grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-            <ChoiceRow label="🏟️ พื้น" options={FLOOR_LABELS} value={floor} onChange={v => setFloor(v as FloorType)} />
-            <ChoiceRow label="💡 แสง" options={LIGHT_LABELS} value={light} onChange={v => setLight(v as LightLevel)} />
-            <ChoiceRow label="🌬️ อากาศ" options={AIR_LABELS} value={air} onChange={v => setAir(v as AirType)} />
-            <ChoiceRow label="👥 ความหนาแน่น" options={CROWD_LABELS} value={crowd} onChange={v => setCrowd(v as CrowdLevel)} />
+            <ChoiceRow label="พื้น" options={FLOOR_LABELS} value={floor} onChange={v => setFloor(v as FloorType)} />
+            <ChoiceRow label="แสง" options={LIGHT_LABELS} value={light} onChange={v => setLight(v as LightLevel)} />
+            <ChoiceRow label="อากาศ" options={AIR_LABELS} value={air} onChange={v => setAir(v as AirType)} />
+            <ChoiceRow label="ความหนาแน่น" options={CROWD_LABELS} value={crowd} onChange={v => setCrowd(v as CrowdLevel)} />
             <div className="col-span-2">
-              <p className="text-xs font-medium text-gray-600 mb-1">🪶 ลูกขนไก่ — ความทน</p>
+              <p className="text-xs font-medium text-gray-600 mb-1">ลูกขนไก่ — ความทน</p>
               <div className="flex flex-wrap gap-1 mb-2">
                 {(Object.entries(SHUTTLE_LABELS) as [ShuttleType, string][]).map(([key, text]) => (
                   <button key={key} onClick={() => setShuttle(key)}

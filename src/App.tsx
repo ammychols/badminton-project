@@ -26,7 +26,6 @@ export default function App() {
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2">
-          <span className="text-2xl">🏸</span>
           <h1 className="text-lg font-bold text-green-700">BadmintonTracker</h1>
         </div>
       </header>
