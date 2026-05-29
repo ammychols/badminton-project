@@ -46,30 +46,13 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {/* Top bar */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">สนามของฉัน</h2>
-        <div className="flex items-center gap-2">
-          {/* List / Map toggle */}
-          <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-            >
-              รายการ
-            </button>
-            <button
-              onClick={() => setViewMode('map')}
-              className={`px-3 py-1.5 font-medium transition-colors ${viewMode === 'map' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-            >
-              แผนที่
-            </button>
-          </div>
-          <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
-            + เพิ่มสนาม
-          </button>
-        </div>
+        <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+          + เพิ่มสนาม
+        </button>
       </div>
 
       {/* Day filter tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-5 scrollbar-none">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3 scrollbar-none">
         {DAY_TABS.map(({ key, label }) => (
           <button
             key={key}
@@ -85,8 +68,24 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         ))}
       </div>
 
+      {/* List / Map toggle */}
+      <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm w-fit mb-5">
+        <button
+          onClick={() => setViewMode('list')}
+          className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+        >
+          รายการ
+        </button>
+        <button
+          onClick={() => setViewMode('map')}
+          className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'map' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+        >
+          แผนที่
+        </button>
+      </div>
+
       {/* Map view */}
-      {viewMode === 'map' && <CourtsMap courts={courts} />}
+      {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
 
       {/* List view */}
       {viewMode === 'list' && (courts.length === 0 ? (
