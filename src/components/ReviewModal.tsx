@@ -40,71 +40,73 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center overflow-y-auto">
-      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6 my-auto">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-bold text-gray-800">รีวิวก๊วน</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
-        </div>
-        <p className="text-sm text-gray-500 mb-5">{group.name} · {court.name}</p>
-
-        {/* Star ratings */}
-        <div className="flex flex-col gap-4 mb-5">
-          <RatingRow label="🎉 ความสนุก" description="บรรยากาศ คนในก๊วน" value={fun} onChange={setFun} />
-          <RatingRow label="🤝 การจัดมือ" description="ระดับพอกัน เล่นได้เต็มที่" value={arrangement} onChange={setArrangement} />
-          <RatingRow label="🚗 การเดินทาง" description="ใกล้ สะดวก จอดรถง่าย" value={travel} onChange={setTravel} />
-        </div>
-
-        {/* Choice selections */}
-        <div className="flex flex-col gap-3 mb-5">
-          <ChoiceRow label="🏟️ พื้น" options={FLOOR_LABELS} value={floor} onChange={v => setFloor(v as FloorType)} />
-          <ChoiceRow label="💡 แสง" options={LIGHT_LABELS} value={light} onChange={v => setLight(v as LightLevel)} />
-          <ChoiceRow label="🌬️ อากาศ" options={AIR_LABELS} value={air} onChange={v => setAir(v as AirType)} />
-          <ChoiceRow label="👥 ความหนาแน่น" options={CROWD_LABELS} value={crowd} onChange={v => setCrowd(v as CrowdLevel)} />
-          <ChoiceRow label="🪶 ขนนก" options={SHUTTLE_LABELS} value={shuttle} onChange={v => setShuttle(v as ShuttleType)} />
-        </div>
-
-        {canSave && (
-          <div className="bg-green-50 rounded-xl p-3 text-center mb-4">
-            <p className="text-sm text-gray-500">คะแนนรวม</p>
-            <p className="text-3xl font-bold text-green-600">{avgScore}</p>
-            <p className="text-xs text-gray-400">/ 5.0</p>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-center justify-between mb-0.5">
+            <h3 className="text-lg font-bold text-gray-800">รีวิวก๊วน</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
           </div>
-        )}
+          <p className="text-xs text-gray-400">{group.name} · {court.name}</p>
+        </div>
 
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-gray-700 mb-1">บันทึกเพิ่มเติม</label>
+        {/* Scrollable content */}
+        <div className="overflow-y-auto flex-1 px-5 py-4 flex flex-col gap-4">
+
+          {/* Star ratings — compact rows */}
+          <div className="flex flex-col gap-2.5">
+            {[
+              { label: '🎉 ความสนุก', desc: 'บรรยากาศ คนในก๊วน', val: fun, set: setFun },
+              { label: '🤝 การจัดมือ', desc: 'ระดับพอกัน เล่นได้เต็มที่', val: arrangement, set: setArrangement },
+              { label: '🚗 การเดินทาง', desc: 'ใกล้ สะดวก จอดรถง่าย', val: travel, set: setTravel },
+            ].map(({ label, desc, val, set }) => (
+              <div key={label} className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{label}</p>
+                  <p className="text-xs text-gray-400">{desc}</p>
+                </div>
+                <StarRating value={val} onChange={set} size="sm" />
+              </div>
+            ))}
+          </div>
+
+          {/* Choice chips — 2 per row grid */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <ChoiceRow label="🏟️ พื้น" options={FLOOR_LABELS} value={floor} onChange={v => setFloor(v as FloorType)} />
+            <ChoiceRow label="💡 แสง" options={LIGHT_LABELS} value={light} onChange={v => setLight(v as LightLevel)} />
+            <ChoiceRow label="🌬️ อากาศ" options={AIR_LABELS} value={air} onChange={v => setAir(v as AirType)} />
+            <ChoiceRow label="👥 ความหนาแน่น" options={CROWD_LABELS} value={crowd} onChange={v => setCrowd(v as CrowdLevel)} />
+            <ChoiceRow label="🪶 ขนนก" options={SHUTTLE_LABELS} value={shuttle} onChange={v => setShuttle(v as ShuttleType)} />
+          </div>
+
+          {/* Notes */}
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
-            placeholder="ความรู้สึกวันนี้..."
+            placeholder=""
             rows={2}
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={!canSave}
-          className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
-        >
-          บันทึกรีวิว
-        </button>
+        {/* Footer */}
+        <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex-shrink-0 flex items-center gap-3">
+          {canSave && (
+            <div className="bg-green-50 rounded-xl px-4 py-2 text-center flex-shrink-0">
+              <p className="text-xs text-gray-400">คะแนน</p>
+              <p className="text-xl font-bold text-green-600">{avgScore}</p>
+            </div>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={!canSave}
+            className="flex-1 bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
+          >
+            บันทึกรีวิว
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function RatingRow({ label, description, value, onChange }: {
-  label: string; description: string; value: number; onChange: (v: number) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-800">{label}</p>
-        <p className="text-xs text-gray-400">{description}</p>
-      </div>
-      <StarRating value={value} onChange={onChange} size="md" />
     </div>
   );
 }
@@ -114,16 +116,14 @@ function ChoiceRow<T extends string>({ label, options, value, onChange }: {
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-gray-800 mb-1.5">{label}</p>
-      <div className="flex gap-2 flex-wrap">
+      <p className="text-xs font-medium text-gray-600 mb-1">{label}</p>
+      <div className="flex flex-wrap gap-1">
         {(Object.entries(options) as [T, string][]).map(([key, text]) => (
           <button
             key={key}
             onClick={() => onChange(key)}
-            className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-              value === key
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            className={`px-2.5 py-1 rounded-full text-xs transition-colors ${
+              value === key ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             {text}
