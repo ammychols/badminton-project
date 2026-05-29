@@ -4,7 +4,7 @@ import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, LIGHT_LABELS, AIR_LA
 interface CourtsViewProps {
   courts: Court[];
   onAddCourt: () => void;
-  onAddGroup: (courtId: string) => void;
+  onAddGroup: (courtId: string, defaultDay?: DayOfWeek) => void;
   onDeleteCourt: (courtId: string) => void;
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onAddReview: (courtId: string, groupId: string) => void;
@@ -27,7 +27,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>(TODAY_MAP[new Date().getDay()] ?? 'all');
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="p-4 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">🏟️ สนามของฉัน</h2>
         <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
@@ -106,7 +106,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         />
                       ))}
                       <button
-                        onClick={() => onAddGroup(court.id)}
+                        onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
                         className="w-full mt-1 border border-dashed border-green-300 text-green-600 text-sm py-2 rounded-xl hover:bg-green-50 transition-colors"
                       >
                         + เพิ่มก๊วน

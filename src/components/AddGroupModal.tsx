@@ -3,6 +3,7 @@ import { DayOfWeek, DAY_LABELS } from '../types';
 
 interface AddGroupModalProps {
   courtName: string;
+  defaultDay?: DayOfWeek;
   onClose: () => void;
   onSave: (data: {
     name: string;
@@ -15,9 +16,9 @@ interface AddGroupModalProps {
 
 const ALL_DAYS: DayOfWeek[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-export function AddGroupModal({ courtName, onClose, onSave }: AddGroupModalProps) {
+export function AddGroupModal({ courtName, defaultDay, onClose, onSave }: AddGroupModalProps) {
   const [name, setName] = useState('');
-  const [days, setDays] = useState<DayOfWeek[]>([]);
+  const [days, setDays] = useState<DayOfWeek[]>(defaultDay ? [defaultDay] : []);
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('12:00');
   const [notes, setNotes] = useState('');

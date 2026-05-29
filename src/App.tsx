@@ -5,10 +5,13 @@ import { AddCourtModal } from './components/AddCourtModal';
 import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
 
+import { DayOfWeek } from './types';
+
 interface ModalState {
   type: 'addCourt' | 'addGroup' | 'review';
   courtId?: string;
   groupId?: string;
+  defaultDay?: DayOfWeek;
 }
 
 export default function App() {
@@ -22,7 +25,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-2">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2">
           <span className="text-2xl">🏸</span>
           <h1 className="text-lg font-bold text-green-700">BadmintonTracker</h1>
         </div>
@@ -32,7 +35,7 @@ export default function App() {
         <CourtsView
           courts={courts}
           onAddCourt={() => setModal({ type: 'addCourt' })}
-          onAddGroup={courtId => setModal({ type: 'addGroup', courtId })}
+          onAddGroup={(courtId, defaultDay) => setModal({ type: 'addGroup', courtId, defaultDay })}
           onDeleteCourt={deleteCourt}
           onDeleteGroup={deleteGroup}
           onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
@@ -43,7 +46,7 @@ export default function App() {
         <AddCourtModal onClose={closeModal} onSave={data => { addCourt(data); closeModal(); }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
-        <AddGroupModal courtName={activeCourt.name} onClose={closeModal} onSave={data => { addGroup(modal.courtId!, data); closeModal(); }} />
+        <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { addGroup(modal.courtId!, data); closeModal(); }} />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (
         <ReviewModal
