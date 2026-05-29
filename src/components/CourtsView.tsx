@@ -15,7 +15,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   const [expandedCourt, setExpandedCourt] = useState<string | null>(null);
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
+    <div className="p-4 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">🏟️ สนามของฉัน</h2>
         <button
@@ -51,29 +51,46 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               </div>
 
               {expandedCourt === court.id && (
-                <div className="border-t border-gray-100 px-4 pb-4">
-                  {/* Groups */}
-                  {court.groups.map(group => (
-                    <GroupCard
-                      key={group.id}
-                      group={group}
-                      onDelete={() => onDeleteGroup(court.id, group.id)}
-                    />
-                  ))}
+                <div className="border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row">
+                    {/* Groups */}
+                    <div className="flex-1 px-4 pb-4">
+                      {court.groups.map(group => (
+                        <GroupCard
+                          key={group.id}
+                          group={group}
+                          onDelete={() => onDeleteGroup(court.id, group.id)}
+                        />
+                      ))}
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => onAddGroup(court.id)}
+                          className="flex-1 bg-green-50 text-green-700 text-sm py-2 rounded-xl hover:bg-green-100 transition-colors"
+                        >
+                          + เพิ่มก๊วน
+                        </button>
+                        <button
+                          onClick={() => onDeleteCourt(court.id)}
+                          className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-xl hover:bg-red-100 transition-colors"
+                        >
+                          ลบสนาม
+                        </button>
+                      </div>
+                    </div>
 
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={() => onAddGroup(court.id)}
-                      className="flex-1 bg-green-50 text-green-700 text-sm py-2 rounded-xl hover:bg-green-100 transition-colors"
-                    >
-                      + เพิ่มก๊วน
-                    </button>
-                    <button
-                      onClick={() => onDeleteCourt(court.id)}
-                      className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-xl hover:bg-red-100 transition-colors"
-                    >
-                      ลบสนาม
-                    </button>
+                    {/* Google Map */}
+                    <div className="sm:w-56 sm:min-h-0 h-44 sm:h-auto sm:border-l border-t sm:border-t-0 border-gray-100 flex-shrink-0">
+                      <iframe
+                        title={court.name}
+                        width="100%"
+                        height="100%"
+                        className="rounded-b-2xl sm:rounded-bl-none sm:rounded-r-2xl"
+                        style={{ border: 0, minHeight: '160px' }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(court.address || court.name)}&output=embed&z=15`}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
