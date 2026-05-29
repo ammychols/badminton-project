@@ -44,9 +44,16 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   <p className="text-xs text-gray-400">{court.address}</p>
                   <p className="text-xs text-gray-400 mt-1">{court.groups.length} ก๊วน</p>
                 </div>
-                <span className="text-gray-400 text-xl">
-                  {expandedCourt === court.id ? '▲' : '▼'}
-                </span>
+                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  <button
+                    onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
+                    className="text-red-400 hover:text-red-600 text-lg px-1"
+                    title="ลบสนาม"
+                  >🗑️</button>
+                  <span className="text-gray-400 text-xl">
+                    {expandedCourt === court.id ? '▲' : '▼'}
+                  </span>
+                </div>
               </div>
 
               {expandedCourt === court.id && (
@@ -62,20 +69,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                           onReview={() => onAddReview(court.id, group.id)}
                         />
                       ))}
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={() => onAddGroup(court.id)}
-                          className="flex-1 bg-green-50 text-green-700 text-sm py-2 rounded-xl hover:bg-green-100 transition-colors"
-                        >
-                          + เพิ่มก๊วน
-                        </button>
-                        <button
-                          onClick={() => { if (confirm(`ลบสนาม "${court.name}" และก๊วนทั้งหมด?`)) onDeleteCourt(court.id); }}
-                          className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-xl hover:bg-red-100 transition-colors"
-                        >
-                          ลบสนาม
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => onAddGroup(court.id)}
+                        className="w-full mt-3 bg-green-50 text-green-700 text-sm py-2 rounded-xl hover:bg-green-100 transition-colors"
+                      >
+                        + เพิ่มก๊วน
+                      </button>
                     </div>
 
                     {/* Google Map */}
