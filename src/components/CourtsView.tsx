@@ -58,9 +58,17 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           <p>ยังไม่มีสนาม</p>
           <p className="text-sm mt-1">กดปุ่ม + เพิ่มสนาม เพื่อเริ่มต้น</p>
         </div>
+      ) : courts.filter(court =>
+            selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek))
+          ).length === 0 ? (
+        <div className="text-center py-12 text-gray-400">
+          <p>ไม่มีก๊วนในวันนี้</p>
+        </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {courts.map(court => {
+          {courts.filter(court =>
+            selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek))
+          ).map(court => {
             const visibleGroups = selectedDay === 'all'
               ? court.groups
               : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
