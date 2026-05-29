@@ -6,7 +6,7 @@ interface AddCourtModalProps {
 }
 
 function isMapsReady() {
-  return typeof window !== 'undefined' && !!(window as any).google?.maps?.places;
+  return typeof window !== 'undefined' && !!(window as any).google?.maps?.places?.AutocompleteService;
 }
 
 export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
@@ -19,6 +19,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const [lng, setLng] = useState<number | undefined>();
   const [mapsAvailable, setMapsAvailable] = useState(isMapsReady());
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const serviceRef = useRef<any>(null);
 
   // Poll until Google Maps JS API is loaded
   useEffect(() => {
@@ -32,39 +33,49 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   // Debounced autocomplete on every keystroke
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!searchQuery.trim() || !isMapsReady()) { setResults([]); return; }
+    if (!searchQuery.trim() || !mapsAvailable) { setResults([]); return; }
 
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const { AutocompleteSuggestion } = await (window as any).google.maps.importLibrary('places') as any;
-        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
-          input: searchQuery,
-          includedRegionCodes: ['th'],
-        });
-        setResults(suggestions.map((s: any) => s.placePrediction));
-      } catch {
-        setResults([]);
+    debounceRef.current = setTimeout(() => {
+      if (!serviceRef.current) {
+        serviceRef.current = new (window as any).google.maps.places.AutocompleteService();
       }
+      serviceRef.current.getPlacePredictions(
+        { input: searchQuery, componentRestrictions: { country: 'th' } },
+        (predictions: any[], status: string) => {
+          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setResults(predictions);
+          } else {
+            setResults([]);
+          }
+        }
+      );
     }, 300);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [searchQuery, mapsAvailable]);
 
-  const handleSelectPlace = async (prediction: any) => {
-    const mainText = prediction.mainText?.text ?? '';
-    const fullText = prediction.text?.text ?? '';
-    setSelected({ placeId: prediction.placeId, description: fullText });
+  const handleSelectPlace = (prediction: any) => {
+    const mainText = prediction.structured_formatting?.main_text ?? prediction.description;
+    const fullText = prediction.description ?? '';
+    setSelected({ placeId: prediction.place_id, description: fullText });
     setName(mainText);
     setAddress(fullText);
     setResults([]);
     setSearchQuery('');
 
+    // Fetch lat/lng using PlacesService
     try {
-      const { Place } = await (window as any).google.maps.importLibrary('places') as any;
-      const place = new Place({ id: prediction.placeId });
-      await place.fetchFields({ fields: ['location'] });
-      const loc = place.location;
-      if (loc) { setLat(loc.lat()); setLng(loc.lng()); }
+      const mapDiv = document.createElement('div');
+      const placesService = new (window as any).google.maps.places.PlacesService(mapDiv);
+      placesService.getDetails(
+        { placeId: prediction.place_id, fields: ['geometry'] },
+        (place: any, status: string) => {
+          if (status === (window as any).google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
+            setLat(place.geometry.location.lat());
+            setLng(place.geometry.location.lng());
+          }
+        }
+      );
     } catch {}
   };
 
@@ -108,14 +119,14 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
             <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden shadow-lg">
               {results.map(r => (
                 <button
-                  key={r.placeId}
+                  key={r.place_id}
                   onClick={() => handleSelectPlace(r)}
                   className="w-full text-left px-3 py-2.5 text-sm hover:bg-green-50 border-b border-gray-100 last:border-0 flex items-start gap-2"
                 >
                   <span className="text-green-500 mt-0.5 flex-shrink-0">📍</span>
                   <div>
-                    <p className="font-medium text-gray-800">{r.mainText?.text ?? ''}</p>
-                    <p className="text-xs text-gray-400">{r.secondaryText?.text ?? ''}</p>
+                    <p className="font-medium text-gray-800">{r.structured_formatting?.main_text ?? r.description}</p>
+                    <p className="text-xs text-gray-400">{r.structured_formatting?.secondary_text ?? ''}</p>
                   </div>
                 </button>
               ))}
