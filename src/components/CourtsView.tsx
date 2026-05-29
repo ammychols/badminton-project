@@ -112,46 +112,42 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
 
   return (
     <div className="mt-3 bg-gray-50 rounded-xl p-3">
+      {/* Top row: name/time/days + actions */}
       <div className="flex justify-between items-start">
         <div>
           <p className="font-medium text-sm text-gray-800">{group.name}</p>
-          <p className="text-xs text-green-600">
-            {group.startTime} – {group.endTime} น.
-          </p>
+          <p className="text-xs text-green-600">{group.startTime} – {group.endTime} น.</p>
           <div className="flex gap-1 mt-1 flex-wrap">
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).map(day => (
-              <span
-                key={day}
-                className={`text-xs px-2 py-0.5 rounded-full ${
-                  group.days.includes(day)
-                    ? 'bg-green-200 text-green-800'
-                    : 'bg-gray-200 text-gray-400'
-                }`}
-              >
-                {DAY_LABELS[day]}
-              </span>
+              <span key={day} className={`text-xs px-2 py-0.5 rounded-full ${
+                group.days.includes(day) ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-400'
+              }`}>{DAY_LABELS[day]}</span>
             ))}
           </div>
-          {starBadges.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {starBadges.map(({ label, val }) => (
-                <span key={label} className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                  {label} {'★'.repeat(val)}{'☆'.repeat(5 - val)}
-                </span>
-              ))}
-              {last?.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[last.floor]}</span>}
-              {last?.air && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[last.air]}</span>}
-            </div>
-          )}
         </div>
-        <div className="text-right">
+        <div className="text-right flex-shrink-0 ml-2">
           <p className="text-xs text-gray-400">{group.reviews.length} รีวิว</p>
           <button onClick={onReview} className="text-xs text-green-500 mt-1 hover:text-green-700 block">+ รีวิว</button>
-          <button onClick={onDelete} className="text-xs text-red-400 mt-1 hover:text-red-600 block">
-            ลบ
-          </button>
+          <button onClick={onDelete} className="text-xs text-red-400 mt-1 hover:text-red-600 block">ลบ</button>
         </div>
       </div>
+
+      {/* Badges full width */}
+      {starBadges.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {starBadges.map(({ label, val }) => (
+            <span key={label} className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
+              {label} {'★'.repeat(val)}{'☆'.repeat(5 - val)}
+            </span>
+          ))}
+          {last?.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[last.floor]}</span>}
+          {last?.light && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{LIGHT_LABELS[last.light]}</span>}
+          {last?.air && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[last.air]}</span>}
+          {last?.crowd && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{CROWD_LABELS[last.crowd]}</span>}
+          {last?.shuttle && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{SHUTTLE_LABELS[last.shuttle]}</span>}
+          {last?.shuttleBrand && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{last.shuttleBrand}</span>}
+        </div>
+      )}
     </div>
   );
 }
