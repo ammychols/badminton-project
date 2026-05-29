@@ -4,7 +4,7 @@ export interface Court {
   address: string;
   lat?: number;
   lng?: number;
-  placeId?: string; // Google Maps place_id
+  placeId?: string;
   groups: Group[];
   createdAt: string;
 }
@@ -13,9 +13,9 @@ export interface Group {
   id: string;
   courtId: string;
   name: string;
-  days: DayOfWeek[]; // วันที่เปิด
-  startTime: string; // "08:00"
-  endTime: string;   // "12:00"
+  days: DayOfWeek[];
+  startTime: string;
+  endTime: string;
   notes?: string;
   reviews: Review[];
 }
@@ -34,13 +34,13 @@ export type FloorType = 'concrete' | 'wood' | 'rubber';
 export type LightLevel = 'bright' | 'medium' | 'dim';
 export type AirType = 'aircon' | 'fan' | 'stuffy';
 export type CrowdLevel = 'no-wait' | 'some-wait' | 'long-wait';
-export type ShuttleType = 'free' | 'for-sale' | 'bring-own';
+export type ShuttleType = 'durable' | 'medium' | 'fragile';
 
 export const FLOOR_LABELS: Record<FloorType, string> = { concrete: 'พื้นปูน', wood: 'พื้นไม้', rubber: 'พื้นยาง' };
 export const LIGHT_LABELS: Record<LightLevel, string> = { bright: 'สว่าง', medium: 'ปานกลาง', dim: 'มืด' };
 export const AIR_LABELS: Record<AirType, string> = { aircon: 'มีแอร์', fan: 'พัดลม', stuffy: 'ถ่ายเทน้อย' };
 export const CROWD_LABELS: Record<CrowdLevel, string> = { 'no-wait': 'ไม่ต้องรอ', 'some-wait': 'รอบ้าง', 'long-wait': 'รอนาน' };
-export const SHUTTLE_LABELS: Record<ShuttleType, string> = { free: 'มีแจก', 'for-sale': 'มีขาย', 'bring-own': 'ต้องพกเอง' };
+export const SHUTTLE_LABELS: Record<ShuttleType, string> = { durable: 'พังยาก', medium: 'ปานกลาง', fragile: 'พังง่าย' };
 
 export interface Review {
   id: string;
@@ -54,6 +54,7 @@ export interface Review {
   air?: AirType;
   crowd?: CrowdLevel;
   shuttle?: ShuttleType;
+  shuttleBrand?: string;
   notes?: string;
 }
 

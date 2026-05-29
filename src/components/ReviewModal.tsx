@@ -10,7 +10,7 @@ interface ReviewModalProps {
   onSave: (data: {
     fun: number; arrangement: number; travel: number;
     floor?: FloorType; light?: LightLevel; air?: AirType;
-    crowd?: CrowdLevel; shuttle?: ShuttleType;
+    crowd?: CrowdLevel; shuttle?: ShuttleType; shuttleBrand?: string;
     notes?: string; date: string;
   }) => void;
 }
@@ -25,6 +25,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
   const [air, setAir] = useState<AirType | undefined>();
   const [crowd, setCrowd] = useState<CrowdLevel | undefined>();
   const [shuttle, setShuttle] = useState<ShuttleType | undefined>();
+  const [shuttleBrand, setShuttleBrand] = useState('');
   const [notes, setNotes] = useState('');
 
   if (!group) return null;
@@ -35,6 +36,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
   const handleSave = () => {
     if (!canSave) return;
     onSave({ fun, arrangement, travel, floor, light, air, crowd, shuttle,
+      shuttleBrand: shuttleBrand.trim() || undefined,
       notes: notes.trim() || undefined, date: new Date().toISOString() });
     onClose();
   };
@@ -77,7 +79,24 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
             <ChoiceRow label="💡 แสง" options={LIGHT_LABELS} value={light} onChange={v => setLight(v as LightLevel)} />
             <ChoiceRow label="🌬️ อากาศ" options={AIR_LABELS} value={air} onChange={v => setAir(v as AirType)} />
             <ChoiceRow label="👥 ความหนาแน่น" options={CROWD_LABELS} value={crowd} onChange={v => setCrowd(v as CrowdLevel)} />
-            <ChoiceRow label="🪶 ขนนก" options={SHUTTLE_LABELS} value={shuttle} onChange={v => setShuttle(v as ShuttleType)} />
+            <div className="col-span-2">
+              <p className="text-xs font-medium text-gray-600 mb-1">🪶 ลูกขนไก่ — ความทน</p>
+              <div className="flex flex-wrap gap-1 mb-2">
+                {(Object.entries(SHUTTLE_LABELS) as [ShuttleType, string][]).map(([key, text]) => (
+                  <button key={key} onClick={() => setShuttle(key)}
+                    className={`px-2.5 py-1 rounded-full text-xs transition-colors ${shuttle === key ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                    {text}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={shuttleBrand}
+                onChange={e => setShuttleBrand(e.target.value)}
+                placeholder="ยี่ห้อ / รุ่น เช่น RSL No.1"
+                className="w-full border border-gray-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
+            </div>
           </div>
 
           {/* Notes */}
