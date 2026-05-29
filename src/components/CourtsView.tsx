@@ -220,16 +220,15 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
       </div>
 
       {/* Action bar */}
-      <div className="flex border-t border-gray-100 bg-white">
-        <button onClick={onReview} className="flex-1 py-2 text-xs font-medium text-green-600 hover:bg-green-50 transition-colors">
-          {review ? 'แก้ไขรีวิว' : '+ รีวิว'}
+      <div className="flex items-center justify-between border-t border-gray-100 bg-white px-3 py-2">
+        <button onClick={onReview} className="text-xs font-medium text-green-600 hover:text-green-700 transition-colors">
+          {review ? '✏️ แก้ไขรีวิว' : '+ เพิ่มรีวิว'}
         </button>
-        <div className="w-px bg-gray-100" />
         <button
-          onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?`)) onDelete(); }}
-          className="w-10 flex items-center justify-center text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-xs"
+          onClick={() => { if (confirm(`ลบก๊วน "${group.name}"?\nการลบไม่สามารถกู้คืนได้`)) onDelete(); }}
+          className="text-xs text-gray-300 hover:text-red-400 transition-colors"
         >
-          ลบ
+          ลบก๊วน
         </button>
       </div>
     </div>
