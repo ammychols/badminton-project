@@ -12,6 +12,15 @@ interface CourtsViewProps {
 }
 
 const TODAY_MAP: Record<number, DayOfWeek | 'all'> = { 0: 'SUN', 1: 'MON', 2: 'TUE', 3: 'WED', 4: 'THU', 5: 'FRI', 6: 'SAT' };
+const DAY_COLORS: Record<DayOfWeek, { pill: string; active: string }> = {
+  MON: { pill: 'bg-yellow-100 text-yellow-700',   active: 'bg-yellow-500 text-white' },
+  TUE: { pill: 'bg-pink-100 text-pink-700',        active: 'bg-pink-500 text-white' },
+  WED: { pill: 'bg-green-100 text-green-700',      active: 'bg-green-600 text-white' },
+  THU: { pill: 'bg-orange-100 text-orange-700',    active: 'bg-orange-500 text-white' },
+  FRI: { pill: 'bg-blue-100 text-blue-700',        active: 'bg-blue-500 text-white' },
+  SAT: { pill: 'bg-purple-100 text-purple-700',    active: 'bg-purple-500 text-white' },
+  SUN: { pill: 'bg-red-100 text-red-600',          active: 'bg-red-500 text-white' },
+};
 const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'all', label: 'ทั้งหมด' },
   { key: 'MON', label: 'จ' },
@@ -66,8 +75,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             onClick={() => setSelectedDay(key)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               selectedDay === key
-                ? 'bg-green-600 text-white'
-                : 'bg-white border border-gray-200 text-gray-500 hover:border-green-300 hover:text-green-600'
+                ? (key === 'all' ? 'bg-gray-800 text-white' : DAY_COLORS[key as DayOfWeek].active)
+                : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
             }`}
           >
             {label}
@@ -170,7 +179,7 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
           <p className="font-medium text-sm text-gray-800">{group.name}</p>
           <div className="flex gap-1 flex-wrap justify-end flex-shrink-0">
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
-              <span key={day} className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
+              <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
               </span>
             ))}
