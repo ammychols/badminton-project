@@ -168,12 +168,12 @@ function GroupCard({ group, onDelete, onReview }: { group: Group; onDelete: () =
         <p className="font-medium text-sm text-gray-800">{group.name}</p>
         <p className="text-xs text-green-600 mt-1 mb-2">{group.startTime} – {group.endTime} น.</p>
 
-        {/* Day pills */}
+        {/* Day pills — active days only */}
         <div className="flex gap-1 flex-wrap mb-3">
-          {(Object.keys(DAY_LABELS) as DayOfWeek[]).map(day => (
-            <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              group.days.includes(day) ? 'bg-green-100 text-green-700' : 'text-gray-300'
-            }`}>{DAY_LABELS[day]}</span>
+          {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
+            <span key={day} className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
+              {DAY_LABELS[day]}
+            </span>
           ))}
         </div>
 
