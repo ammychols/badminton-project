@@ -32,14 +32,15 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!searchQuery.trim() || !isMapsReady()) { setResults([]); return; }
 
-    debounceRef.current = setTimeout(async () => {
+    debounceRef.current = setTimeout(() => {
       try {
-        const { AutocompleteSuggestion } = await (window as any).google.maps.importLibrary('places');
-        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
-          input: searchQuery,
-          includedRegionCodes: ['th'],
-        });
-        setResults(suggestions.map((s: any) => s.placePrediction));
+        const service = new window.google.maps.places.AutocompleteService();
+        service.getPlacePredictions(
+          { input: searchQuery, componentRestrictions: { country: 'th' } },
+          (predictions: any, status: any) => {
+            setResults(status === 'OK' && predictions ? predictions : []);
+          }
+        );
       } catch {
         setResults([]);
       }
@@ -49,11 +50,9 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   }, [searchQuery, mapsAvailable]);
 
   const handleSelectPlace = (prediction: any) => {
-    const mainText = prediction.mainText?.text ?? prediction.text?.text ?? '';
-    const fullText = prediction.text?.text ?? '';
-    setSelected({ placeId: prediction.placeId, description: fullText });
-    setName(mainText);
-    setAddress(fullText);
+    setSelected({ placeId: prediction.place_id, description: prediction.description });
+    setName(prediction.structured_formatting.main_text);
+    setAddress(prediction.description);
     setResults([]);
     setSearchQuery('');
   };
@@ -97,14 +96,14 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
             <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden shadow-lg">
               {results.map(r => (
                 <button
-                  key={r.placeId}
+                  key={r.place_id}
                   onClick={() => handleSelectPlace(r)}
                   className="w-full text-left px-3 py-2.5 text-sm hover:bg-green-50 border-b border-gray-100 last:border-0 flex items-start gap-2"
                 >
                   <span className="text-green-500 mt-0.5 flex-shrink-0">📍</span>
                   <div>
-                    <p className="font-medium text-gray-800">{r.mainText?.text ?? r.text?.text}</p>
-                    <p className="text-xs text-gray-400">{r.secondaryText?.text ?? ''}</p>
+                    <p className="font-medium text-gray-800">{r.structured_formatting.main_text}</p>
+                    <p className="text-xs text-gray-400">{r.structured_formatting.secondary_text}</p>
                   </div>
                 </button>
               ))}
