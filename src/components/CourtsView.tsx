@@ -44,11 +44,11 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     : courts.filter(court => court.groups.some(g => g.days.includes(selectedDay as DayOfWeek)));
 
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-2xl mx-auto">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800">สนามของฉัน</h2>
-        <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-2xl font-bold text-gray-900">สนามของฉัน</h2>
+        <button onClick={onAddCourt} className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm">
           + เพิ่มสนาม
         </button>
       </div>
@@ -61,7 +61,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             onClick={() => setSelectedDay(key)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               selectedDay === key
-                ? (key === 'all' ? 'bg-gray-800 text-white' : DAY_COLORS[key as DayOfWeek].active)
+                ? (key === 'all' ? 'bg-gray-900 text-white' : DAY_COLORS[key as DayOfWeek].active)
                 : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
             }`}
           >
@@ -71,135 +71,102 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       </div>
 
       {/* List / Map toggle */}
-      <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm w-fit mb-5">
-        <button
-          onClick={() => setViewMode('list')}
-          className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-        >
-          รายการ
-        </button>
-        <button
-          onClick={() => setViewMode('map')}
-          className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'map' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-        >
-          แผนที่
-        </button>
+      <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm w-fit mb-6 bg-white">
+        <button onClick={() => setViewMode('list')} className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>รายการ</button>
+        <button onClick={() => setViewMode('map')}  className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'map'  ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>แผนที่</button>
       </div>
 
-      {/* Map view */}
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
 
-      {/* List view */}
       {viewMode === 'list' && (courts.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-base">ยังไม่มีสนาม</p>
+        <div className="text-center py-20 text-gray-400">
+          <p className="text-4xl mb-3">🏸</p>
+          <p className="font-medium text-gray-500">ยังไม่มีสนาม</p>
           <p className="text-sm mt-1">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
         </div>
       ) : filteredCourts.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p>ไม่มีก๊วนในวันนี้</p>
-        </div>
+        <div className="text-center py-20 text-gray-400">ไม่มีก๊วนในวันนี้</div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {filteredCourts.map(court => {
             const visibleGroups = selectedDay === 'all'
               ? court.groups
               : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
 
             return (
-              <div key={court.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+              <div key={court.id} className="rounded-2xl overflow-hidden shadow-md border border-gray-100">
 
-                {/* Court header */}
-                <div className="px-4 pt-4 pb-3 bg-gradient-to-r from-green-600 to-emerald-500 rounded-t-2xl">
+                {/* Court header — dark gradient */}
+                <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-5 py-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-extrabold text-white text-xl leading-tight tracking-tight">{court.name}</p>
+                      {/* Initial badge + name */}
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                          <span className="text-white font-bold text-sm">{court.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <p className="font-bold text-white text-lg leading-tight">{court.name}</p>
+                      </div>
                       {court.address && (
-                        <p className="text-xs text-green-100 mt-0.5 truncate">{court.address}</p>
+                        <p className="text-xs text-gray-400 ml-12 truncate">{court.address}</p>
                       )}
-                      {/* Court info chips */}
+                      {/* Info chips */}
                       {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
-                        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                          {court.info.floor && (
-                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>
-                          )}
-                          {court.info.air && (
-                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[court.info.air]}</span>
-                          )}
-                          {court.info.parking && (
-                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[court.info.parking]}</span>
-                          )}
-                          {court.info.notes && (
-                            <span className="text-xs text-green-100">{court.info.notes}</span>
-                          )}
+                        <div className="flex items-center gap-1.5 mt-2.5 ml-12 flex-wrap">
+                          {court.info.floor && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>}
+                          {court.info.air   && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{AIR_LABELS[court.info.air]}</span>}
+                          {court.info.parking && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{PARKING_LABELS[court.info.parking]}</span>}
+                          {court.info.notes && <span className="text-xs text-gray-400">{court.info.notes}</span>}
                         </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => onRateCourt(court.id)}
-                        className="text-xs text-white/60 hover:text-white transition-colors"
-                        title="ข้อมูลสนาม"
-                      >
-                        ✎
-                      </button>
+                      <button onClick={() => onRateCourt(court.id)} className="text-gray-500 hover:text-gray-300 transition-colors text-sm" title="ข้อมูลสนาม">✎</button>
                       <button
                         onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                        className="bg-white text-green-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-green-50 transition-colors"
+                        className="bg-green-500 hover:bg-green-400 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
                       >
                         + ก๊วน
                       </button>
-                      <button
-                        onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
-                        className="text-xs text-white/40 hover:text-white/80 transition-colors"
-                      >
-                        ลบ
-                      </button>
+                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-600 hover:text-red-400 transition-colors text-xs">ลบ</button>
                     </div>
                   </div>
                 </div>
 
                 {/* Groups */}
-                <div className="px-4 py-3 bg-gray-50/50 border-t border-gray-100">
-                  <div className="flex-1 min-w-0">
-                    {court.groups.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center py-3">
-                        ยังไม่มีก๊วน — กด "+ เพิ่มก๊วน" ด้านบน
-                      </p>
-                    ) : visibleGroups.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center py-3">ไม่มีก๊วนในวันนี้</p>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {visibleGroups.map(group => (
-                          <GroupCard
-                            key={group.id}
-                            group={group}
-                            onDelete={() => onDeleteGroup(court.id, group.id)}
-                            onEdit={() => onEditGroup(court.id, group.id)}
-                            onReview={() => onAddReview(court.id, group.id)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                <div className="bg-gray-50 px-4 py-3 flex flex-col gap-2">
+                  {court.groups.length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-3">ยังไม่มีก๊วน</p>
+                  ) : visibleGroups.length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-3">ไม่มีก๊วนในวันนี้</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {visibleGroups.map(group => (
+                        <GroupCard
+                          key={group.id}
+                          group={group}
+                          onDelete={() => onDeleteGroup(court.id, group.id)}
+                          onEdit={() => onEditGroup(court.id, group.id)}
+                          onReview={() => onAddReview(court.id, group.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       ))}
+
       {confirmDeleteCourt && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteCourt(null)}>
           <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
             <p className="text-base font-semibold text-gray-800 mb-1">ลบสนาม</p>
             <p className="text-sm text-gray-400 mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
             <div className="flex gap-2">
-              <button onClick={() => setConfirmDeleteCourt(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-                ยกเลิก
-              </button>
-              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
-                ลบ
-              </button>
+              <button onClick={() => setConfirmDeleteCourt(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
+              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
             </div>
           </div>
         </div>
@@ -224,12 +191,8 @@ function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm:
         <p className="text-base font-semibold text-gray-800 mb-1">ลบก๊วน</p>
         <p className="text-sm text-gray-400 mb-5">"{name}"</p>
         <div className="flex gap-2">
-          <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-            ยกเลิก
-          </button>
-          <button onClick={onConfirm} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
-            ลบ
-          </button>
+          <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
+          <button onClick={onConfirm} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
         </div>
       </div>
     </div>
@@ -241,67 +204,51 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-50 px-3 pt-3 pb-2.5 flex items-start justify-between gap-2 border-b border-gray-100">
+      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap mb-1">
-            <span className="font-bold text-base text-gray-900">{group.name}</span>
+          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+            <span className="font-bold text-sm text-gray-900">{group.name}</span>
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
-              <span key={day} className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>
+              <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
               </span>
             ))}
             {group.levels?.map(lv => (
-              <span key={lv} className="text-xs px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-500 border border-gray-200">
-                {lv}
-              </span>
+              <span key={lv} className="text-xs px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-500 border border-gray-200">{lv}</span>
             ))}
           </div>
-          <span className="text-sm font-semibold text-gray-700">{group.startTime} – {group.endTime} <span className="text-xs font-normal text-gray-400">น.</span></span>
+          <span className="text-sm font-semibold text-emerald-600">{group.startTime} – {group.endTime} <span className="text-xs font-normal text-gray-400">น.</span></span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={onEdit}
-            className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm"
-          >✎</button>
-          <button
-            onClick={() => setConfirming(true)}
-            className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors flex-shrink-0 text-lg leading-none"
-          >×</button>
+          <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm">✎</button>
+          <button onClick={() => setConfirming(true)} className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-lg leading-none">×</button>
         </div>
       </div>
 
       {/* Review */}
       <div className="border-t border-gray-100">
         {review ? (
-          <div className="px-3 py-2.5 flex flex-col gap-1.5">
+          <div className="px-3 py-2 flex flex-col gap-1">
             {[
               { icon: '🎉', label: 'ความสนุก', val: review.fun },
               { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
             ].map(({ icon, label, val }) => (
               <div key={label} className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">{icon} {label}</span>
+                <span className="text-xs text-gray-400">{icon} {label}</span>
                 <MiniStars val={val} />
               </div>
             ))}
-            {review.notes && (
-              <p className="text-xs text-gray-500 pt-1 border-t border-gray-100">{review.notes}</p>
-            )}
-            <button onClick={onReview} className="text-xs text-green-600 hover:text-green-700 font-medium transition-colors pt-0.5">
-              แก้ไขรีวิว
-            </button>
+            {review.notes && <p className="text-xs text-gray-400 pt-1 border-t border-gray-100">{review.notes}</p>}
+            <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium pt-0.5">แก้ไขรีวิว</button>
           </div>
         ) : (
-          <button onClick={onReview} className="w-full py-3 text-xs text-green-600 font-medium hover:bg-green-50 transition-colors">
-            + เพิ่มรีวิว
-          </button>
+          <button onClick={onReview} className="w-full py-2.5 text-xs text-emerald-600 font-medium hover:bg-emerald-50 transition-colors">+ เพิ่มรีวิว</button>
         )}
       </div>
 
-      {confirming && (
-        <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />
-      )}
+      {confirming && <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
     </div>
   );
 }
