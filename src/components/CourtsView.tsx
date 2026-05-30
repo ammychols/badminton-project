@@ -208,18 +208,28 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
       {/* Header */}
       <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+          {/* Row 1: name + day pills */}
+          <div className="flex items-center gap-1.5 flex-wrap mb-1">
             <span className="font-bold text-sm text-gray-900">{group.name}</span>
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
               <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
               </span>
             ))}
-            {group.levels?.map(lv => (
-              <span key={lv} className="text-xs px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-500 border border-gray-200">{lv}</span>
-            ))}
           </div>
-          <span className="text-sm font-semibold text-emerald-600">{group.startTime} – {group.endTime} <span className="text-xs font-normal text-gray-400">น.</span></span>
+          {/* Row 2: level tags */}
+          {group.levels && group.levels.length > 0 && (
+            <div className="flex items-center gap-1 flex-wrap mb-1.5">
+              {group.levels.map(lv => (
+                <span key={lv} className="text-xs px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-500 border border-gray-200">{lv}</span>
+              ))}
+            </div>
+          )}
+          {/* Time badge */}
+          <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg mt-0.5">
+            <span className="text-xs">🕐</span>
+            <span className="text-xs font-semibold">{group.startTime} – {group.endTime} น.</span>
+          </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm">✎</button>
