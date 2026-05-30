@@ -10,6 +10,7 @@ interface CourtsViewProps {
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onEditGroup: (courtId: string, groupId: string) => void;
   onRateCourt: (courtId: string) => void;
+  onClearCourtRating: (courtId: string) => void;
   onAddReview: (courtId: string, groupId: string) => void;
 }
 
@@ -34,7 +35,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onClearCourtRating, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
@@ -128,8 +129,13 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         <span className="text-xs text-gray-400">{court.rating.notes}</span>
                       )}
                       <button onClick={() => onRateCourt(court.id)} className="text-xs text-green-600 hover:text-green-700 font-medium">
-                        {court.rating ? 'แก้ไขคะแนนสนาม' : '+ ให้คะแนนสนาม'}
+                        {court.rating ? 'แก้ไข' : '+ ให้คะแนนสนาม'}
                       </button>
+                      {court.rating && (
+                        <button onClick={() => onClearCourtRating(court.id)} className="text-xs text-red-400 hover:text-red-600 font-medium">
+                          ลบ
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
