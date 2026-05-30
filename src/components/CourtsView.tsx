@@ -9,6 +9,7 @@ interface CourtsViewProps {
   onDeleteCourt: (courtId: string) => void;
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onEditGroup: (courtId: string, groupId: string) => void;
+  onRateCourt: (courtId: string) => void;
   onAddReview: (courtId: string, groupId: string) => void;
 }
 
@@ -33,7 +34,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
@@ -115,6 +116,21 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     {court.address && (
                       <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
                     )}
+                    {/* Court ratings */}
+                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                      {court.rating?.travel ? (
+                        <span className="text-xs text-gray-500">🚗 <MiniStars val={court.rating.travel} /></span>
+                      ) : null}
+                      {court.rating?.floor ? (
+                        <span className="text-xs text-gray-500">🏸 <MiniStars val={court.rating.floor} /></span>
+                      ) : null}
+                      {court.rating?.notes && (
+                        <span className="text-xs text-gray-400">{court.rating.notes}</span>
+                      )}
+                      <button onClick={() => onRateCourt(court.id)} className="text-xs text-green-600 hover:text-green-700 font-medium">
+                        {court.rating ? 'แก้ไขคะแนนสนาม' : '+ ให้คะแนนสนาม'}
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
@@ -252,7 +268,6 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             {[
               { icon: '🎉', label: 'ความสนุก', val: review.fun },
               { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
-              { icon: '🚗', label: 'การเดินทาง', val: review.travel },
             ].map(({ icon, label, val }) => (
               <div key={label} className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">{icon} {label}</span>

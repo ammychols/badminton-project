@@ -8,7 +8,7 @@ export function getTodayDayOfWeek(): DayOfWeek {
 export function getAverageScore(reviews: Review[]): number {
   if (reviews.length === 0) return 0;
   const total = reviews.reduce(
-    (sum, r) => sum + (r.fun + r.arrangement + r.travel) / 3,
+    (sum, r) => sum + (r.fun + r.arrangement) / 2,
     0
   );
   return Math.round((total / reviews.length) * 10) / 10;

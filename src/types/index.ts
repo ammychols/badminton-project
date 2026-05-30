@@ -1,3 +1,9 @@
+export interface CourtRating {
+  travel?: number;
+  floor?: number;
+  notes?: string;
+}
+
 export interface Court {
   id: string;
   name: string;
@@ -7,6 +13,7 @@ export interface Court {
   placeId?: string;
   groups: Group[];
   createdAt: string;
+  rating?: CourtRating;
 }
 
 export type GroupLevel = 'BB' | 'BG' | 'N-' | 'N' | 'S' | 'P';
@@ -52,13 +59,6 @@ export interface Review {
   date: string;
   fun: number;
   arrangement: number;
-  travel: number;
-  floor?: FloorType;
-  light?: LightLevel;
-  air?: AirType;
-  crowd?: CrowdLevel;
-  shuttle?: ShuttleType;
-  shuttleBrand?: string;
   notes?: string;
 }
 

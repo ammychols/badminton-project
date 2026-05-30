@@ -4,11 +4,12 @@ import { CourtsView } from './components/CourtsView';
 import { AddCourtModal } from './components/AddCourtModal';
 import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
+import { CourtRatingModal } from './components/CourtRatingModal';
 
 import { DayOfWeek } from './types';
 
 interface ModalState {
-  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review';
+  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'rateCourt';
   courtId?: string;
   groupId?: string;
   defaultDay?: DayOfWeek;
@@ -16,7 +17,7 @@ interface ModalState {
 
 export default function App() {
   const [modal, setModal] = useState<ModalState | null>(null);
-  const { courts, addCourt, deleteCourt, addGroup, updateGroup, deleteGroup, addReview } = useCourts();
+  const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts();
 
   const closeModal = () => setModal(null);
   const activeCourt = modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined;
@@ -24,7 +25,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-none mx-auto px-4 py-3 flex items-center gap-2">
           <h1 className="text-lg font-bold text-green-700">BadmintonTracker</h1>
@@ -39,6 +39,7 @@ export default function App() {
           onDeleteCourt={deleteCourt}
           onDeleteGroup={deleteGroup}
           onEditGroup={(courtId, groupId) => setModal({ type: 'editGroup', courtId, groupId })}
+          onRateCourt={courtId => setModal({ type: 'rateCourt', courtId })}
           onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
         />
       </main>
@@ -58,6 +59,13 @@ export default function App() {
           initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes }}
           onClose={closeModal}
           onSave={data => { updateGroup(modal.courtId!, modal.groupId!, data); closeModal(); }}
+        />
+      )}
+      {modal?.type === 'rateCourt' && modal.courtId && activeCourt && (
+        <CourtRatingModal
+          court={activeCourt}
+          onClose={closeModal}
+          onSave={data => { updateCourt(modal.courtId!, { rating: data }); closeModal(); }}
         />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (
