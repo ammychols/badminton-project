@@ -53,13 +53,16 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
             ))}
           </div>
 
-          <textarea
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="โน้ต (ไม่บังคับ)"
-            rows={3}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">โน้ต (ไม่บังคับ)</label>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder=""
+              rows={3}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
+            />
+          </div>
         </div>
 
         <div className="px-5 pb-5 pt-2 border-t border-gray-100">
