@@ -216,8 +216,8 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
         {/* Top row: name + time + actions */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex-1 min-w-0">
-            <span className="font-bold text-sm text-gray-900 block truncate">{group.name}</span>
-            <span className="text-xs font-semibold text-emerald-600">{group.startTime} – {group.endTime} น.</span>
+            <span className="font-extrabold text-base text-gray-900 block truncate leading-tight">{group.name}</span>
+            <span className="text-xs font-medium text-emerald-600 mt-0.5 block">{group.startTime} – {group.endTime} น.</span>
           </div>
           <div className="flex items-center gap-0.5 flex-shrink-0 -mt-0.5">
             <button onClick={onEdit} className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm">✎</button>
