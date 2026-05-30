@@ -203,59 +203,53 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
   const review = group.reviews[0];
   const [confirming, setConfirming] = useState(false);
 
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          {/* Row 1: name */}
-          <div className="mb-1">
-            <span className="font-bold text-sm text-gray-900">{group.name}</span>
-          </div>
-          {/* Row 2: day pills + time badge */}
-          <div className="flex items-center gap-1.5 flex-wrap mb-1">
-            {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
-              <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>
-                {DAY_LABELS[day]}
-              </span>
-            ))}
-            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-              🕐 {group.startTime} – {group.endTime} น.
-            </span>
-          </div>
-          {/* Row 3: level tags */}
-          {group.levels && group.levels.length > 0 && (
-            <div className="flex items-center gap-1 flex-wrap">
-              {group.levels.map(lv => (
-                <span key={lv} className="text-xs px-1.5 py-0.5 rounded font-medium bg-gray-100 text-gray-500 border border-gray-200">{lv}</span>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm">✎</button>
-          <button onClick={() => setConfirming(true)} className="w-6 h-6 flex items-center justify-center rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-lg leading-none">×</button>
-        </div>
-      </div>
+  // Pick the first day's color for the left accent
+  const firstDay = (Object.keys(DAY_LABELS) as DayOfWeek[]).find(d => group.days.includes(d));
+  const accentClass = firstDay ? DAY_COLORS[firstDay].active : 'bg-gray-400';
 
-      {/* Review */}
-      <div className="border-t border-gray-100">
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex">
+      {/* Left color accent bar */}
+      <div className={`w-1 flex-shrink-0 ${accentClass}`} />
+
+      <div className="flex-1 min-w-0 px-3 py-3">
+        {/* Top row: name + time + actions */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex-1 min-w-0">
+            <span className="font-bold text-sm text-gray-900 block truncate">{group.name}</span>
+            <span className="text-xs font-semibold text-emerald-600">{group.startTime} – {group.endTime} น.</span>
+          </div>
+          <div className="flex items-center gap-0.5 flex-shrink-0 -mt-0.5">
+            <button onClick={onEdit} className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-blue-400 hover:bg-blue-50 transition-colors text-sm">✎</button>
+            <button onClick={() => setConfirming(true)} className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-xl leading-none">×</button>
+          </div>
+        </div>
+
+        {/* Pills row: day + levels */}
+        <div className="flex items-center gap-1 flex-wrap mb-2.5">
+          {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
+            <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>{DAY_LABELS[day]}</span>
+          ))}
+          {group.levels?.map(lv => (
+            <span key={lv} className="text-xs px-1.5 py-0.5 rounded-md font-medium bg-gray-100 text-gray-500">{lv}</span>
+          ))}
+        </div>
+
+        {/* Review section */}
         {review ? (
-          <div className="px-3 py-2 flex flex-col gap-1">
-            {[
-              { icon: '🎉', label: 'ความสนุก', val: review.fun },
-              { icon: '🤝', label: 'การจัดมือ', val: review.arrangement },
-            ].map(({ icon, label, val }) => (
-              <div key={label} className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">{icon} {label}</span>
-                <MiniStars val={val} />
-              </div>
-            ))}
-            {review.notes && <p className="text-xs text-gray-400 pt-1 border-t border-gray-100">{review.notes}</p>}
-            <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium pt-0.5">แก้ไขรีวิว</button>
+          <div className="border-t border-gray-100 pt-2">
+            {/* Inline stars */}
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-xs text-gray-400 flex items-center gap-1">🎉 <MiniStars val={review.fun} /></span>
+              <span className="text-xs text-gray-400 flex items-center gap-1">🤝 <MiniStars val={review.arrangement} /></span>
+            </div>
+            {review.notes && <p className="text-xs text-gray-400 mb-1">{review.notes}</p>}
+            <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">แก้ไขรีวิว</button>
           </div>
         ) : (
-          <button onClick={onReview} className="w-full py-2.5 text-xs text-emerald-600 font-medium hover:bg-emerald-50 transition-colors">+ เพิ่มรีวิว</button>
+          <button onClick={onReview} className="w-full text-xs text-emerald-600 font-medium py-1.5 rounded-lg border border-dashed border-emerald-200 hover:bg-emerald-50 transition-colors">
+            + เพิ่มรีวิว
+          </button>
         )}
       </div>
 
