@@ -108,48 +108,52 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
 
             return (
-              <div key={court.id} className="rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+              <div key={court.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
 
-                {/* Court header — dark band */}
-                <div className="bg-gray-800 px-4 py-3">
+                {/* Court header */}
+                <div className="px-4 pt-4 pb-3 border-l-4 border-green-500">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white leading-tight">{court.name}</p>
+                      <p className="font-bold text-gray-900 text-base leading-tight">{court.name}</p>
                       {court.address && (
                         <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
                       )}
-                      {/* Court ratings */}
+                      {/* Court ratings as chips */}
                       {(court.rating?.travel || court.rating?.floor || court.rating?.notes) && (
-                        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                          {court.rating?.travel ? (
-                            <span className="text-xs text-gray-300">🚗 <MiniStars val={court.rating.travel} /></span>
-                          ) : null}
-                          {court.rating?.floor ? (
-                            <span className="text-xs text-gray-300">🏸 <MiniStars val={court.rating.floor} /></span>
-                          ) : null}
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                          {court.rating?.travel && (
+                            <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                              🚗 <MiniStars val={court.rating.travel} />
+                            </span>
+                          )}
+                          {court.rating?.floor && (
+                            <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
+                              🏸 <MiniStars val={court.rating.floor} />
+                            </span>
+                          )}
                           {court.rating?.notes && (
                             <span className="text-xs text-gray-400">{court.rating.notes}</span>
                           )}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <button
                         onClick={() => onRateCourt(court.id)}
-                        className="text-xs text-gray-400 hover:text-white transition-colors"
+                        className="text-xs text-gray-400 hover:text-green-600 transition-colors"
                         title={court.rating ? 'แก้ไขคะแนนสนาม' : 'ให้คะแนนสนาม'}
                       >
                         {court.rating ? '★' : '☆'}
                       </button>
                       <button
                         onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                        className="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-400 transition-colors"
+                        className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
                       >
                         + ก๊วน
                       </button>
                       <button
                         onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
-                        className="text-xs text-gray-500 hover:text-red-400 transition-colors px-1"
+                        className="text-xs text-gray-300 hover:text-red-400 transition-colors"
                       >
                         ลบ
                       </button>
@@ -158,7 +162,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 </div>
 
                 {/* Groups */}
-                <div className="bg-white px-4 py-3">
+                <div className="px-4 py-3 bg-gray-50/50 border-t border-gray-100">
                   <div className="flex-1 min-w-0">
                     {court.groups.length === 0 ? (
                       <p className="text-xs text-gray-400 text-center py-3">
