@@ -37,6 +37,7 @@ export interface Group {
   endTime: string;
   levels?: GroupLevel[];
   notes?: string;
+  image?: string;
   reviews: Review[];
 }
 

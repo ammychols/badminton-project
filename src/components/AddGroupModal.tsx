@@ -4,7 +4,7 @@ import { DayOfWeek, DAY_LABELS, GroupLevel, ALL_LEVELS } from '../types';
 interface AddGroupModalProps {
   courtName: string;
   defaultDay?: DayOfWeek;
-  initialValues?: { name: string; days: DayOfWeek[]; startTime: string; endTime: string; levels?: GroupLevel[]; notes?: string };
+  initialValues?: { name: string; days: DayOfWeek[]; startTime: string; endTime: string; levels?: GroupLevel[]; notes?: string; image?: string };
   onClose: () => void;
   onSave: (data: {
     name: string;
@@ -13,6 +13,7 @@ interface AddGroupModalProps {
     endTime: string;
     levels?: GroupLevel[];
     notes?: string;
+    image?: string;
   }) => void;
 }
 
@@ -27,6 +28,15 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
   const toggleLevel = (lv: GroupLevel) =>
     setLevels(prev => prev.includes(lv) ? prev.filter(l => l !== lv) : [...prev, lv]);
   const [notes, setNotes] = useState(initialValues?.notes ?? '');
+  const [image, setImage] = useState<string | undefined>(initialValues?.image);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const toggleDay = (day: DayOfWeek) => {
     setDays(prev =>
@@ -36,7 +46,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   const handleSave = () => {
     if (!name.trim() || days.length === 0) return;
-    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, notes: notes.trim() || undefined });
+    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, notes: notes.trim() || undefined, image });
     onClose();
   };
 
@@ -117,6 +127,22 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
             rows={2}
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
+        </div>
+
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">รูปก๊วน (ไม่บังคับ)</label>
+          {image ? (
+            <div className="relative">
+              <img src={image} alt="group" className="w-full h-36 object-cover rounded-xl" />
+              <button type="button" onClick={() => setImage(undefined)} className="absolute top-2 right-2 bg-black/50 text-white w-7 h-7 rounded-full text-lg leading-none flex items-center justify-center hover:bg-black/70">×</button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+              <span className="text-2xl mb-1">📷</span>
+              <span className="text-xs text-gray-400">กดเพื่อเลือกรูป</span>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+            </label>
+          )}
         </div>
 
         <button

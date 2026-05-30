@@ -58,7 +58,7 @@ export default function App() {
       {modal?.type === 'editGroup' && modal.courtId && modal.groupId && activeCourt && activeGroup && (
         <AddGroupModal
           courtName={activeCourt.name}
-          initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes }}
+          initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes, image: activeGroup.image }}
           onClose={closeModal}
           onSave={data => { updateGroup(modal.courtId!, modal.groupId!, data); closeModal(); }}
         />

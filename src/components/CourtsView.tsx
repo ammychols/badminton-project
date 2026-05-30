@@ -209,6 +209,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {group.image && <img src={group.image} alt={group.name} className="w-full h-32 object-cover" />}
       <div className="flex-1 min-w-0 px-3 py-3">
         {/* Top row: name + time + actions */}
         <div className="flex items-start justify-between gap-2 mb-2">
@@ -238,11 +239,11 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             {/* Inline stars */}
             <div className="flex flex-col gap-0.5 mb-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-700">ความสนุก</span>
+                <span className="text-xs text-gray-700">🎉 ความสนุก</span>
                 <MiniStars val={review.fun} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-700">การจัดมือ</span>
+                <span className="text-xs text-gray-700">🤝 การจัดมือ</span>
                 <MiniStars val={review.arrangement} />
               </div>
             </div>
