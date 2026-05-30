@@ -239,22 +239,25 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
         )}
 
         {/* Review section */}
-        {review ? (
-          <div className="border-t border-gray-100 pt-2">
-            <div className="flex items-center justify-between">
+        <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
+          {review ? (
+            <>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-500 flex items-center gap-1">🎉 <MiniStars val={review.fun} /></span>
-                <span className="text-xs text-gray-500 flex items-center gap-1">🤝 <MiniStars val={review.arrangement} /></span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-600">สนุก</span>
+                  <MiniStars val={review.fun} />
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-600">จัดการ</span>
+                  <MiniStars val={review.arrangement} />
+                </div>
               </div>
-              <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">แก้ไข</button>
-            </div>
-            {review.notes && <p className="text-xs text-gray-400 mt-1">{review.notes}</p>}
-          </div>
-        ) : (
-          <button onClick={onReview} className="w-full text-xs text-emerald-600 font-medium py-1.5 rounded-lg border border-dashed border-emerald-200 hover:bg-emerald-50 transition-colors">
-            + เพิ่มรีวิว
-          </button>
-        )}
+              <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex-shrink-0">แก้ไขรีวิว</button>
+            </>
+          ) : (
+            <button onClick={onReview} className="text-xs text-emerald-600 font-medium hover:text-emerald-700">+ เพิ่มรีวิว</button>
+          )}
+        </div>
       </div>
 
       {confirming && <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
