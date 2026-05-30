@@ -233,6 +233,11 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           ))}
         </div>
 
+        {/* Group notes */}
+        {group.notes && (
+          <p className="text-xs text-gray-500 mb-2">{group.notes}</p>
+        )}
+
         {/* Review section */}
         {review ? (
           <div className="border-t border-gray-100 pt-2">
