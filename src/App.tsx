@@ -32,6 +32,7 @@ export default function App() {
       </header>
 
       <main className="pb-8">
+        <div className="max-w-5xl mx-auto">
         <CourtsView
           courts={courts}
           onAddCourt={() => setModal({ type: 'addCourt' })}
@@ -42,6 +43,7 @@ export default function App() {
           onRateCourt={courtId => setModal({ type: 'courtInfo', courtId })}
           onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
         />
+        </div>
       </main>
 
       {modal?.type === 'addCourt' && (
