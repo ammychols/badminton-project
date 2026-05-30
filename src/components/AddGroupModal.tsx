@@ -71,6 +71,22 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
         </div>
 
         <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">รูปก๊วน (ไม่บังคับ)</label>
+          {image ? (
+            <div className="relative">
+              <img src={image} alt="group" className="w-full h-36 object-cover rounded-xl" />
+              <button type="button" onClick={() => setImage(undefined)} className="absolute top-2 right-2 bg-black/50 text-white w-7 h-7 rounded-full text-lg leading-none flex items-center justify-center hover:bg-black/70">×</button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+              <span className="text-2xl mb-1">📷</span>
+              <span className="text-xs text-gray-400">กดเพื่อเลือกรูป</span>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+            </label>
+          )}
+        </div>
+
+        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">วันที่เปิด *</label>
           <div className="flex gap-2 flex-wrap">
             {ALL_DAYS.map(day => (
@@ -124,25 +140,9 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder=""
-            rows={2}
+            rows={5}
             className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
           />
-        </div>
-
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-gray-700 mb-2">รูปก๊วน (ไม่บังคับ)</label>
-          {image ? (
-            <div className="relative">
-              <img src={image} alt="group" className="w-full h-36 object-cover rounded-xl" />
-              <button type="button" onClick={() => setImage(undefined)} className="absolute top-2 right-2 bg-black/50 text-white w-7 h-7 rounded-full text-lg leading-none flex items-center justify-center hover:bg-black/70">×</button>
-            </div>
-          ) : (
-            <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-              <span className="text-2xl mb-1">📷</span>
-              <span className="text-xs text-gray-400">กดเพื่อเลือกรูป</span>
-              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-            </label>
-          )}
         </div>
 
         <button
