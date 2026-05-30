@@ -4,12 +4,12 @@ import { CourtsView } from './components/CourtsView';
 import { AddCourtModal } from './components/AddCourtModal';
 import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
-import { CourtRatingModal } from './components/CourtRatingModal';
+import { CourtInfoModal } from './components/CourtInfoModal';
 
 import { DayOfWeek } from './types';
 
 interface ModalState {
-  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'rateCourt';
+  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'courtInfo';
   courtId?: string;
   groupId?: string;
   defaultDay?: DayOfWeek;
@@ -39,8 +39,7 @@ export default function App() {
           onDeleteCourt={deleteCourt}
           onDeleteGroup={deleteGroup}
           onEditGroup={(courtId, groupId) => setModal({ type: 'editGroup', courtId, groupId })}
-          onRateCourt={courtId => setModal({ type: 'rateCourt', courtId })}
-          onClearCourtRating={courtId => updateCourt(courtId, { rating: undefined })}
+          onRateCourt={courtId => setModal({ type: 'courtInfo', courtId })}
           onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
         />
       </main>
@@ -62,11 +61,11 @@ export default function App() {
           onSave={data => { updateGroup(modal.courtId!, modal.groupId!, data); closeModal(); }}
         />
       )}
-      {modal?.type === 'rateCourt' && modal.courtId && activeCourt && (
-        <CourtRatingModal
+      {modal?.type === 'courtInfo' && modal.courtId && activeCourt && (
+        <CourtInfoModal
           court={activeCourt}
           onClose={closeModal}
-          onSave={data => { updateCourt(modal.courtId!, { rating: data }); closeModal(); }}
+          onSave={data => { updateCourt(modal.courtId!, { info: data }); closeModal(); }}
         />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (

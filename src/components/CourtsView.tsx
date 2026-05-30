@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Court, Group, DAY_LABELS, DayOfWeek } from '../types';
+import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { CourtsMap } from './CourtsMap';
 
 interface CourtsViewProps {
@@ -10,7 +10,6 @@ interface CourtsViewProps {
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onEditGroup: (courtId: string, groupId: string) => void;
   onRateCourt: (courtId: string) => void;
-  onClearCourtRating: (courtId: string) => void;
   onAddReview: (courtId: string, groupId: string) => void;
 }
 
@@ -35,7 +34,7 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onClearCourtRating, onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
@@ -111,28 +110,27 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               <div key={court.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
 
                 {/* Court header */}
-                <div className="px-4 pt-4 pb-3 border-l-4 border-green-500">
+                <div className="px-4 pt-4 pb-3 bg-gradient-to-r from-green-600 to-emerald-500 rounded-t-2xl">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-900 text-base leading-tight">{court.name}</p>
+                      <p className="font-bold text-white text-base leading-tight">{court.name}</p>
                       {court.address && (
-                        <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
+                        <p className="text-xs text-green-100 mt-0.5 truncate">{court.address}</p>
                       )}
-                      {/* Court ratings as chips */}
-                      {(court.rating?.travel || court.rating?.floor || court.rating?.notes) && (
-                        <div className="flex items-center gap-2 mt-2 flex-wrap">
-                          {court.rating?.travel && (
-                            <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                              🚗 <MiniStars val={court.rating.travel} />
-                            </span>
+                      {/* Court info chips */}
+                      {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
+                        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                          {court.info.floor && (
+                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>
                           )}
-                          {court.rating?.floor && (
-                            <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                              🏸 <MiniStars val={court.rating.floor} />
-                            </span>
+                          {court.info.air && (
+                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[court.info.air]}</span>
                           )}
-                          {court.rating?.notes && (
-                            <span className="text-xs text-gray-400">{court.rating.notes}</span>
+                          {court.info.parking && (
+                            <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[court.info.parking]}</span>
+                          )}
+                          {court.info.notes && (
+                            <span className="text-xs text-green-100">{court.info.notes}</span>
                           )}
                         </div>
                       )}
@@ -140,20 +138,20 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button
                         onClick={() => onRateCourt(court.id)}
-                        className="text-xs text-gray-400 hover:text-green-600 transition-colors"
-                        title={court.rating ? 'แก้ไขคะแนนสนาม' : 'ให้คะแนนสนาม'}
+                        className="text-xs text-white/60 hover:text-white transition-colors"
+                        title="ข้อมูลสนาม"
                       >
-                        {court.rating ? '★' : '☆'}
+                        ✎
                       </button>
                       <button
                         onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                        className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
+                        className="bg-white text-green-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-green-50 transition-colors"
                       >
                         + ก๊วน
                       </button>
                       <button
                         onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
-                        className="text-xs text-gray-300 hover:text-red-400 transition-colors"
+                        className="text-xs text-white/40 hover:text-white/80 transition-colors"
                       >
                         ลบ
                       </button>

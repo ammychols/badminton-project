@@ -1,6 +1,15 @@
-export interface CourtRating {
-  travel?: number;
-  floor?: number;
+export type FloorType = 'concrete' | 'wood' | 'rubber';
+export type AirType = 'aircon' | 'fan' | 'stuffy';
+export type ParkingType = 'easy' | 'limited' | 'none';
+
+export const FLOOR_LABELS: Record<FloorType, string> = { concrete: 'พื้นปูน', wood: 'พื้นไม้', rubber: 'พื้นยาง' };
+export const AIR_LABELS: Record<AirType, string> = { aircon: 'มีแอร์', fan: 'พัดลม', stuffy: 'ถ่ายเทน้อย' };
+export const PARKING_LABELS: Record<ParkingType, string> = { easy: 'จอดรถง่าย', limited: 'จอดรถจำกัด', none: 'ไม่มีที่จอด' };
+
+export interface CourtInfo {
+  floor?: FloorType;
+  air?: AirType;
+  parking?: ParkingType;
   notes?: string;
 }
 
@@ -13,7 +22,7 @@ export interface Court {
   placeId?: string;
   groups: Group[];
   createdAt: string;
-  rating?: CourtRating;
+  info?: CourtInfo;
 }
 
 export type GroupLevel = 'BB' | 'BG' | 'N-' | 'N' | 'S' | 'P';
@@ -41,17 +50,6 @@ export const DAY_FULL_LABELS: Record<DayOfWeek, string> = {
   MON: 'จันทร์', TUE: 'อังคาร', WED: 'พุธ', THU: 'พฤหัส', FRI: 'ศุกร์', SAT: 'เสาร์', SUN: 'อาทิตย์',
 };
 
-export type FloorType = 'concrete' | 'wood' | 'rubber';
-export type LightLevel = 'bright' | 'medium' | 'dim';
-export type AirType = 'aircon' | 'fan' | 'stuffy';
-export type CrowdLevel = 'no-wait' | 'some-wait' | 'long-wait';
-export type ShuttleType = 'durable' | 'medium' | 'fragile';
-
-export const FLOOR_LABELS: Record<FloorType, string> = { concrete: 'พื้นปูน', wood: 'พื้นไม้', rubber: 'พื้นยาง' };
-export const LIGHT_LABELS: Record<LightLevel, string> = { bright: 'สว่าง', medium: 'ปานกลาง', dim: 'มืด' };
-export const AIR_LABELS: Record<AirType, string> = { aircon: 'มีแอร์', fan: 'พัดลม', stuffy: 'ถ่ายเทน้อย' };
-export const CROWD_LABELS: Record<CrowdLevel, string> = { 'no-wait': 'ไม่ต้องรอ', 'some-wait': 'รอบ้าง', 'long-wait': 'รอนาน' };
-export const SHUTTLE_LABELS: Record<ShuttleType, string> = { durable: 'พังยาก', medium: 'ปานกลาง', fragile: 'พังง่าย' };
 
 export interface Review {
   id: string;
