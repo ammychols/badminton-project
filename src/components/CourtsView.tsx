@@ -231,7 +231,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
               </span>
             ))}
           </div>
-          <span className="text-xs text-green-600">{group.startTime} – {group.endTime} น.</span>
+          <span className="text-sm font-semibold text-gray-700">{group.startTime} – {group.endTime} <span className="text-xs font-normal text-gray-400">น.</span></span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           <button
