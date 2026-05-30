@@ -253,7 +253,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
                     <MiniStars val={review.arrangement} />
                   </div>
                 </div>
-                {review.notes && <p className="text-xs text-gray-700 font-medium">"{review.notes}"</p>}
+                {review.notes && <p className="text-xs text-gray-500">{review.notes}</p>}
               </div>
               <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex-shrink-0">แก้ไขรีวิว</button>
             </>
