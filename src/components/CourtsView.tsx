@@ -108,54 +108,57 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
 
             return (
-              <div key={court.id} className="bg-white rounded-2xl shadow-sm border border-gray-100">
+              <div key={court.id} className="rounded-2xl shadow-sm overflow-hidden border border-gray-200">
 
-                {/* Court header */}
-                <div className="flex items-start justify-between gap-3 px-4 py-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-800">{court.name}</p>
-                    {court.address && (
-                      <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
-                    )}
-                    {/* Court ratings */}
-                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                      {court.rating?.travel ? (
-                        <span className="text-xs text-gray-500">🚗 <MiniStars val={court.rating.travel} /></span>
-                      ) : null}
-                      {court.rating?.floor ? (
-                        <span className="text-xs text-gray-500">🏸 <MiniStars val={court.rating.floor} /></span>
-                      ) : null}
-                      {court.rating?.notes && (
-                        <span className="text-xs text-gray-400">{court.rating.notes}</span>
+                {/* Court header — dark band */}
+                <div className="bg-gray-800 px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-white leading-tight">{court.name}</p>
+                      {court.address && (
+                        <p className="text-xs text-gray-400 mt-0.5 truncate">{court.address}</p>
                       )}
-                      <button onClick={() => onRateCourt(court.id)} className="text-xs text-green-600 hover:text-green-700 font-medium">
-                        {court.rating ? 'แก้ไข' : '+ ให้คะแนนสนาม'}
-                      </button>
-                      {court.rating && (
-                        <button onClick={() => onClearCourtRating(court.id)} className="text-xs text-red-400 hover:text-red-600 font-medium">
-                          ลบ
-                        </button>
+                      {/* Court ratings */}
+                      {(court.rating?.travel || court.rating?.floor || court.rating?.notes) && (
+                        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                          {court.rating?.travel ? (
+                            <span className="text-xs text-gray-300">🚗 <MiniStars val={court.rating.travel} /></span>
+                          ) : null}
+                          {court.rating?.floor ? (
+                            <span className="text-xs text-gray-300">🏸 <MiniStars val={court.rating.floor} /></span>
+                          ) : null}
+                          {court.rating?.notes && (
+                            <span className="text-xs text-gray-400">{court.rating.notes}</span>
+                          )}
+                        </div>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                      className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
-                    >
-                      + เพิ่มก๊วน
-                    </button>
-                    <button
-                      onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
-                      className="text-xs text-red-400 hover:text-red-600 transition-colors px-1"
-                    >
-                      ลบ
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                      <button
+                        onClick={() => onRateCourt(court.id)}
+                        className="text-xs text-gray-400 hover:text-white transition-colors"
+                        title={court.rating ? 'แก้ไขคะแนนสนาม' : 'ให้คะแนนสนาม'}
+                      >
+                        {court.rating ? '★' : '☆'}
+                      </button>
+                      <button
+                        onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                        className="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-400 transition-colors"
+                      >
+                        + ก๊วน
+                      </button>
+                      <button
+                        onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })}
+                        className="text-xs text-gray-500 hover:text-red-400 transition-colors px-1"
+                      >
+                        ลบ
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Groups */}
-                <div className="border-t border-gray-100 px-4 py-3">
+                <div className="bg-white px-4 py-3">
                   <div className="flex-1 min-w-0">
                     {court.groups.length === 0 ? (
                       <p className="text-xs text-gray-400 text-center py-3">
