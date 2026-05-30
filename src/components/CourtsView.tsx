@@ -242,7 +242,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
         <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
           {review ? (
             <>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-2">
                 {review.notes && <p className="text-xs text-gray-500">{review.notes}</p>}
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
