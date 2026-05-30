@@ -235,7 +235,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
 
         {/* Group notes */}
         {group.notes && (
-          <p className="text-xs text-gray-500 mb-2">{group.notes}</p>
+          <p className="text-xs text-gray-500 mb-2 truncate">{group.notes}</p>
         )}
 
         {/* Review section */}
