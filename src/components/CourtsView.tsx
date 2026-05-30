@@ -244,11 +244,11 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             <>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-600">สนุก</span>
+                  <span className="text-xs text-gray-600">🎉 ความสนุก</span>
                   <MiniStars val={review.fun} />
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-600">จัดการ</span>
+                  <span className="text-xs text-gray-600">🤝 การจัดมือ</span>
                   <MiniStars val={review.arrangement} />
                 </div>
               </div>
