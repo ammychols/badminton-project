@@ -232,7 +232,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+      <div className="bg-gray-50 px-3 pt-3 pb-2.5 flex items-start justify-between gap-2 border-b border-gray-100">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap mb-1">
             <span className="font-semibold text-sm text-gray-800">{group.name}</span>
