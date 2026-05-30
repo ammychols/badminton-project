@@ -5,6 +5,7 @@
 @layer base {
   body {
     font-family: 'Kanit', sans-serif;
+    font-size: 17px;
   }
 }
 
