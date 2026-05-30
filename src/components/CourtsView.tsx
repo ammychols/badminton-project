@@ -242,15 +242,18 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
         <div className="border-t border-gray-100 pt-2 flex items-center justify-between">
           {review ? (
             <>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-600">🎉 ความสนุก</span>
-                  <MiniStars val={review.fun} />
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-600">🎉 ความสนุก</span>
+                    <MiniStars val={review.fun} />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-600">🤝 การจัดมือ</span>
+                    <MiniStars val={review.arrangement} />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-600">🤝 การจัดมือ</span>
-                  <MiniStars val={review.arrangement} />
-                </div>
+                {review.notes && <p className="text-xs text-gray-400">{review.notes}</p>}
               </div>
               <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex-shrink-0">แก้ไขรีวิว</button>
             </>
