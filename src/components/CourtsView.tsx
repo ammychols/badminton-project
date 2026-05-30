@@ -238,11 +238,11 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             {/* Inline stars */}
             <div className="flex flex-col gap-0.5 mb-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">ความสนุก</span>
+                <span className="text-xs text-gray-700">ความสนุก</span>
                 <MiniStars val={review.fun} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">การจัดมือ</span>
+                <span className="text-xs text-gray-700">การจัดมือ</span>
                 <MiniStars val={review.arrangement} />
               </div>
             </div>
