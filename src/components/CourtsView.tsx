@@ -44,7 +44,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     : courts.filter(court => court.groups.some(g => g.days.includes(selectedDay as DayOfWeek)));
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="p-4">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-2xl font-bold text-gray-900">สนามของฉัน</h2>
