@@ -208,10 +208,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
   const accentClass = firstDay ? DAY_COLORS[firstDay].active : 'bg-gray-400';
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex">
-      {/* Left color accent bar */}
-      <div className={`w-1 flex-shrink-0 ${accentClass}`} />
-
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="flex-1 min-w-0 px-3 py-3">
         {/* Top row: name + time + actions */}
         <div className="flex items-start justify-between gap-2 mb-2">
