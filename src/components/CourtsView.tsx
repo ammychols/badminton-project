@@ -113,7 +113,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 <div className="px-4 pt-4 pb-3 bg-gradient-to-r from-green-600 to-emerald-500 rounded-t-2xl">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-white text-base leading-tight">{court.name}</p>
+                      <p className="font-extrabold text-white text-xl leading-tight tracking-tight">{court.name}</p>
                       {court.address && (
                         <p className="text-xs text-green-100 mt-0.5 truncate">{court.address}</p>
                       )}
@@ -246,7 +246,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
       <div className="bg-gray-50 px-3 pt-3 pb-2.5 flex items-start justify-between gap-2 border-b border-gray-100">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap mb-1">
-            <span className="font-semibold text-sm text-gray-800">{group.name}</span>
+            <span className="font-bold text-base text-gray-900">{group.name}</span>
             {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
               <span key={day} className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>
                 {DAY_LABELS[day]}
