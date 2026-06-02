@@ -18,7 +18,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
 
   if (!group) return null;
 
-  const canSave = fun > 0 && arrangement > 0;
+  const canSave = true;
 
   const handleSave = () => {
     if (!canSave) return;

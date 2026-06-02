@@ -21,7 +21,7 @@ export function StarRating({ value, onChange, readonly = false, size = 'md' }: S
           className={`${sizeClass} transition-transform ${!readonly ? 'hover:scale-125 cursor-pointer' : 'cursor-default'}`}
           onMouseEnter={() => !readonly && setHovered(star)}
           onMouseLeave={() => !readonly && setHovered(0)}
-          onClick={() => !readonly && onChange?.(star)}
+          onClick={() => !readonly && onChange?.(value === star ? 0 : star)}
         >
           <span className={(hovered || value) >= star ? 'text-yellow-400' : 'text-gray-300'}>
             ★
