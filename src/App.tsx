@@ -38,12 +38,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-none mx-auto px-5 py-3.5 flex items-center">
-          <div className="flex items-baseline gap-px">
-            <span className="text-lg font-black text-gray-900 tracking-tighter leading-none">BADMINTON</span>
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 mx-1 mb-0.5" />
-            <span className="text-lg font-light text-gray-400 tracking-tighter leading-none">TRACKER</span>
-          </div>
+        <div className="max-w-none mx-auto px-4 py-3 flex items-center gap-2">
+          <h1 className="text-lg font-bold text-green-700">BadmintonTracker</h1>
         </div>
       </header>
 
