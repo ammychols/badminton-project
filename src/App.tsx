@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useCourts } from './hooks/useCourts';
 import { useSessions } from './hooks/useSessions';
@@ -60,6 +60,17 @@ export default function App() {
   const [modal, setModal] = useState<ModalState | null>(null);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showUserMenu]);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
@@ -91,19 +102,16 @@ export default function App() {
       </header>
 
       {showUserMenu && (
-        <>
-          <div className="fixed inset-0 z-[60]" onClick={() => setShowUserMenu(false)} />
-          <div className="fixed top-14 right-4 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-[70] min-w-[200px]">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
-              <p className="text-xs text-gray-400 truncate">{user.email}</p>
-            </div>
-            <button onClick={() => { signOut(); setShowUserMenu(false); }}
-              className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
-              ออกจากระบบ
-            </button>
+        <div ref={userMenuRef} className="fixed top-14 right-4 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
+            <p className="text-xs text-gray-400 truncate">{user.email}</p>
           </div>
-        </>
+          <button onClick={() => { signOut(); setShowUserMenu(false); }}
+            className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
+            ออกจากระบบ
+          </button>
+        </div>
       )}
 
       <main className="flex-1 pb-20">

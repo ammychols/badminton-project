@@ -19,7 +19,7 @@ export function BottomSheet({ title, onClose, children, footer }: BottomSheetPro
           {children}
         </div>
         {footer && (
-          <div className="px-6 pb-6 pt-3 border-t border-gray-100">
+          <div className="relative z-10 px-6 pb-6 pt-3 border-t border-gray-100 bg-white flex-shrink-0">
             {footer}
           </div>
         )}
