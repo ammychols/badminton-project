@@ -59,6 +59,7 @@ export default function App() {
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
@@ -73,8 +74,6 @@ export default function App() {
       </div>
     );
   }
-
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   if (!user) return <LoginScreen onSignIn={signIn} error={error} />;
 
