@@ -172,61 +172,57 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   return (
     <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
       {/* Calendar */}
-      <div className="bg-gray-50 rounded-2xl p-3 mb-5">
+      <div className="bg-gray-50 rounded-2xl p-3 mb-4">
         <MiniCalendar selected={date} onChange={handleDateChange} />
       </div>
 
-      {/* Court */}
-      <div className="mb-4">
-        <label className={text.label}>สนาม</label>
-        <select value={courtId} onChange={e => handleCourtChange(e.target.value)}
-          className={input.base}>
-          {displayCourts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
-          {displayCourts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+      {/* Court + Group */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className={text.label}>สนาม</label>
+          <select value={courtId} onChange={e => handleCourtChange(e.target.value)} className={input.base}>
+            {displayCourts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
+            {displayCourts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={text.label}>ก๊วน</label>
+          <select value={groupId} onChange={e => setGroupId(e.target.value)} className={input.base}>
+            {displayGroups.length === 0 && <option value="">ไม่มีก๊วน</option>}
+            {displayGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+        </div>
       </div>
 
-      {/* Group */}
-      <div className="mb-4">
-        <label className={text.label}>ก๊วน</label>
-        <select value={groupId} onChange={e => setGroupId(e.target.value)}
-          className={input.base}>
-          {displayGroups.length === 0 && <option value="">ยังไม่มีก๊วนในสนามนี้</option>}
-          {displayGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-        </select>
-      </div>
-
-      {/* Times */}
-      <div className="flex gap-3 mb-4">
-        <div className="flex-1">
-          <label className={text.label}>เวลาเริ่ม</label>
+      {/* Time + Games */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div>
+          <label className={text.label}>เริ่ม</label>
           <TimePicker value={startTime} onChange={setStartTime} />
         </div>
-        <div className="flex-1">
-          <label className={text.label}>เวลาเลิก</label>
+        <div>
+          <label className={text.label}>เลิก</label>
           <TimePicker value={endTime} onChange={setEndTime} />
         </div>
-      </div>
-
-      {/* Games */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">จำนวนเกมที่เล่น</label>
-        <div className="flex items-center gap-4">
-          <button type="button" onClick={() => setGamesPlayed(g => Math.max(0, g - 1))}
-            className="w-10 h-10 rounded-full bg-gray-100 text-gray-700 text-xl font-bold hover:bg-gray-200 flex items-center justify-center">−</button>
-          <span className="text-2xl font-bold text-gray-800 w-8 text-center">{gamesPlayed}</span>
-          <button type="button" onClick={() => setGamesPlayed(g => g + 1)}
-            className="w-10 h-10 rounded-full bg-gray-100 text-gray-700 text-xl font-bold hover:bg-gray-200 flex items-center justify-center">+</button>
+        <div>
+          <label className={text.label}>เกม</label>
+          <div className="flex items-center gap-1.5 h-[42px]">
+            <button type="button" onClick={() => setGamesPlayed(g => Math.max(0, g - 1))}
+              className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 text-lg font-bold hover:bg-gray-200 flex items-center justify-center flex-shrink-0">−</button>
+            <span className="text-lg font-bold text-gray-800 flex-1 text-center">{gamesPlayed}</span>
+            <button type="button" onClick={() => setGamesPlayed(g => g + 1)}
+              className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 text-lg font-bold hover:bg-gray-200 flex items-center justify-center flex-shrink-0">+</button>
+          </div>
         </div>
       </div>
 
       {/* Mood */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">อารมณ์วันนี้</label>
-        <div className="flex gap-2 justify-between">
+        <label className={text.label}>อารมณ์</label>
+        <div className="flex gap-2">
           {([1, 2, 3, 4, 5] as const).map(m => (
             <button key={m} type="button" onClick={() => setMood(m)}
-              className={`flex-1 py-2 rounded-2xl text-3xl transition-all ${mood === m ? 'bg-gray-900 scale-110' : 'bg-gray-100 opacity-50 hover:opacity-80'}`}>
+              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-gray-900 scale-105' : 'bg-gray-100 opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}
             </button>
           ))}
@@ -237,7 +233,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
       <div className="mb-2">
         <label className={text.label}>โน้ต (ไม่บังคับ)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)}
-          placeholder="เช่น วันนี้เล่นดีมาก!" rows={3}
+          placeholder="เช่น วันนี้เล่นดีมาก!" rows={2}
           className={input.textarea} />
       </div>
     </BottomSheet>
