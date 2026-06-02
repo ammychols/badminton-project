@@ -88,7 +88,7 @@ export default function App() {
               <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
             </button>
             {showUserMenu && (
-              <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden z-50 min-w-[180px]" onClick={() => setShowUserMenu(false)}>
+              <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden z-[70] min-w-[180px]" onClick={() => setShowUserMenu(false)}>
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
                   <p className="text-xs text-gray-400 truncate">{user.email}</p>
@@ -104,7 +104,7 @@ export default function App() {
       </header>
 
       {showUserMenu && (
-        <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+        <div className="fixed inset-0 z-[60]" onClick={() => setShowUserMenu(false)} />
       )}
 
       <main className="flex-1 pb-20">
