@@ -145,7 +145,7 @@ export default function App() {
       {modal?.type === 'addCourt' && (
         <AddCourtModal onClose={closeModal} onSave={data => {
           const newCourt = addCourt(data);
-          setModal({ type: 'courtInfo', courtId: newCourt.id, isNewCourt: true, courtSnapshot: newCourt });
+          openModal({ type: 'courtInfo', courtId: newCourt.id, isNewCourt: true, courtSnapshot: newCourt });
         }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
