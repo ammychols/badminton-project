@@ -52,7 +52,8 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
-      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md flex flex-col max-h-[90vh]">
+        <div className="overflow-y-auto flex-1 p-6">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-lg font-bold text-gray-800">{initialValues ? 'แก้ไขก๊วน' : 'เพิ่มก๊วน'}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
@@ -145,13 +146,16 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
           />
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={!name.trim() || days.length === 0}
-          className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
-        >
-          {initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
-        </button>
+        </div>
+        <div className="p-6 pt-0 border-t border-gray-100">
+          <button
+            onClick={handleSave}
+            disabled={!name.trim() || days.length === 0}
+            className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
+          >
+            {initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
+          </button>
+        </div>
       </div>
     </div>
   );
