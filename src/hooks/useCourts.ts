@@ -36,7 +36,7 @@ export function useCourts(uid: string) {
     const court = get(courtId);
     if (!court) return;
     const raw = { ...group, id: crypto.randomUUID(), courtId, reviews: [] };
-    const newGroup = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as Group;
+    const newGroup = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as unknown as Group;
     setDoc(ref(courtId), { groups: [...court.groups, newGroup] }, { merge: true });
     return newGroup;
   };
