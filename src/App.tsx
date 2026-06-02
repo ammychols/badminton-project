@@ -9,7 +9,6 @@ import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
-import { AppIcon } from './components/AppIcon';
 
 import { Court, DayOfWeek } from './types';
 
@@ -29,9 +28,6 @@ function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center px-6">
       <div className="mb-10 text-center">
-        <div className="flex justify-center mb-6">
-          <AppIcon size={96} />
-        </div>
         <h1 className="text-3xl font-bold text-white tracking-tight mb-2">BadmintonTracker</h1>
         <p className="text-sm text-slate-400">บันทึกสนาม · ก๊วน · สถิติการตี</p>
       </div>
@@ -93,8 +89,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
-          <AppIcon size={28} />
-          <h1 className="text-lg font-bold text-gray-900">BadmintonTracker</h1>
+          <h1 className="text-lg font-bold text-gray-900">🏸 BadmintonTracker</h1>
           <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
             <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
           </button>
