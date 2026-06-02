@@ -49,7 +49,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     : [];
 
   return (
-    <div className="px-6 pt-5 pb-10">
+    <div className="px-10 pt-5 pb-10">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <div>

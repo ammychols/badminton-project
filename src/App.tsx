@@ -34,7 +34,7 @@ export default function App() {
       </header>
 
       <main className="pb-8">
-        <div className="max-w-screen-2xl mx-auto">
+        <div className="max-w-screen-2xl mx-auto px-4">
         <CourtsView
           courts={courts}
           onAddCourt={() => setModal({ type: 'addCourt' })}
