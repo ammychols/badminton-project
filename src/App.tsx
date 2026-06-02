@@ -68,17 +68,6 @@ export default function App() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
         <div className="flex items-center justify-center gap-2 px-6 py-2">
           <button
-            onClick={() => setTab('courts')}
-            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-              tab === 'courts'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            <span>🏸</span>
-            <span>สนาม</span>
-          </button>
-          <button
             onClick={() => setTab('sessions')}
             className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
               tab === 'sessions'
@@ -88,6 +77,17 @@ export default function App() {
           >
             <span>📝</span>
             <span>บันทึก</span>
+          </button>
+          <button
+            onClick={() => setTab('courts')}
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+              tab === 'courts'
+                ? 'bg-gray-900 text-white'
+                : 'text-gray-500 hover:text-gray-800'
+            }`}
+          >
+            <span>🏸</span>
+            <span>สนาม</span>
           </button>
         </div>
       </nav>
