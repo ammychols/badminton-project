@@ -17,7 +17,8 @@ export function useSessions(uid: string) {
 
   const addSession = (data: Omit<Session, 'id'>) => {
     const id = crypto.randomUUID();
-    const session: Session = { ...data, id };
+    const raw = { ...data, id };
+    const session = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as Session;
     setDoc(ref(id), session);
     return session;
   };

@@ -35,7 +35,8 @@ export function useCourts(uid: string) {
   const addGroup = (courtId: string, group: Omit<Group, 'id' | 'courtId' | 'reviews'>) => {
     const court = get(courtId);
     if (!court) return;
-    const newGroup: Group = { ...group, id: crypto.randomUUID(), courtId, reviews: [] };
+    const raw = { ...group, id: crypto.randomUUID(), courtId, reviews: [] };
+    const newGroup = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as Group;
     setDoc(ref(courtId), { groups: [...court.groups, newGroup] }, { merge: true });
     return newGroup;
   };
@@ -43,7 +44,8 @@ export function useCourts(uid: string) {
   const updateGroup = (courtId: string, groupId: string, data: Partial<Group>) => {
     const court = get(courtId);
     if (!court) return;
-    setDoc(ref(courtId), { groups: court.groups.map(g => g.id === groupId ? { ...g, ...data } : g) }, { merge: true });
+    const clean = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+    setDoc(ref(courtId), { groups: court.groups.map(g => g.id === groupId ? { ...g, ...clean } : g) }, { merge: true });
   };
 
   const deleteGroup = (courtId: string, groupId: string) => {
