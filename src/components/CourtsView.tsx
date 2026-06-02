@@ -72,8 +72,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
 
       {/* List / Map toggle */}
       <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm w-fit mb-6 bg-white">
-        <button onClick={() => setViewMode('list')} className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>รายการ</button>
-        <button onClick={() => setViewMode('map')}  className={`px-4 py-1.5 font-medium transition-colors ${viewMode === 'map'  ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>แผนที่</button>
+        <button onClick={() => setViewMode('list')} className={`w-20 py-1.5 font-medium text-center transition-colors ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>รายการ</button>
+        <button onClick={() => setViewMode('map')}  className={`w-20 py-1.5 font-medium text-center transition-colors ${viewMode === 'map'  ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>แผนที่</button>
       </div>
 
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
