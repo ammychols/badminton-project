@@ -1,44 +1,36 @@
 import { useState, useEffect } from 'react';
+import { collection, doc, onSnapshot, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { Session } from '../types';
 
-const STORAGE_KEY = 'badminton-sessions';
-
-export function useSessions() {
-  const [sessions, setSessions] = useState<Session[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
+export function useSessions(uid: string) {
+  const [sessions, setSessions] = useState<Session[]>([]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-  }, [sessions]);
+    if (!uid) return;
+    return onSnapshot(collection(db, 'users', uid, 'sessions'), snap => {
+      setSessions(snap.docs.map(d => d.data() as Session));
+    });
+  }, [uid]);
 
-  const addSession = (session: Omit<Session, 'id'>) => {
-    const newSession: Session = {
-      ...session,
-      id: crypto.randomUUID(),
-    };
-    setSessions(prev => [...prev, newSession]);
-    return newSession;
+  const ref = (id: string) => doc(db, 'users', uid, 'sessions', id);
+
+  const addSession = (data: Omit<Session, 'id'>) => {
+    const id = crypto.randomUUID();
+    const session: Session = { ...data, id };
+    setDoc(ref(id), session);
+    return session;
   };
 
-  const deleteSession = (id: string) => {
-    setSessions(prev => prev.filter(s => s.id !== id));
-  };
+  const deleteSession = (id: string) => deleteDoc(ref(id));
 
   const updateSession = (id: string, data: Omit<Session, 'id'>) => {
-    setSessions(prev => prev.map(s => s.id === id ? { ...data, id } : s));
+    updateDoc(ref(id), data as any);
   };
 
-  // Return sorted newest first
   const sortedSessions = [...sessions].sort((a, b) => {
-    const dateCompare = b.date.localeCompare(a.date);
-    if (dateCompare !== 0) return dateCompare;
-    return b.startTime.localeCompare(a.startTime);
+    const d = b.date.localeCompare(a.date);
+    return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
   });
 
   return { sessions: sortedSessions, addSession, deleteSession, updateSession };
