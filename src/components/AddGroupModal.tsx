@@ -43,7 +43,6 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
   const [startTime, setStartTime] = useState(initialValues?.startTime ?? '08:00');
   const [endTime, setEndTime] = useState(initialValues?.endTime ?? '12:00');
   const [levels, setLevels] = useState<GroupLevel[]>(initialValues?.levels ?? []);
-  const [notes, setNotes] = useState(initialValues?.notes ?? '');
   const [image, setImage] = useState<string | undefined>(initialValues?.image);
 
   const toggleLevel = (lv: GroupLevel) =>
@@ -62,7 +61,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   const handleSave = () => {
     if (!name.trim() || days.length === 0) return;
-    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, notes: notes.trim() || undefined, image });
+    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, image });
     onClose();
   };
 
@@ -139,11 +138,6 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
         </div>
       </div>
 
-      <div className="mb-2">
-        <label className={text.label}>โน้ต (ไม่บังคับ)</label>
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={4}
-          className={input.textarea} />
-      </div>
     </BottomSheet>
   );
 }
