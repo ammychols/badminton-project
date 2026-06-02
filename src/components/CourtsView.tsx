@@ -95,7 +95,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       ) : (
         <>
           {/* Court grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
@@ -126,30 +126,29 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           {selectedCourt && (
             <div>
               {/* Court detail bar */}
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-                <div>
-                  <h3 className="text-xl font-black text-gray-900">{selectedCourt.name}</h3>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) && (
-                      <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 hover:opacity-70 transition-opacity">
-                        {selectedCourt.info.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
-                        {selectedCourt.info.air   && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
-                        {selectedCourt.info.parking && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
-                      </button>
-                    )}
-                    {!selectedCourt.info?.floor && !selectedCourt.info?.air && !selectedCourt.info?.parking && (
-                      <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-gray-400 hover:text-gray-600">+ ข้อมูลสนาม</button>
-                    )}
+              <div className="mb-4 pb-3 border-b border-gray-200">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-xl font-black text-gray-900 leading-tight">{selectedCourt.name}</h3>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
+                    <button
+                      onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                      className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors whitespace-nowrap"
+                    >
+                      + ก๊วน
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
-                  <button
-                    onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                    className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
-                  >
-                    + ก๊วน
-                  </button>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) ? (
+                    <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 hover:opacity-70 transition-opacity">
+                      {selectedCourt.info.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
+                      {selectedCourt.info.air   && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
+                      {selectedCourt.info.parking && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
+                    </button>
+                  ) : (
+                    <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-gray-400 hover:text-gray-600">+ ข้อมูลสนาม</button>
+                  )}
                 </div>
               </div>
 
