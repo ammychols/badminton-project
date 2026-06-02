@@ -9,7 +9,7 @@ interface BottomSheetProps {
 
 export function BottomSheet({ title, onClose, children, footer }: BottomSheetProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center">
+    <div className="fixed inset-0 bg-black/50 z-[80] flex items-end justify-center sm:items-center">
       <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md flex flex-col max-h-[90vh]">
         <div className="overflow-y-auto flex-1 p-6">
           <div className="flex items-center justify-between mb-5">

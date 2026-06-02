@@ -64,6 +64,7 @@ export default function App() {
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
   const closeModal = () => setModal(null);
+  const openModal = (m: ModalState) => { setShowUserMenu(false); setModal(m); };
   const activeCourt = modal?.courtSnapshot ?? (modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined);
   const activeGroup = activeCourt && modal?.groupId ? activeCourt.groups.find(g => g.id === modal.groupId) : undefined;
 
@@ -109,21 +110,21 @@ export default function App() {
         {tab === 'courts' ? (
           <CourtsView
             courts={courts}
-            onAddCourt={() => setModal({ type: 'addCourt' })}
-            onAddGroup={(courtId, defaultDay) => setModal({ type: 'addGroup', courtId, defaultDay })}
+            onAddCourt={() => openModal({ type: 'addCourt' })}
+            onAddGroup={(courtId, defaultDay) => openModal({ type: 'addGroup', courtId, defaultDay })}
             onDeleteCourt={deleteCourt}
             onDeleteGroup={deleteGroup}
-            onEditGroup={(courtId, groupId) => setModal({ type: 'editGroup', courtId, groupId })}
-            onRateCourt={courtId => setModal({ type: 'courtInfo', courtId })}
+            onEditGroup={(courtId, groupId) => openModal({ type: 'editGroup', courtId, groupId })}
+            onRateCourt={courtId => openModal({ type: 'courtInfo', courtId })}
             onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toISOString() })}
           />
         ) : (
           <SessionsView
             sessions={sessions}
             courts={courts}
-            onLogSession={() => setModal({ type: 'logSession' })}
+            onLogSession={() => openModal({ type: 'logSession' })}
             onDeleteSession={deleteSession}
-            onEditSession={session => setModal({ type: 'logSession', sessionId: session.id })}
+            onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
           />
         )}
       </main>
