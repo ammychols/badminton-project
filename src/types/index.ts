@@ -66,3 +66,15 @@ export interface TodayGroup {
   group: Group;
   averageScore: number;
 }
+
+export interface Session {
+  id: string;
+  courtId: string;
+  groupId: string;
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+  gamesPlayed: number;
+  mood: 1 | 2 | 3 | 4 | 5;
+  notes?: string;
+}
