@@ -177,7 +177,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
       </div>
 
       {/* Court + Group */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-3 mb-1">
         <div>
           <label className={text.label}>สนาม</label>
           <select value={courtId} onChange={e => handleCourtChange(e.target.value)} className={input.base}>
@@ -193,6 +193,13 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
           </select>
         </div>
       </div>
+      {filteredCourts.length === 0 && courts.length > 0 && (
+        <p className="text-xs text-amber-500 mb-3">⚠ ไม่มีก๊วนที่เปิดวันนี้ — แสดงทั้งหมด</p>
+      )}
+      {filteredCourts.length > 0 && groups.length === 0 && allGroups.length > 0 && (
+        <p className="text-xs text-amber-500 mb-3">⚠ ก๊วนนี้ไม่เปิดวันนี้ — แสดงทั้งหมด</p>
+      )}
+      {filteredCourts.length > 0 && groups.length > 0 && <div className="mb-3" />}
 
       {/* Time + Games */}
       <div className="grid grid-cols-3 gap-3 mb-4">
