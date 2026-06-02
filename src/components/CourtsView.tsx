@@ -114,8 +114,14 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   </span>
                   <p className="font-semibold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
                   {court.address && (() => {
-                    const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
-                    return <p className="text-xs text-gray-400 truncate">{parts.slice(-2).join(' · ')}</p>;
+                    const parts = court.address
+                      .split(',')
+                      .map(s => s.trim())
+                      .filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
+                    const short = parts.length >= 2
+                      ? parts.slice(-2).join(' · ')
+                      : parts[0] ?? court.address;
+                    return <p className="text-xs text-gray-400 truncate max-w-full">{short}</p>;
                   })()}
                   <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
                 </button>
