@@ -13,6 +13,7 @@ interface ModalState {
   courtId?: string;
   groupId?: string;
   defaultDay?: DayOfWeek;
+  isNewCourt?: boolean;
 }
 
 export default function App() {
@@ -49,7 +50,7 @@ export default function App() {
       {modal?.type === 'addCourt' && (
         <AddCourtModal onClose={closeModal} onSave={data => {
           const newCourt = addCourt(data);
-          setModal({ type: 'addGroup', courtId: newCourt.id });
+          setModal({ type: 'courtInfo', courtId: newCourt.id, isNewCourt: true });
         }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
@@ -67,7 +68,12 @@ export default function App() {
         <CourtInfoModal
           court={activeCourt}
           onClose={closeModal}
-          onSave={data => { updateCourt(modal.courtId!, { info: data }); closeModal(); }}
+          isNewCourt={modal.isNewCourt}
+          onSave={data => {
+            updateCourt(modal.courtId!, { info: data });
+            if (modal.isNewCourt) setModal({ type: 'addGroup', courtId: modal.courtId });
+            else closeModal();
+          }}
         />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (

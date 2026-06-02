@@ -5,6 +5,7 @@ interface CourtInfoModalProps {
   court: Court;
   onClose: () => void;
   onSave: (data: CourtInfo) => void;
+  isNewCourt?: boolean;
 }
 
 function ChipGroup<T extends string>({
@@ -37,7 +38,7 @@ function ChipGroup<T extends string>({
   );
 }
 
-export function CourtInfoModal({ court, onClose, onSave }: CourtInfoModalProps) {
+export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfoModalProps) {
   const existing = court.info;
   const [floor, setFloor] = useState<FloorType | undefined>(existing?.floor);
   const [air, setAir] = useState<AirType | undefined>(existing?.air);
@@ -46,7 +47,6 @@ export function CourtInfoModal({ court, onClose, onSave }: CourtInfoModalProps) 
 
   const handleSave = () => {
     onSave({ floor, air, parking, notes: notes.trim() || undefined });
-    onClose();
   };
 
   return (
@@ -74,12 +74,19 @@ export function CourtInfoModal({ court, onClose, onSave }: CourtInfoModalProps) 
             />
           </div>
 
-          <button
-            onClick={handleSave}
-            className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 transition-colors"
-          >
-            บันทึก
-          </button>
+          <div className="flex gap-2">
+            {isNewCourt && (
+              <button onClick={() => onSave({})} className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+                ข้าม
+              </button>
+            )}
+            <button
+              onClick={handleSave}
+              className="flex-1 bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 transition-colors"
+            >
+              {isNewCourt ? 'บันทึก → เพิ่มก๊วน' : 'บันทึก'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
