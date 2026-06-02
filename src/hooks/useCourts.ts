@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Court, Group, Review } from '../types';
 
@@ -23,8 +23,9 @@ export function useCourts(uid: string) {
     return court;
   };
 
+  // Use setDoc merge so it works even if doc was just created (no race condition)
   const updateCourt = (id: string, data: Partial<Court>) => {
-    updateDoc(ref(id), data as any);
+    setDoc(ref(id), data, { merge: true });
   };
 
   const deleteCourt = (id: string) => {
@@ -35,29 +36,29 @@ export function useCourts(uid: string) {
     const court = get(courtId);
     if (!court) return;
     const newGroup: Group = { ...group, id: crypto.randomUUID(), courtId, reviews: [] };
-    updateDoc(ref(courtId), { groups: [...court.groups, newGroup] });
+    setDoc(ref(courtId), { groups: [...court.groups, newGroup] }, { merge: true });
     return newGroup;
   };
 
   const updateGroup = (courtId: string, groupId: string, data: Partial<Group>) => {
     const court = get(courtId);
     if (!court) return;
-    updateDoc(ref(courtId), { groups: court.groups.map(g => g.id === groupId ? { ...g, ...data } : g) });
+    setDoc(ref(courtId), { groups: court.groups.map(g => g.id === groupId ? { ...g, ...data } : g) }, { merge: true });
   };
 
   const deleteGroup = (courtId: string, groupId: string) => {
     const court = get(courtId);
     if (!court) return;
-    updateDoc(ref(courtId), { groups: court.groups.filter(g => g.id !== groupId) });
+    setDoc(ref(courtId), { groups: court.groups.filter(g => g.id !== groupId) }, { merge: true });
   };
 
   const addReview = (courtId: string, groupId: string, review: Omit<Review, 'id' | 'groupId'>) => {
     const court = get(courtId);
     if (!court) return;
     const newReview: Review = { ...review, id: crypto.randomUUID(), groupId };
-    updateDoc(ref(courtId), {
+    setDoc(ref(courtId), {
       groups: court.groups.map(g => g.id === groupId ? { ...g, reviews: [newReview] } : g),
-    });
+    }, { merge: true });
   };
 
   return { courts, addCourt, updateCourt, deleteCourt, addGroup, updateGroup, deleteGroup, addReview };
