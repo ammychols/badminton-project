@@ -112,8 +112,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
                         const short = parts.slice(-2).join(' · ');
                         return (
-                          <button onClick={() => setViewMode('map')} title={court.address} className="text-xs text-gray-500 hover:text-green-400 transition-colors text-left mb-3">
-                            📍 {short}
+                          <button onClick={() => setViewMode('map')} title={court.address} className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-400 transition-colors text-left mb-3">
+                            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                            {short}
                           </button>
                         );
                       })()}
