@@ -26,7 +26,9 @@ export function useSessions(uid: string) {
   const deleteSession = (id: string) => deleteDoc(ref(id));
 
   const updateSession = (id: string, data: Omit<Session, 'id'>) => {
-    updateDoc(ref(id), data as any);
+    const raw = { ...data, id };
+    const session = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as unknown as Session;
+    setDoc(ref(id), session);
   };
 
   const sortedSessions = [...sessions].sort((a, b) => {
