@@ -100,31 +100,38 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
-                <button
-                  key={court.id}
-                  onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
-                  onMouseDown={e => e.preventDefault()}
-                  className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all flex-shrink-0 w-48 sm:w-auto ${
-                    isSelected ? 'bg-gray-800' : 'bg-gray-900/80 hover:bg-gray-800'
-                  }`}
-                >
-                  {/* Decorative letter */}
-                  <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
-                    {court.name.charAt(0).toUpperCase()}
-                  </span>
-                  <p className="font-semibold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
-                  {court.address && (() => {
-                    const parts = court.address
-                      .split(',')
-                      .map(s => s.trim())
-                      .filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
-                    const short = parts.length >= 2
-                      ? parts.slice(-2).join(' · ')
-                      : parts[0] ?? court.address;
-                    return <p className="text-xs text-gray-400 truncate max-w-full">{short}</p>;
-                  })()}
-                  <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
-                </button>
+                <div key={court.id} className="relative flex-shrink-0 w-48 sm:w-auto">
+                  <button
+                    onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
+                    onMouseDown={e => e.preventDefault()}
+                    className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full ${
+                      isSelected ? 'bg-gray-800' : 'bg-gray-900/80 hover:bg-gray-800'
+                    }`}
+                  >
+                    <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
+                      {court.name.charAt(0).toUpperCase()}
+                    </span>
+                    <p className="font-semibold text-white text-sm leading-tight truncate mb-1 pr-5">{court.name}</p>
+                    {court.address && (() => {
+                      const parts = court.address
+                        .split(',')
+                        .map(s => s.trim())
+                        .filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
+                      const short = parts.length >= 2
+                        ? parts.slice(-2).join(' · ')
+                        : parts[0] ?? court.address;
+                      return <p className="text-xs text-gray-400 truncate max-w-full">{short}</p>;
+                    })()}
+                    <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
+                  </button>
+                  <button
+                    onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
+                    className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-white/40 hover:bg-red-500/80 hover:text-white transition-colors"
+                    title="ลบสนาม"
+                  >
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -136,15 +143,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               <div className="mb-4 pb-3 border-b border-gray-200">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold text-gray-900 leading-tight">{selectedCourt.name}</h3>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-300 hover:text-red-400 transition-colors text-xs">ลบ</button>
-                    <button
-                      onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                      className="bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors whitespace-nowrap"
-                    >
-                      + ก๊วน
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                    className="bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors whitespace-nowrap flex-shrink-0"
+                  >
+                    + ก๊วน
+                  </button>
                 </div>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) ? (
