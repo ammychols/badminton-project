@@ -10,7 +10,7 @@ interface CourtsViewProps {
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onEditGroup: (courtId: string, groupId: string) => void;
   onRateCourt: (courtId: string) => void;
-  onAddReview: (courtId: string, groupId: string) => void;
+  onAddReview: (courtId: string, groupId: string, notes: string) => void;
 }
 
 const DAY_COLORS: Record<DayOfWeek, { pill: string; active: string; bg: string }> = {
@@ -164,7 +164,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                       group={group}
                       onDelete={() => onDeleteGroup(selectedCourt.id, group.id)}
                       onEdit={() => onEditGroup(selectedCourt.id, group.id)}
-                      onReview={() => onAddReview(selectedCourt.id, group.id)}
+                      onSaveNote={(notes) => onAddReview(selectedCourt.id, group.id, notes)}
                     />
                   ))}
                 </div>
@@ -214,10 +214,17 @@ function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm:
   );
 }
 
-function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDelete: () => void; onEdit: () => void; onReview: () => void }) {
+function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDelete: () => void; onEdit: () => void; onSaveNote: (notes: string) => void }) {
   const review = group.reviews[0];
   const [confirming, setConfirming] = useState(false);
+  const [editingNote, setEditingNote] = useState(false);
+  const [noteText, setNoteText] = useState(review?.notes ?? '');
   const firstDay = (Object.keys(DAY_LABELS) as DayOfWeek[]).find(d => group.days.includes(d));
+
+  const commitNote = () => {
+    setEditingNote(false);
+    onSaveNote(noteText.trim());
+  };
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
@@ -264,14 +271,28 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           ))}
         </div>
         {group.notes && <p className="text-xs text-gray-400 mb-2 leading-relaxed">{group.notes}</p>}
-        <div className="border-t border-gray-100 pt-2 flex items-center justify-between gap-2">
-          {review ? (
-            <>
-              {review.notes && <p className="text-xs text-gray-400">{review.notes}</p>}
-              <button onClick={onReview} className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">แก้ไข</button>
-            </>
+        <div className="border-t border-gray-100 pt-2">
+          {editingNote ? (
+            <textarea
+              autoFocus
+              value={noteText}
+              onChange={e => setNoteText(e.target.value)}
+              onBlur={commitNote}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(review?.notes ?? ''); setEditingNote(false); } }}
+              placeholder="บันทึกความเห็น..."
+              rows={2}
+              className="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
           ) : (
-            <button onClick={onReview} className="text-xs text-gray-400 hover:text-gray-600">+ เพิ่มรีวิว</button>
+            <button
+              onClick={() => { setNoteText(review?.notes ?? ''); setEditingNote(true); }}
+              className="w-full text-left"
+            >
+              {review?.notes
+                ? <p className="text-xs text-gray-500 leading-relaxed hover:text-gray-700 transition-colors">{review.notes}</p>
+                : <p className="text-xs text-gray-300 hover:text-gray-400 transition-colors">+ บันทึกความเห็น</p>
+              }
+            </button>
           )}
         </div>
       </div>

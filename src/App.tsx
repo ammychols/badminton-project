@@ -52,7 +52,7 @@ export default function App() {
               onDeleteGroup={deleteGroup}
               onEditGroup={(courtId, groupId) => setModal({ type: 'editGroup', courtId, groupId })}
               onRateCourt={courtId => setModal({ type: 'courtInfo', courtId })}
-              onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
+              onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toISOString() })}
             />
         ) : (
           <SessionsView
