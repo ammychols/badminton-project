@@ -89,7 +89,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       ) : filteredCourts.length === 0 ? (
         <div className="text-center py-24 text-gray-400">ไม่มีก๊วนในวันนี้</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {filteredCourts.map(court => {
             const visibleGroups = selectedDay === 'all'
               ? court.groups
@@ -153,7 +153,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 ) : visibleGroups.length === 0 ? (
                   <p className="text-sm text-gray-400 text-center py-4">ไม่มีก๊วนในวันนี้</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {visibleGroups.map(group => (
                       <GroupCard
                         key={group.id}
