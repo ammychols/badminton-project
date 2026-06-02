@@ -9,37 +9,31 @@ interface BottomSheetProps {
 
 export function BottomSheet({ title, onClose, children, footer }: BottomSheetProps) {
   return (
-    <>
-      {/* Backdrop — closes modal on click */}
+    <div
+      className="fixed inset-0 bg-black/50 z-[100] flex items-end justify-center sm:items-center"
+      onMouseDown={onClose}
+    >
       <div
-        className="fixed inset-0 bg-black/50 z-[99]"
-        onClick={onClose}
-      />
-
-      {/* Modal content — sits above backdrop, pointer events only on white box */}
-      <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center pointer-events-none">
-        <div
-          className="pointer-events-auto bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-y-auto max-h-[90vh]"
-          onClick={e => e.stopPropagation()}
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors text-xl leading-none"
-              >×</button>
-            </div>
-            {children}
+        className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-y-auto max-h-[90vh]"
+        onMouseDown={e => e.stopPropagation()}
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+            <button
+              type="button"
+              onMouseDown={e => { e.stopPropagation(); onClose(); }}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors text-xl leading-none"
+            >×</button>
           </div>
-          {footer && (
-            <div className="px-6 pb-6 pt-3 border-t border-gray-100">
-              {footer}
-            </div>
-          )}
+          {children}
         </div>
+        {footer && (
+          <div className="px-6 pb-6 pt-3 border-t border-gray-100">
+            {footer}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
