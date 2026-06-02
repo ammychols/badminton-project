@@ -121,13 +121,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
 
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) ? (
-                          <>
+                          <button onClick={() => onRateCourt(court.id)} className="flex items-center gap-1.5 flex-wrap hover:opacity-80 transition-opacity">
                             {court.info.floor && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>}
                             {court.info.air   && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{AIR_LABELS[court.info.air]}</span>}
                             {court.info.parking && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{PARKING_LABELS[court.info.parking]}</span>}
                             {court.info.notes && <span className="text-xs text-gray-400">{court.info.notes}</span>}
-                            <button onClick={() => onRateCourt(court.id)} className="text-gray-600 hover:text-gray-300 transition-colors text-xs">✎</button>
-                          </>
+                          </button>
                         ) : (
                           <button onClick={() => onRateCourt(court.id)} className="bg-white/10 hover:bg-white/20 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-1 rounded-full transition-colors">
                             + ข้อมูลสนาม
