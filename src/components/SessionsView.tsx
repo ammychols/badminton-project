@@ -215,7 +215,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
     courts.find(c => c.id === courtId)?.groups.find(g => g.id === groupId)?.name ?? 'ไม่พบก๊วน';
 
   return (
-    <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10">
+    <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
