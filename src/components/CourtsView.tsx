@@ -95,7 +95,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       ) : (
         <>
           {/* Court grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
+          <div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:mb-6 flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
@@ -103,7 +103,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   key={court.id}
                   onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                   onMouseDown={e => e.preventDefault()}
-                  className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all ${
+                  className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all flex-shrink-0 w-48 sm:w-auto ${
                     isSelected ? 'bg-gray-800' : 'bg-gray-900/80 hover:bg-gray-800'
                   }`}
                 >
