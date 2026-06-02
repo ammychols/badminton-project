@@ -6,7 +6,7 @@ import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 
-import { DayOfWeek } from './types';
+import { Court, DayOfWeek } from './types';
 
 interface ModalState {
   type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'courtInfo';
@@ -14,6 +14,7 @@ interface ModalState {
   groupId?: string;
   defaultDay?: DayOfWeek;
   isNewCourt?: boolean;
+  courtSnapshot?: Court;
 }
 
 export default function App() {
@@ -21,7 +22,7 @@ export default function App() {
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts();
 
   const closeModal = () => setModal(null);
-  const activeCourt = modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined;
+  const activeCourt = modal?.courtSnapshot ?? (modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined);
   const activeGroup = activeCourt && modal?.groupId ? activeCourt.groups.find(g => g.id === modal.groupId) : undefined;
 
   return (
@@ -50,7 +51,7 @@ export default function App() {
       {modal?.type === 'addCourt' && (
         <AddCourtModal onClose={closeModal} onSave={data => {
           const newCourt = addCourt(data);
-          setModal({ type: 'courtInfo', courtId: newCourt.id, isNewCourt: true });
+          setModal({ type: 'courtInfo', courtId: newCourt.id, isNewCourt: true, courtSnapshot: newCourt });
         }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
