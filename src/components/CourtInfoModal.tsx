@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Court, CourtInfo, FloorType, AirType, ParkingType, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { BottomSheet } from './BottomSheet';
+import { text } from '../styles/tokens';
 
 interface CourtInfoModalProps {
   court: Court;
@@ -64,7 +65,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
       <ChipGroup label="อากาศ" options={['aircon', 'fan', 'stuffy'] as AirType[]} labels={AIR_LABELS} value={air} onChange={setAir} />
       <ChipGroup label="ที่จอดรถ" options={['easy', 'limited', 'none'] as ParkingType[]} labels={PARKING_LABELS} value={parking} onChange={setParking} />
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">โน้ต (ไม่บังคับ)</label>
+        <label className={text.label}>โน้ต (ไม่บังคับ)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)}
           placeholder="เช่น ค่าคอร์ท 80 บาท, มีน้ำดื่มฟรี" rows={3}
           className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none" />

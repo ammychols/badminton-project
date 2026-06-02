@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BottomSheet } from './BottomSheet';
+import { text } from '../styles/tokens';
 
 interface AddCourtModalProps {
   onClose: () => void;
@@ -76,7 +77,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   return (
     <BottomSheet title="เพิ่มสนามใหม่" onClose={onClose} footer={saveButton}>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">ค้นหาจาก Google Maps</label>
+        <label className={text.label}>ค้นหาจาก Google Maps</label>
         <div className="relative">
           <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             placeholder={mapsAvailable ? 'พิมพ์ชื่อสนาม...' : 'กำลังโหลด Google Maps...'}
@@ -106,14 +107,14 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
       <div className="text-center text-xs text-gray-400 mb-3">— หรือกรอกเอง —</div>
 
       <div className="mb-3">
-        <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อสนาม *</label>
+        <label className={text.label}>ชื่อสนาม *</label>
         <input type="text" value={name} onChange={e => setName(e.target.value)}
           placeholder="เช่น สนามแบดโก้วเฮง"
           className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400" />
       </div>
 
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">ที่อยู่ / พื้นที่</label>
+        <label className={text.label}>ที่อยู่ / พื้นที่</label>
         <input type="text" value={address} onChange={e => setAddress(e.target.value)}
           placeholder="เช่น ลาดพร้าว กรุงเทพฯ"
           className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400" />

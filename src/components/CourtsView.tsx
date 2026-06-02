@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
 import { CourtsMap } from './CourtsMap';
+import { btn, emptyState } from '../styles/tokens';
 
 interface CourtsViewProps {
   courts: Court[];
@@ -53,7 +54,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {/* Top bar */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-bold text-gray-900">สนามของฉัน</h2>
-        <button onClick={onAddCourt} className="bg-gray-900 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors flex items-center gap-1.5">
+        <button onClick={onAddCourt} className={btn.primaryIcon}>
           <span className="text-lg leading-none">+</span> เพิ่มสนาม
         </button>
       </div>
@@ -64,10 +65,10 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           <button
             key={key}
             onClick={() => setSelectedDay(key)}
-            className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+            className={`flex-shrink-0 ${btn.pill} ${
               selectedDay === key
-                ? (key === 'all' ? 'bg-gray-900 text-white' : DAY_COLORS[key as DayOfWeek].active)
-                : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-300'
+                ? (key === 'all' ? btn.pillActive : DAY_COLORS[key as DayOfWeek].active)
+                : btn.pillInactive
             }`}
           >
             {label}
@@ -84,11 +85,11 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
 
       {viewMode === 'list' && (courts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center text-4xl mb-5">🏸</div>
-          <div className="text-base font-semibold text-gray-800 mb-1">เพิ่มสนามแบดมินตัน</div>
-          <div className="text-sm text-gray-400 mb-6">บันทึกสนามที่ชอบไปตีไว้ที่นี่</div>
-          <button onClick={onAddCourt} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors">
+        <div className={emptyState.wrapper}>
+          <div className={emptyState.icon}>🏸</div>
+          <div className={emptyState.title}>เพิ่มสนามแบดมินตัน</div>
+          <div className={emptyState.subtitle}>บันทึกสนามที่ชอบไปตีไว้ที่นี่</div>
+          <button onClick={onAddCourt} className={btn.primaryLg}>
             + เพิ่มสนามแรก
           </button>
         </div>
@@ -180,8 +181,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             <p className="text-base font-semibold text-gray-800 mb-1">ลบสนาม</p>
             <p className="text-sm text-gray-400 mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
             <div className="flex gap-2">
-              <button onClick={() => setConfirmDeleteCourt(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
-              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
+              <button onClick={() => setConfirmDeleteCourt(null)} className={btn.cancel}>ยกเลิก</button>
+              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }} className={btn.danger}>ลบ</button>
             </div>
           </div>
         </div>
@@ -206,8 +207,8 @@ function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm:
         <p className="text-base font-semibold text-gray-800 mb-1">ลบก๊วน</p>
         <p className="text-sm text-gray-400 mb-5">"{name}"</p>
         <div className="flex gap-2">
-          <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
-          <button onClick={onConfirm} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
+          <button onClick={onCancel} className={btn.cancel}>ยกเลิก</button>
+          <button onClick={onConfirm} className={btn.danger}>ลบ</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Court, Session } from '../types';
 import { BottomSheet } from './BottomSheet';
+import { text, input } from '../styles/tokens';
 
 interface LogSessionModalProps {
   courts: Court[];
@@ -11,7 +12,6 @@ interface LogSessionModalProps {
 const MOOD_EMOJIS: Record<number, string> = { 1: '😴', 2: '😐', 3: '🙂', 4: '😄', 5: '🔥' };
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
-const SELECT_CLS = 'flex-1 border border-gray-200 rounded-xl px-2 py-2 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white appearance-none text-center';
 const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 const MONTH_LABELS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 
@@ -31,11 +31,11 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
   );
   return (
     <div className="flex gap-1 items-center">
-      <select value={h} onChange={e => onChange(`${e.target.value}:${m}`)} className={SELECT_CLS}>
+      <select value={h} onChange={e => onChange(`${e.target.value}:${m}`)} className={input.timeSelect}>
         {HOURS.map(hh => <option key={hh} value={hh}>{hh}</option>)}
       </select>
       <span className="text-gray-400 font-medium">:</span>
-      <select value={nearestMin} onChange={e => onChange(`${h}:${e.target.value}`)} className={SELECT_CLS}>
+      <select value={nearestMin} onChange={e => onChange(`${h}:${e.target.value}`)} className={input.timeSelect}>
         {MINUTES.map(mm => <option key={mm} value={mm}>{mm}</option>)}
       </select>
     </div>
@@ -155,9 +155,9 @@ export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProp
 
       {/* Court */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">สนาม</label>
+        <label className={text.label}>สนาม</label>
         <select value={courtId} onChange={e => handleCourtChange(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white">
+          className={input.base}>
           {courts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
           {courts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
@@ -165,9 +165,9 @@ export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProp
 
       {/* Group */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">ก๊วน</label>
+        <label className={text.label}>ก๊วน</label>
         <select value={groupId} onChange={e => setGroupId(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 bg-white">
+          className={input.base}>
           {groups.length === 0 && <option value="">ยังไม่มีก๊วนในสนามนี้</option>}
           {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
@@ -176,11 +176,11 @@ export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProp
       {/* Times */}
       <div className="flex gap-3 mb-4">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">เวลาเริ่ม</label>
+          <label className={text.label}>เวลาเริ่ม</label>
           <TimePicker value={startTime} onChange={setStartTime} />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">เวลาเลิก</label>
+          <label className={text.label}>เวลาเลิก</label>
           <TimePicker value={endTime} onChange={setEndTime} />
         </div>
       </div>
@@ -212,10 +212,10 @@ export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProp
 
       {/* Notes */}
       <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">โน้ต (ไม่บังคับ)</label>
+        <label className={text.label}>โน้ต (ไม่บังคับ)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)}
           placeholder="เช่น วันนี้เล่นดีมาก!" rows={3}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-gray-400 resize-none" />
+          className={input.textarea} />
       </div>
     </BottomSheet>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Court, Session } from '../types';
+import { btn, card, text, emptyState } from '../styles/tokens';
 
 interface SessionsViewProps {
   sessions: Session[];
@@ -62,7 +63,7 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
   const maxDow = Math.max(...dowCount, 1);
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
+    <div className={`${card.padded} mb-4`}>
       <div className="text-sm font-semibold text-gray-800 mb-4">สถิติรายเดือน</div>
 
       {/* Monthly bars */}
@@ -189,10 +190,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold text-gray-900">บันทึกการตี</h2>
+        <h2 className={text.pageTitle}>บันทึกการตี</h2>
         <button
           onClick={onLogSession}
-          className="bg-gray-900 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors flex items-center gap-1.5"
+          className={btn.primaryIcon}
         >
           <span className="text-lg leading-none">+</span> บันทึก
         </button>
@@ -247,11 +248,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }
 
       {/* Session list */}
       {sessions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center text-4xl mb-5">🏸</div>
-          <div className="text-base font-semibold text-gray-800 mb-1">เริ่มบันทึกการตีแบด</div>
-          <div className="text-sm text-gray-400 mb-6">ติดตามพัฒนาการและสถิติของคุณ</div>
-          <button onClick={onLogSession} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors">
+        <div className={emptyState.wrapper}>
+          <div className={emptyState.icon}>🏸</div>
+          <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+          <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+          <button onClick={onLogSession} className={btn.primaryLg}>
             + บันทึกครั้งแรก
           </button>
         </div>
@@ -262,7 +263,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }
             return (
               <div
                 key={session.id}
-                className="bg-white border border-gray-100 rounded-2xl overflow-hidden flex"
+                className={`${card.base} overflow-hidden flex`}
               >
                 {/* Mood accent bar */}
                 <div className={`w-1 flex-shrink-0 ${MOOD_ACCENT[session.mood]}`} />
