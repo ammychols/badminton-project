@@ -42,8 +42,22 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
+  const [viewYear, setViewYear] = useState(currentYear);
+  const [viewMonth, setViewMonth] = useState(currentMonth);
 
-  // Build last 6 months summary
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth)) return;
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  };
+  const isNextDisabled = viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth);
+
+  // Build last 6 months summary (always relative to today)
+  const currentYM = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
   const monthStats = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(currentYear, currentMonth - (5 - i), 1);
     const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -52,11 +66,12 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
   });
   const maxMonth = Math.max(...monthStats.map(m => m.count), 1);
 
-  // Build current month calendar
-  const currentYM = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const firstDow = new Date(currentYear, currentMonth, 1).getDay();
-  const sessionDays = new Set(sessions.filter(s => s.date.startsWith(currentYM)).map(s => parseInt(s.date.slice(8))));
+  // Build viewed month calendar
+  const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+  const sessionDays = new Set(sessions.filter(s => s.date.startsWith(viewYM)).map(s => parseInt(s.date.slice(8))));
+  const isViewingCurrentMonth = viewYM === currentYM;
 
   // Day-of-week frequency (all time)
   const dowCount = Array(7).fill(0);
@@ -87,16 +102,21 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
         })}
       </div>
 
-      {/* Current month mini calendar */}
+      {/* Calendar with month nav */}
       <div className="mb-4">
-        <div className="text-xs font-medium text-gray-500 mb-2">{MONTH_SHORT[currentMonth]} {currentYear + 543} — วันที่ตี</div>
+        <div className="flex items-center justify-between mb-2">
+          <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none">‹</button>
+          <span className="text-xs font-medium text-gray-600">{MONTH_SHORT[viewMonth]} {viewYear + 543} — วันที่ตี</span>
+          <button onClick={nextMonth} disabled={isNextDisabled}
+            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none disabled:opacity-20 disabled:cursor-default">›</button>
+        </div>
         <div className="grid grid-cols-7 gap-1">
           {DOW_LABELS.map(d => (
             <div key={d} className="text-center text-xs text-gray-300 pb-1">{d}</div>
           ))}
           {Array(firstDow).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
           {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
-            const isToday = d === now.getDate();
+            const isToday = isViewingCurrentMonth && d === now.getDate();
             const hasSession = sessionDays.has(d);
             return (
               <div key={d} className={`aspect-square flex flex-col items-center justify-center rounded-lg text-xs font-medium transition-all ${
