@@ -1,38 +1,46 @@
 import React from 'react';
 
-// Feather petal: wide leaf shape, extends downward from pivot (PX, PY)
-const PX = 40, PY = 32;
-const PETAL = `M ${PX} ${PY} C ${PX - 11} ${PY + 9} ${PX - 12} ${PY + 26} ${PX} ${PY + 34} C ${PX + 12} ${PY + 26} ${PX + 11} ${PY + 9} ${PX} ${PY}`;
-const ANGLES = [-34, -17, 0, 17, 34];
+// Draws a vertical shuttlecock then rotates it to match the reference tilt
+const PX = 40, PY = 36; // feather pivot
+const ANGLES = [-28, -9, 9, 28];
+
+function petal(angle: number) {
+  const rad = (angle * Math.PI) / 180;
+  // Tip of feather (30px from pivot)
+  const tx = PX + Math.sin(rad) * 30;
+  const ty = PY + Math.cos(rad) * 30;
+  // Control points for wide rounded shape
+  const lx = PX + Math.sin(rad - 0.38) * 18;
+  const ly = PY + Math.cos(rad - 0.38) * 18;
+  const rx = PX + Math.sin(rad + 0.38) * 18;
+  const ry = PY + Math.cos(rad + 0.38) * 18;
+  return `M ${PX} ${PY} Q ${lx.toFixed(1)} ${ly.toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q ${rx.toFixed(1)} ${ry.toFixed(1)} ${PX} ${PY}`;
+}
 
 export function AppIcon({ size = 80 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="80" height="80" rx="20" fill="#1a2035"/>
 
-      {/* Feather petals — outer ones first (darker), center on top */}
-      {ANGLES.map((angle, i) => {
-        const isCenter = i === 2;
-        return (
-          <g key={i} transform={`rotate(${angle}, ${PX}, ${PY})`}>
-            <path
-              d={PETAL}
-              fill={isCenter ? '#f0f0f0' : '#d8d8d8'}
-              stroke="#1a2035"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-          </g>
-        );
-      })}
+      {/* Rotate everything ~35° clockwise to match reference tilt */}
+      <g transform="rotate(35, 40, 40)">
 
-      {/* Collar — two thin stripes */}
-      <rect x="34" y="27" width="12" height="4" rx="2" fill="#c8c8c8" stroke="#1a2035" strokeWidth="1.5"/>
-      <rect x="34" y="23" width="12" height="5" rx="2.5" fill="#e0e0e0" stroke="#1a2035" strokeWidth="1.5"/>
+        {/* Feathers — back to front */}
+        {ANGLES.map((angle, i) => (
+          <path key={i} d={petal(angle)}
+            fill={i === 0 || i === 3 ? '#c8c8c8' : '#e8e8e8'}
+            stroke="#1a2035" strokeWidth="2.2" strokeLinejoin="round"/>
+        ))}
 
-      {/* Cork — small golden dome */}
-      <path d="M 32 23 Q 32 13 40 13 Q 48 13 48 23" fill="#f5c842" stroke="#1a2035" strokeWidth="2" strokeLinejoin="round"/>
-      <ellipse cx="40" cy="23" rx="8" ry="2.5" fill="#f5c842" stroke="#1a2035" strokeWidth="1.5"/>
+        {/* Collar stripes */}
+        <rect x="35.5" y="31" width="9" height="3.5" rx="1.5" fill="#b0b0b0" stroke="#1a2035" strokeWidth="1.5"/>
+        <rect x="35.5" y="27" width="9" height="5" rx="2.5" fill="#d8d8d8" stroke="#1a2035" strokeWidth="1.5"/>
+
+        {/* Cork */}
+        <circle cx="40" cy="19" r="9" fill="#f5c842" stroke="#1a2035" strokeWidth="2.2"/>
+        {/* Shadow on cork */}
+        <path d="M 32 22 Q 35 26 40 26 Q 45 26 48 22" fill="rgba(0,0,0,0.08)" stroke="none"/>
+      </g>
     </svg>
   );
 }
