@@ -25,7 +25,8 @@ export function useCourts(uid: string) {
 
   // Use setDoc merge so it works even if doc was just created (no race condition)
   const updateCourt = (id: string, data: Partial<Court>) => {
-    setDoc(ref(id), data, { merge: true });
+    const clean = JSON.parse(JSON.stringify(data));
+    setDoc(ref(id), clean, { merge: true });
   };
 
   const deleteCourt = (id: string) => {
