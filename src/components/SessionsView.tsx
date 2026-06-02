@@ -223,6 +223,20 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
   const hasSessionToday = sessions.some(s => s.date === today);
   const streak = calcStreak(sessions);
 
+  const sessionDurations = thisMonthSessions.map(s => {
+    const [sh, sm] = s.startTime.split(':').map(Number);
+    const [eh, em] = s.endTime.split(':').map(Number);
+    return (eh * 60 + em) - (sh * 60 + sm);
+  }).filter(d => d > 0);
+  const avgMinutes = sessionDurations.length > 0
+    ? Math.round(sessionDurations.reduce((a, b) => a + b, 0) / sessionDurations.length)
+    : null;
+  const avgDuration = avgMinutes
+    ? avgMinutes >= 60
+      ? `${Math.floor(avgMinutes / 60)}ชม.${avgMinutes % 60 > 0 ? `${avgMinutes % 60}น.` : ''}`
+      : `${avgMinutes}น.`
+    : null;
+
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
     courts.find(c => c.id === courtId)?.groups.find(g => g.id === groupId)?.name ?? 'ไม่พบก๊วน';
@@ -271,6 +285,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
           <div>
             <div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div>
             <div className="text-xs text-gray-400">เกม/วัน</div>
+          </div>
+          <div className="w-px bg-white/10" />
+          <div>
+            <div className="text-2xl font-bold">{avgDuration ?? '—'}</div>
+            <div className="text-xs text-gray-400">เฉลี่ย/ครั้ง</div>
           </div>
         </div>
       </div>
