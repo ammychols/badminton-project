@@ -23,7 +23,9 @@ interface ModalState {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('courts');
+  const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'courts');
+
+  const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts();
   const { sessions, addSession, deleteSession } = useSessions();
@@ -68,7 +70,7 @@ export default function App() {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
         <div className="flex items-center justify-center gap-2 px-6 py-2">
           <button
-            onClick={() => setTab('sessions')}
+            onClick={() => switchTab('sessions')}
             className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
               tab === 'sessions'
                 ? 'bg-gray-900 text-white'
@@ -79,7 +81,7 @@ export default function App() {
             <span>บันทึก</span>
           </button>
           <button
-            onClick={() => setTab('courts')}
+            onClick={() => switchTab('courts')}
             className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
               tab === 'courts'
                 ? 'bg-gray-900 text-white'
