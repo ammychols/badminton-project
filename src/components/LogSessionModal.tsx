@@ -97,17 +97,18 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
               key={d}
               disabled={isFuture}
               onClick={() => onChange(dateStr)}
-              className={`aspect-square flex items-center justify-center rounded-xl text-sm font-medium transition-all mx-0.5 ${
+              className={`aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all mx-0.5 ${
                 isSel
                   ? 'bg-gray-900 text-white'
-                  : isToday
-                  ? 'ring-2 ring-gray-300 text-gray-800'
                   : isFuture
                   ? 'text-gray-200 cursor-default'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
               {d}
+              {isToday && (
+                <span className={`w-1 h-1 rounded-full mt-0.5 ${isSel ? 'bg-white/60' : 'bg-gray-900'}`} />
+              )}
             </button>
           );
         })}
