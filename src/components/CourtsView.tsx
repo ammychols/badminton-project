@@ -150,15 +150,20 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     + ก๊วน
                   </button>
                 </div>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) ? (
-                    <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 hover:opacity-70 transition-opacity">
-                      {selectedCourt.info.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
-                      {selectedCourt.info.air   && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
-                      {selectedCourt.info.parking && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
-                    </button>
-                  ) : (
-                    <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-gray-400 hover:text-gray-600">+ ข้อมูลสนาม</button>
+                <div className="flex flex-col gap-1 mt-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) ? (
+                      <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 hover:opacity-70 transition-opacity">
+                        {selectedCourt.info.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
+                        {selectedCourt.info.air   && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
+                        {selectedCourt.info.parking && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
+                      </button>
+                    ) : (
+                      <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-gray-400 hover:text-gray-600">+ ข้อมูลสนาม</button>
+                    )}
+                  </div>
+                  {selectedCourt.info?.notes && (
+                    <p className="text-xs text-gray-400 leading-relaxed">{selectedCourt.info.notes}</p>
                   )}
                 </div>
               </div>
