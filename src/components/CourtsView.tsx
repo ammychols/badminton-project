@@ -103,7 +103,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   key={court.id}
                   onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                   className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all ${
-                    isSelected ? 'bg-gray-700' : 'bg-gray-900/80 hover:bg-gray-800'
+                    isSelected ? 'bg-gray-800' : 'bg-gray-900/80 hover:bg-gray-800'
                   }`}
                 >
                   {/* Decorative letter */}
