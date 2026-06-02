@@ -74,6 +74,8 @@ export default function App() {
     );
   }
 
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+
   if (!user) return <LoginScreen onSignIn={signIn} error={error} />;
 
   return (
@@ -82,11 +84,29 @@ export default function App() {
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
           <AppIcon size={28} />
           <h1 className="text-lg font-bold text-gray-900">BadmintonTracker</h1>
-          <button onClick={signOut} className="flex items-center gap-2">
+          <button onClick={() => setConfirmSignOut(true)} className="flex items-center gap-2">
             <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
           </button>
         </div>
       </header>
+
+      {confirmSignOut && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmSignOut(false)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-4">
+              <img src={user.photoURL ?? ''} alt="" className="w-10 h-10 rounded-full" />
+              <div>
+                <p className="text-sm font-semibold text-gray-800">{user.displayName}</p>
+                <p className="text-xs text-gray-400">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmSignOut(false)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
+              <button onClick={() => { signOut(); setConfirmSignOut(false); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ออกจากระบบ</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 pb-20">
         {tab === 'courts' ? (
