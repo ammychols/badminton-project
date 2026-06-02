@@ -36,11 +36,17 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
 export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [selectedCourtId, setSelectedCourtId] = useState<string | null>(() => courts[0]?.id ?? null);
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
 
   const filteredCourts = selectedDay === 'all'
     ? courts
     : courts.filter(court => court.groups.some(g => g.days.includes(selectedDay as DayOfWeek)));
+
+  const selectedCourt = courts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
+  const visibleGroups = selectedCourt
+    ? (selectedDay === 'all' ? selectedCourt.groups : selectedCourt.groups.filter(g => g.days.includes(selectedDay as DayOfWeek)))
+    : [];
 
   return (
     <div className="px-4 pt-5 pb-10">
@@ -86,89 +92,87 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           <p className="text-xl font-bold text-gray-800">ยังไม่มีสนาม</p>
           <p className="text-sm text-gray-400 mt-2">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
         </div>
-      ) : filteredCourts.length === 0 ? (
-        <div className="text-center py-24 text-gray-400">ไม่มีก๊วนในวันนี้</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {filteredCourts.map(court => {
-            const visibleGroups = selectedDay === 'all'
-              ? court.groups
-              : court.groups.filter(g => g.days.includes(selectedDay as DayOfWeek));
-
-            return (
-              <div key={court.id}>
-                {/* Court header — lifestyle style */}
-                <div className="relative bg-gray-900 rounded-3xl px-6 py-5 overflow-hidden mb-3">
-                  {/* Decorative large letter background */}
-                  <span className="absolute -right-2 -top-4 text-[9rem] font-black text-white/5 leading-none select-none pointer-events-none">
+        <>
+          {/* Court grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+            {filteredCourts.map(court => {
+              const isSelected = selectedCourt?.id === court.id;
+              return (
+                <button
+                  key={court.id}
+                  onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
+                  className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all ${
+                    isSelected ? 'bg-gray-900 ring-2 ring-green-400' : 'bg-gray-900/80 hover:bg-gray-800'
+                  }`}
+                >
+                  {/* Decorative letter */}
+                  <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
                     {court.name.charAt(0).toUpperCase()}
                   </span>
+                  <p className="font-bold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
+                  {court.address && (() => {
+                    const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
+                    return <p className="text-xs text-gray-400 truncate">{parts.slice(-2).join(' · ')}</p>;
+                  })()}
+                  <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
+                  {isSelected && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-400" />}
+                </button>
+              );
+            })}
+          </div>
 
-                  <div className="relative flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-2xl font-black text-white leading-tight mb-1">{court.name}</p>
-
-                      {court.address && (() => {
-                        const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
-                        const short = parts.slice(-2).join(' · ');
-                        return (
-                          <button onClick={() => setViewMode('map')} title={court.address} className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-400 transition-colors text-left mb-3">
-                            <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            {short}
-                          </button>
-                        );
-                      })()}
-
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) ? (
-                          <button onClick={() => onRateCourt(court.id)} className="flex items-center gap-1.5 flex-wrap hover:opacity-80 transition-opacity">
-                            {court.info.floor && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>}
-                            {court.info.air   && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{AIR_LABELS[court.info.air]}</span>}
-                            {court.info.parking && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-1 rounded-full">{PARKING_LABELS[court.info.parking]}</span>}
-                            {court.info.notes && <span className="text-xs text-gray-400">{court.info.notes}</span>}
-                          </button>
-                        ) : (
-                          <button onClick={() => onRateCourt(court.id)} className="bg-white/10 hover:bg-white/20 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-1 rounded-full transition-colors">
-                            + ข้อมูลสนาม
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
-                      <button
-                        onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                        className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
-                      >
-                        + ก๊วน
+          {/* Selected court groups */}
+          {selectedCourt && (
+            <div>
+              {/* Court detail bar */}
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                <div>
+                  <h3 className="text-xl font-black text-gray-900">{selectedCourt.name}</h3>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking) && (
+                      <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 hover:opacity-70 transition-opacity">
+                        {selectedCourt.info.floor && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
+                        {selectedCourt.info.air   && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
+                        {selectedCourt.info.parking && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
                       </button>
-                    </div>
+                    )}
+                    {!selectedCourt.info?.floor && !selectedCourt.info?.air && !selectedCourt.info?.parking && (
+                      <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-gray-400 hover:text-gray-600">+ ข้อมูลสนาม</button>
+                    )}
                   </div>
                 </div>
-
-                {/* Groups */}
-                {court.groups.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">ยังไม่มีก๊วน</p>
-                ) : visibleGroups.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-4">ไม่มีก๊วนในวันนี้</p>
-                ) : (
-                  <div className="grid grid-cols-1 gap-3">
-                    {visibleGroups.map(group => (
-                      <GroupCard
-                        key={group.id}
-                        group={group}
-                        onDelete={() => onDeleteGroup(court.id, group.id)}
-                        onEdit={() => onEditGroup(court.id, group.id)}
-                        onReview={() => onAddReview(court.id, group.id)}
-                      />
-                    ))}
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
+                  <button
+                    onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                    className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
+                  >
+                    + ก๊วน
+                  </button>
+                </div>
               </div>
-            );
-          })}
-        </div>
+
+              {visibleGroups.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-12">
+                  {selectedCourt.groups.length === 0 ? 'ยังไม่มีก๊วน' : 'ไม่มีก๊วนในวันนี้'}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {visibleGroups.map(group => (
+                    <GroupCard
+                      key={group.id}
+                      group={group}
+                      onDelete={() => onDeleteGroup(selectedCourt.id, group.id)}
+                      onEdit={() => onEditGroup(selectedCourt.id, group.id)}
+                      onReview={() => onAddReview(selectedCourt.id, group.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       ))}
 
       {confirmDeleteCourt && (
@@ -178,7 +182,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             <p className="text-sm text-gray-400 mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDeleteCourt(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
-              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
+              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
             </div>
           </div>
         </div>
@@ -218,17 +222,14 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-      {/* Image with overlay — or colorful top strip */}
       {group.image ? (
         <div className="relative h-40 overflow-hidden">
           <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          {/* Actions float top-right */}
           <div className="absolute top-2 right-2 flex gap-1">
             <button onClick={onEdit} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm backdrop-blur-sm">✎</button>
             <button onClick={() => setConfirming(true)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-red-500/80 transition-colors text-lg leading-none backdrop-blur-sm">×</button>
           </div>
-          {/* Name + time overlay at bottom */}
           <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
             <p className="font-black text-white text-lg leading-tight">{group.name}</p>
             <p className="text-xs text-green-300 font-semibold">{group.startTime} – {group.endTime} น.</p>
@@ -251,8 +252,6 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             <p className="text-xs font-semibold text-emerald-600 mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
           </>
         )}
-
-        {/* Day + level pills */}
         <div className="flex items-center gap-1 flex-wrap mt-1 mb-2">
           {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
             <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-bold ${DAY_COLORS[day].pill}`}>{DAY_LABELS[day]}</span>
@@ -261,12 +260,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             <span key={lv} className="text-xs px-2 py-0.5 rounded-full font-semibold bg-gray-100 text-gray-500">{lv}</span>
           ))}
         </div>
-
-        {group.notes && (
-          <p className="text-xs text-gray-500 mb-2 leading-relaxed">{group.notes}</p>
-        )}
-
-        {/* Review */}
+        {group.notes && <p className="text-xs text-gray-500 mb-2 leading-relaxed">{group.notes}</p>}
         <div className="border-t border-gray-100 pt-2 flex items-center justify-between gap-2">
           {review ? (
             <>
@@ -290,7 +284,6 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           )}
         </div>
       </div>
-
       {confirming && <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
     </div>
   );
