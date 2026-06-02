@@ -135,14 +135,14 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
                       <button
                         onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
                         className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
                       >
                         + ก๊วน
                       </button>
-                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
                     </div>
                   </div>
                 </div>
