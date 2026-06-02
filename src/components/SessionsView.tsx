@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Court, Session } from '../types';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
@@ -175,6 +175,7 @@ function calcStreak(sessions: { date: string }[]): number {
 export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }: SessionsViewProps) {
   const today = todayString();
   const thisMonth = thisMonthString();
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
@@ -282,7 +283,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }
                         </div>
                       </div>
                       <button
-                        onClick={() => onDeleteSession(session.id)}
+                        onClick={() => setConfirmDeleteId(session.id)}
                         className="text-gray-200 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1"
                         title="ลบ"
                       >
@@ -311,6 +312,19 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession }
               </div>
             );
           })}
+        </div>
+      )}
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+            <p className="text-base font-semibold text-gray-800 mb-1">ลบบันทึก</p>
+            <p className="text-sm text-gray-400 mb-5">ลบรายการนี้ออกจากประวัติ?</p>
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">ยกเลิก</button>
+              <button onClick={() => { onDeleteSession(confirmDeleteId); setConfirmDeleteId(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
