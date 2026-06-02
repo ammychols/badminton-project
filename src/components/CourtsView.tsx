@@ -111,19 +111,26 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         <p className="text-xs text-gray-400 ml-12 truncate">{court.address}</p>
                       )}
                       {/* Info chips */}
-                      {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
-                        <div className="flex items-center gap-1.5 mt-2.5 ml-12 flex-wrap">
-                          {court.info.floor && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>}
-                          {court.info.air   && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{AIR_LABELS[court.info.air]}</span>}
-                          {court.info.parking && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{PARKING_LABELS[court.info.parking]}</span>}
-                          {court.info.notes && <span className="text-xs text-gray-400">{court.info.notes}</span>}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1.5 mt-2.5 ml-12 flex-wrap">
+                        {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) ? (
+                          <>
+                            {court.info.floor && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{FLOOR_LABELS[court.info.floor]}</span>}
+                            {court.info.air   && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{AIR_LABELS[court.info.air]}</span>}
+                            {court.info.parking && <span className="bg-white/10 text-gray-300 text-xs px-2.5 py-0.5 rounded-full">{PARKING_LABELS[court.info.parking]}</span>}
+                            {court.info.notes && <span className="text-xs text-gray-400">{court.info.notes}</span>}
+                            <button onClick={() => onRateCourt(court.id)} className="text-gray-500 hover:text-gray-300 transition-colors text-xs leading-none" title="แก้ไขข้อมูลสนาม">✎</button>
+                          </>
+                        ) : (
+                          <button onClick={() => onRateCourt(court.id)} className="bg-white/10 hover:bg-white/20 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-0.5 rounded-full transition-colors">
+                            + ข้อมูลสนาม
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button onClick={() => onRateCourt(court.id)} className="text-gray-500 hover:text-gray-300 transition-colors text-sm" title="ข้อมูลสนาม">✎</button>
                       <button
                         onClick={() => onAddGroup(court.id, selectedDay !== 'all' ? selectedDay : undefined)}
+
                         className="bg-green-500 hover:bg-green-400 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
                       >
                         + ก๊วน
