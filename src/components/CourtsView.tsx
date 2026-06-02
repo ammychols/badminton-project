@@ -51,26 +51,23 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   return (
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 leading-tight">สนามของฉัน</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{courts.length} สนาม</p>
-        </div>
-        <button onClick={onAddCourt} className="bg-gray-900 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors">
-          + เพิ่มสนาม
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold text-gray-900">สนามของฉัน</h2>
+        <button onClick={onAddCourt} className="bg-gray-900 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors flex items-center gap-1.5">
+          <span className="text-lg leading-none">+</span> เพิ่มสนาม
         </button>
       </div>
 
       {/* Day filter tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-1 mb-4 scrollbar-none">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 mb-4 scrollbar-none">
         {DAY_TABS.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setSelectedDay(key)}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+            className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
               selectedDay === key
                 ? (key === 'all' ? 'bg-gray-900 text-white' : DAY_COLORS[key as DayOfWeek].active)
-                : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-400'
+                : 'bg-white border border-gray-200 text-gray-500 hover:border-gray-300'
             }`}
           >
             {label}
@@ -79,18 +76,21 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       </div>
 
       {/* List / Map toggle */}
-      <div className="flex rounded-full border border-gray-200 overflow-hidden text-sm w-fit mb-8 bg-white">
-        <button onClick={() => setViewMode('list')} className={`w-20 py-2 font-semibold text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}>รายการ</button>
-        <button onClick={() => setViewMode('map')}  className={`w-20 py-2 font-semibold text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}>แผนที่</button>
+      <div className="flex rounded-full border border-gray-200 overflow-hidden text-sm w-fit mb-5 bg-white">
+        <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}>รายการ</button>
+        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}>แผนที่</button>
       </div>
 
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
 
       {viewMode === 'list' && (courts.length === 0 ? (
-        <div className="text-center py-24">
-          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl mb-4">🏸</div>
-          <p className="text-base font-semibold text-gray-700">ยังไม่มีสนาม</p>
-          <p className="text-sm text-gray-400 mt-1">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-gray-900 flex items-center justify-center text-4xl mb-5">🏸</div>
+          <div className="text-base font-semibold text-gray-800 mb-1">เพิ่มสนามแบดมินตัน</div>
+          <div className="text-sm text-gray-400 mb-6">บันทึกสนามที่ชอบไปตีไว้ที่นี่</div>
+          <button onClick={onAddCourt} className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors">
+            + เพิ่มสนามแรก
+          </button>
         </div>
       ) : (
         <>
