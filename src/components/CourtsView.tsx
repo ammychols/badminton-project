@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
+import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
 import { CourtsMap } from './CourtsMap';
 
 interface CourtsViewProps {
@@ -235,7 +235,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
             <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-semibold ${DAY_COLORS[day].pill}`}>{DAY_LABELS[day]}</span>
           ))}
-          {group.levels?.map(lv => (
+          {group.levels?.slice().sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).map(lv => (
             <span key={lv} className="text-xs px-1.5 py-0.5 rounded-md font-medium bg-gray-100 text-gray-500">{lv}</span>
           ))}
         </div>
