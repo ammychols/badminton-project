@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, onSnapshot, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Court, Group, Review } from '../types';
 
@@ -23,10 +23,14 @@ export function useCourts(uid: string) {
     return court;
   };
 
-  // Use setDoc merge so it works even if doc was just created (no race condition)
   const updateCourt = (id: string, data: Partial<Court>) => {
     const clean = JSON.parse(JSON.stringify(data));
-    setDoc(ref(id), clean, { merge: true });
+    // If info has no meaningful fields, remove it entirely
+    if ('info' in data && Object.keys(clean.info ?? {}).length === 0) {
+      setDoc(ref(id), { info: deleteField() }, { merge: true });
+    } else {
+      setDoc(ref(id), clean, { merge: true });
+    }
   };
 
   const deleteCourt = (id: string) => {
@@ -58,7 +62,13 @@ export function useCourts(uid: string) {
   const addReview = (courtId: string, groupId: string, review: Omit<Review, 'id' | 'groupId'>) => {
     const court = get(courtId);
     if (!court) return;
-    const newReview: Review = { ...review, id: crypto.randomUUID(), groupId };
+    // If notes is empty, clear all reviews for this group
+    if (!review.notes) {
+      setDoc(ref(courtId), { groups: court.groups.map(g => g.id === groupId ? { ...g, reviews: [] } : g) }, { merge: true });
+      return;
+    }
+    const raw = { ...review, id: crypto.randomUUID(), groupId };
+    const newReview = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined));
     setDoc(ref(courtId), {
       groups: court.groups.map(g => g.id === groupId ? { ...g, reviews: [newReview] } : g),
     }, { merge: true });
