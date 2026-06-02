@@ -142,7 +142,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                       >
                         + ก๊วน
                       </button>
-                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-700 hover:text-red-400 transition-colors text-xs">ลบ</button>
+                      <button onClick={() => setConfirmDeleteCourt({ id: court.id, name: court.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
                     </div>
                   </div>
                 </div>
