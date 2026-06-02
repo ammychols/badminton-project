@@ -38,22 +38,14 @@ const DAY_NAMES = ['อาทิตย์', 'จันทร์', 'อังค�
 const MONTH_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const DOW_LABELS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 
-function Heatmap({ sessions }: { sessions: { date: string }[] }) {
+function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
+  sessions: { date: string }[];
+  viewYear: number; viewMonth: number;
+  onPrev: () => void; onNext: () => void;
+}) {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  const [viewYear, setViewYear] = useState(currentYear);
-  const [viewMonth, setViewMonth] = useState(currentMonth);
-
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-    else setViewMonth(m => m - 1);
-  };
-  const nextMonth = () => {
-    if (viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth)) return;
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-    else setViewMonth(m => m + 1);
-  };
   const isNextDisabled = viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth);
 
   // Build last 6 months summary (always relative to today)
@@ -105,9 +97,9 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
       {/* Calendar with month nav */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none">‹</button>
+          <button onClick={onPrev} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none">‹</button>
           <span className="text-xs font-medium text-gray-600">{MONTH_SHORT[viewMonth]} {viewYear + 543} — วันที่ตี</span>
-          <button onClick={nextMonth} disabled={isNextDisabled}
+          <button onClick={onNext} disabled={isNextDisabled}
             className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none disabled:opacity-20 disabled:cursor-default">›</button>
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -205,6 +197,23 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
   const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const [viewYear, setViewYear] = useState(currentYear);
+  const [viewMonth, setViewMonth] = useState(currentMonth);
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth)) return;
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  };
+  const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
+  const viewedSessions = sessions.filter(s => s.date.startsWith(viewYM));
+
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
   const thisMonthSessions = sessions.filter(s => s.date.startsWith(thisMonth));
@@ -279,7 +288,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       )}
 
       {/* Heatmap */}
-      {sessions.length > 0 && <Heatmap sessions={sessions} />}
+      {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
 
       {/* Session list */}
       {sessions.length === 0 ? (
@@ -293,7 +302,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {sessions.map(session => {
+          {viewedSessions.length === 0 && (
+            <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
+          )}
+          {viewedSessions.map(session => {
             const { day, full } = formatDate(session.date);
             return (
               <div

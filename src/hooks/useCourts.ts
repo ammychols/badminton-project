@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, onSnapshot, setDoc, deleteDoc, deleteField } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, deleteDoc, deleteField, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Court, Group, Review } from '../types';
 
@@ -24,12 +24,12 @@ export function useCourts(uid: string) {
   };
 
   const updateCourt = (id: string, data: Partial<Court>) => {
-    const clean = JSON.parse(JSON.stringify(data));
-    // If info has no meaningful fields, remove it entirely
-    if ('info' in data && Object.keys(clean.info ?? {}).length === 0) {
-      setDoc(ref(id), { info: deleteField() }, { merge: true });
+    if ('info' in data) {
+      const clean = JSON.parse(JSON.stringify(data.info ?? {}));
+      // Use updateDoc so it replaces the info field entirely (not merge subfields)
+      updateDoc(ref(id), { info: Object.keys(clean).length === 0 ? deleteField() : clean });
     } else {
-      setDoc(ref(id), clean, { merge: true });
+      setDoc(ref(id), JSON.parse(JSON.stringify(data)), { merge: true });
     }
   };
 
