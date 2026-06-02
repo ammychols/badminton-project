@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Court } from '../types';
 
 interface CourtsMapProps {
@@ -7,12 +7,28 @@ interface CourtsMapProps {
 
 declare const google: any;
 
+function isGoogleReady() {
+  return typeof google !== 'undefined' && google.maps;
+}
+
 export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const courts = allCourts.filter(c => c.lat && c.lng);
+  const [googleReady, setGoogleReady] = useState(isGoogleReady);
 
   useEffect(() => {
-    if (!mapRef.current || typeof google === 'undefined') return;
+    if (googleReady) return;
+    const interval = setInterval(() => {
+      if (isGoogleReady()) {
+        setGoogleReady(true);
+        clearInterval(interval);
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [googleReady]);
+
+  useEffect(() => {
+    if (!googleReady || !mapRef.current) return;
 
     const bounds = new google.maps.LatLngBounds();
     const center = courts.length > 0
@@ -57,7 +73,7 @@ export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
     });
 
     if (courts.length > 1) map.fitBounds(bounds);
-  }, [courts.length]);
+  }, [googleReady, courts.length]);
 
   if (courts.length === 0) {
     return (
