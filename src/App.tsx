@@ -44,8 +44,7 @@ export default function App() {
 
       <main className="flex-1 pb-20">
         {tab === 'courts' ? (
-          <div className="max-w-screen-2xl mx-auto px-4">
-            <CourtsView
+          <CourtsView
               courts={courts}
               onAddCourt={() => setModal({ type: 'addCourt' })}
               onAddGroup={(courtId, defaultDay) => setModal({ type: 'addGroup', courtId, defaultDay })}
@@ -55,7 +54,6 @@ export default function App() {
               onRateCourt={courtId => setModal({ type: 'courtInfo', courtId })}
               onAddReview={(courtId, groupId) => setModal({ type: 'review', courtId, groupId })}
             />
-          </div>
         ) : (
           <SessionsView
             sessions={sessions}
