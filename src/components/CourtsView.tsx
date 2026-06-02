@@ -233,7 +233,7 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           </div>
           <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
             <p className="font-black text-white text-lg leading-tight">{group.name}</p>
-            <p className="text-xs text-green-300 font-semibold">{group.startTime} – {group.endTime} น.</p>
+            <p className="text-xs text-white/70 font-medium">{group.startTime} – {group.endTime} น.</p>
           </div>
         </div>
       ) : (
