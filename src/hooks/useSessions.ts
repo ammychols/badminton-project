@@ -30,6 +30,10 @@ export function useSessions() {
     setSessions(prev => prev.filter(s => s.id !== id));
   };
 
+  const updateSession = (id: string, data: Omit<Session, 'id'>) => {
+    setSessions(prev => prev.map(s => s.id === id ? { ...data, id } : s));
+  };
+
   // Return sorted newest first
   const sortedSessions = [...sessions].sort((a, b) => {
     const dateCompare = b.date.localeCompare(a.date);
@@ -37,5 +41,5 @@ export function useSessions() {
     return b.startTime.localeCompare(a.startTime);
   });
 
-  return { sessions: sortedSessions, addSession, deleteSession };
+  return { sessions: sortedSessions, addSession, deleteSession, updateSession };
 }

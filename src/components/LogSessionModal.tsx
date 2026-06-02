@@ -7,6 +7,7 @@ interface LogSessionModalProps {
   courts: Court[];
   onClose: () => void;
   onSave: (data: Omit<Session, 'id'>) => void;
+  initialSession?: Session;
 }
 
 const MOOD_EMOJIS: Record<number, string> = { 1: '😴', 2: '😐', 3: '🙂', 4: '😄', 5: '🔥' };
@@ -115,15 +116,15 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
   );
 }
 
-export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProps) {
-  const [date, setDate] = useState(todayString());
-  const [courtId, setCourtId] = useState(courts[0]?.id ?? '');
-  const [groupId, setGroupId] = useState(() => courts[0]?.groups[0]?.id ?? '');
-  const [startTime, setStartTime] = useState('08:00');
-  const [endTime, setEndTime] = useState('10:00');
-  const [gamesPlayed, setGamesPlayed] = useState(0);
-  const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(3);
-  const [notes, setNotes] = useState('');
+export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {
+  const [date, setDate] = useState(initialSession?.date ?? todayString());
+  const [courtId, setCourtId] = useState(initialSession?.courtId ?? courts[0]?.id ?? '');
+  const [groupId, setGroupId] = useState(initialSession?.groupId ?? courts[0]?.groups[0]?.id ?? '');
+  const [startTime, setStartTime] = useState(initialSession?.startTime ?? '08:00');
+  const [endTime, setEndTime] = useState(initialSession?.endTime ?? '10:00');
+  const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
+  const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(initialSession?.mood ?? 3);
+  const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
   const selectedCourt = courts.find(c => c.id === courtId);
   const groups = selectedCourt?.groups ?? [];
@@ -147,7 +148,7 @@ export function LogSessionModal({ courts, onClose, onSave }: LogSessionModalProp
   );
 
   return (
-    <BottomSheet title="บันทึกการตี" onClose={onClose} footer={saveButton}>
+    <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
       {/* Calendar */}
       <div className="bg-gray-50 rounded-2xl p-3 mb-5">
         <MiniCalendar selected={date} onChange={setDate} />

@@ -20,6 +20,7 @@ interface ModalState {
   defaultDay?: DayOfWeek;
   isNewCourt?: boolean;
   courtSnapshot?: Court;
+  sessionId?: string;
 }
 
 export default function App() {
@@ -28,7 +29,7 @@ export default function App() {
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts();
-  const { sessions, addSession, deleteSession } = useSessions();
+  const { sessions, addSession, deleteSession, updateSession } = useSessions();
 
   const closeModal = () => setModal(null);
   const activeCourt = modal?.courtSnapshot ?? (modal?.courtId ? courts.find(c => c.id === modal.courtId) : undefined);
@@ -60,6 +61,7 @@ export default function App() {
             courts={courts}
             onLogSession={() => setModal({ type: 'logSession' })}
             onDeleteSession={deleteSession}
+            onEditSession={session => setModal({ type: 'logSession', sessionId: session.id })}
           />
         )}
       </main>
@@ -132,7 +134,12 @@ export default function App() {
         <LogSessionModal
           courts={courts}
           onClose={closeModal}
-          onSave={data => { addSession(data); closeModal(); }}
+          initialSession={modal.sessionId ? sessions.find(s => s.id === modal.sessionId) : undefined}
+          onSave={data => {
+            if (modal.sessionId) updateSession(modal.sessionId, data);
+            else addSession(data);
+            closeModal();
+          }}
         />
       )}
     </div>
