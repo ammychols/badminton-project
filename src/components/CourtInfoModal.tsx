@@ -76,7 +76,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
 
           <div className="flex gap-2">
             {isNewCourt && (
-              <button onClick={() => onSave({})} className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+              <button onClick={onClose} className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
                 ข้าม
               </button>
             )}
@@ -84,7 +84,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
               onClick={handleSave}
               className="flex-1 bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 transition-colors"
             >
-              {isNewCourt ? 'บันทึก → เพิ่มก๊วน' : 'บันทึก'}
+              บันทึก
             </button>
           </div>
         </div>

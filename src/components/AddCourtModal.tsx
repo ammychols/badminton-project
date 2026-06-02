@@ -151,7 +151,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
           disabled={!name.trim()}
           className="w-full bg-green-600 text-white py-3 rounded-2xl font-medium hover:bg-green-700 disabled:opacity-40 transition-colors"
         >
-          บันทึกสนาม
+          ถัดไป
         </button>
         </div>
       </div>
