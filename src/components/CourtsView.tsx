@@ -49,7 +49,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     : [];
 
   return (
-    <div className="px-4 pt-5 pb-10">
+    <div className="px-6 pt-5 pb-10">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -103,20 +103,19 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   key={court.id}
                   onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                   className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all ${
-                    isSelected ? 'bg-gray-900 ring-2 ring-green-400' : 'bg-gray-900/80 hover:bg-gray-800'
+                    isSelected ? 'bg-white shadow-lg border-2 border-gray-200' : 'bg-gray-900/80 hover:bg-gray-800'
                   }`}
                 >
                   {/* Decorative letter */}
                   <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
                     {court.name.charAt(0).toUpperCase()}
                   </span>
-                  <p className="font-bold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
+                  <p className={`font-bold text-sm leading-tight truncate mb-1 ${isSelected ? 'text-gray-900' : 'text-white'}`}>{court.name}</p>
                   {court.address && (() => {
                     const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
-                    return <p className="text-xs text-gray-400 truncate">{parts.slice(-2).join(' · ')}</p>;
+                    return <p className={`text-xs truncate ${isSelected ? 'text-gray-500' : 'text-gray-400'}`}>{parts.slice(-2).join(' · ')}</p>;
                   })()}
-                  <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
-                  {isSelected && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-400" />}
+                  <p className={`text-xs mt-1 ${isSelected ? 'text-gray-400' : 'text-gray-500'}`}>{court.groups.length} ก๊วน</p>
                 </button>
               );
             })}
