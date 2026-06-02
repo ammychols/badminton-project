@@ -13,6 +13,11 @@ html {
     line-height: 1.7;
     letter-spacing: 0.01em;
   }
+
+  button, [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @keyframes slide-up {
