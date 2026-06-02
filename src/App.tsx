@@ -152,14 +152,14 @@ export default function App() {
         }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
-        <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { addGroup(modal.courtId!, data); closeModal(); }} />
+        <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { closeModal(); addGroup(modal.courtId!, data); }} />
       )}
       {modal?.type === 'editGroup' && modal.courtId && modal.groupId && activeCourt && activeGroup && (
         <AddGroupModal
           courtName={activeCourt.name}
           initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes, image: activeGroup.image }}
           onClose={closeModal}
-          onSave={data => { updateGroup(modal.courtId!, modal.groupId!, data); closeModal(); }}
+          onSave={data => { closeModal(); updateGroup(modal.courtId!, modal.groupId!, data); }}
         />
       )}
       {modal?.type === 'courtInfo' && modal.courtId && activeCourt && (
@@ -167,7 +167,7 @@ export default function App() {
           court={activeCourt}
           onClose={closeModal}
           isNewCourt={modal.isNewCourt}
-          onSave={data => { updateCourt(modal.courtId!, { info: data }); closeModal(); }}
+          onSave={data => { closeModal(); updateCourt(modal.courtId!, { info: data }); }}
         />
       )}
       {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (
@@ -175,7 +175,7 @@ export default function App() {
           court={activeCourt}
           groupId={modal.groupId}
           onClose={closeModal}
-          onSave={data => { addReview(modal.courtId!, modal.groupId!, data); closeModal(); }}
+          onSave={data => { closeModal(); addReview(modal.courtId!, modal.groupId!, data); }}
         />
       )}
       {modal?.type === 'logSession' && (

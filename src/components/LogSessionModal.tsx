@@ -157,8 +157,8 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
 
   const handleSave = () => {
     if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
-    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, notes: notes.trim() || undefined });
     onClose();
+    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, notes: notes.trim() || undefined });
   };
 
   const saveButton = (

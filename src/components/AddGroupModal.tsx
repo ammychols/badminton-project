@@ -61,8 +61,8 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   const handleSave = () => {
     if (!name.trim() || days.length === 0) return;
-    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, image });
     onClose();
+    onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, image });
   };
 
   const saveButton = (

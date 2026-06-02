@@ -41,6 +41,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
   const [notes, setNotes] = useState(existing?.notes ?? '');
 
   const handleSave = () => {
+    onClose();
     onSave({ floor, air, parking, notes: notes.trim() || undefined });
   };
 
