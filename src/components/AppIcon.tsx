@@ -3,28 +3,29 @@ import React from 'react';
 export function AppIcon({ size = 80 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="#0f172a"/>
+      <rect width="80" height="80" rx="22" fill="#1a2035"/>
 
-      {/* Cork base */}
-      <ellipse cx="40" cy="62" rx="7" ry="4" fill="white"/>
-      <path d="M33 62 Q33 68 40 69 Q47 68 47 62" fill="white"/>
+      {/* Cork — round base */}
+      <circle cx="40" cy="63" r="5.5" fill="white"/>
 
-      {/* Band between cork and feathers */}
-      <rect x="33" y="54" width="14" height="3" rx="1.5" fill="white" opacity="0.9"/>
+      {/* Neck band */}
+      <rect x="35" y="54" width="10" height="5" rx="2" fill="white"/>
 
-      {/* Feather shafts - 5 lines from band center up to top ring */}
-      <line x1="40" y1="54" x2="22" y2="18" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-      <line x1="40" y1="54" x2="31" y2="16" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-      <line x1="40" y1="54" x2="40" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-      <line x1="40" y1="54" x2="49" y2="16" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-      <line x1="40" y1="54" x2="58" y2="18" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
+      {/* Feather cage outline — clean cone */}
+      <path d="M35 54 L18 20 Q40 14 62 20 L45 54 Z"
+        fill="rgba(255,255,255,0.08)" stroke="white" strokeWidth="2"
+        strokeLinejoin="round" strokeLinecap="round"/>
 
-      {/* Horizontal rings connecting feathers */}
-      <path d="M25.5 42 Q32 38 40 37.5 Q48 38 54.5 42" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.75"/>
-      <path d="M22.5 28 Q31 23 40 22.5 Q49 23 57.5 28" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.75"/>
+      {/* Top open rim */}
+      <ellipse cx="40" cy="20" rx="22" ry="5" stroke="white" strokeWidth="2" fill="none"/>
 
-      {/* Top open ring */}
-      <ellipse cx="40" cy="17" rx="18" ry="4" stroke="white" strokeWidth="2" fill="none"/>
+      {/* 3 clean feather shaft lines */}
+      <line x1="40" y1="54" x2="40" y2="15" stroke="white" strokeWidth="1.4" strokeLinecap="round" opacity="0.5"/>
+      <line x1="40" y1="54" x2="27" y2="16" stroke="white" strokeWidth="1.4" strokeLinecap="round" opacity="0.5"/>
+      <line x1="40" y1="54" x2="53" y2="16" stroke="white" strokeWidth="1.4" strokeLinecap="round" opacity="0.5"/>
+
+      {/* One mid ring */}
+      <path d="M23 37 Q40 31 57 37" stroke="white" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.6"/>
     </svg>
   );
 }
