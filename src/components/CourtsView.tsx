@@ -53,10 +53,10 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 leading-tight">สนามของฉัน</h2>
-          <p className="text-sm text-gray-400 mt-0.5">{courts.length} สนาม</p>
+          <h2 className="text-xl font-bold text-gray-900 leading-tight">สนามของฉัน</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{courts.length} สนาม</p>
         </div>
-        <button onClick={onAddCourt} className="bg-gray-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-700 transition-colors">
+        <button onClick={onAddCourt} className="bg-gray-900 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-gray-700 transition-colors">
           + เพิ่มสนาม
         </button>
       </div>
@@ -88,9 +88,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
 
       {viewMode === 'list' && (courts.length === 0 ? (
         <div className="text-center py-24">
-          <p className="text-6xl mb-4">🏸</p>
-          <p className="text-xl font-bold text-gray-800">ยังไม่มีสนาม</p>
-          <p className="text-sm text-gray-400 mt-2">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
+          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl mb-4">🏸</div>
+          <p className="text-base font-semibold text-gray-700">ยังไม่มีสนาม</p>
+          <p className="text-sm text-gray-400 mt-1">กด "+ เพิ่มสนาม" เพื่อเริ่มต้น</p>
         </div>
       ) : (
         <>
@@ -111,7 +111,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
                     {court.name.charAt(0).toUpperCase()}
                   </span>
-                  <p className="font-bold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
+                  <p className="font-semibold text-white text-sm leading-tight truncate mb-1">{court.name}</p>
                   {court.address && (() => {
                     const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
                     return <p className="text-xs text-gray-400 truncate">{parts.slice(-2).join(' · ')}</p>;
@@ -128,12 +128,12 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               {/* Court detail bar */}
               <div className="mb-4 pb-3 border-b border-gray-200">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-xl font-black text-gray-900 leading-tight">{selectedCourt.name}</h3>
+                  <h3 className="text-base font-semibold text-gray-900 leading-tight">{selectedCourt.name}</h3>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-400 hover:text-red-400 transition-colors text-xs">ลบ</button>
+                    <button onClick={() => setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name })} className="text-gray-300 hover:text-red-400 transition-colors text-xs">ลบ</button>
                     <button
                       onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                      className="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors whitespace-nowrap"
+                      className="bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors whitespace-nowrap"
                     >
                       + ก๊วน
                     </button>
@@ -153,7 +153,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
               </div>
 
               {visibleGroups.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-12">
+                <p className="text-xs text-gray-400 text-center py-12">
                   {selectedCourt.groups.length === 0 ? 'ยังไม่มีก๊วน' : 'ไม่มีก๊วนในวันนี้'}
                 </p>
               ) : (
@@ -232,8 +232,8 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
               </button>
           </div>
           <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
-            <p className="font-black text-white text-lg leading-tight">{group.name}</p>
-            <p className="text-xs text-white/70 font-medium">{group.startTime} – {group.endTime} น.</p>
+            <p className="font-semibold text-white text-base leading-tight">{group.name}</p>
+            <p className="text-xs text-white/60 mt-0.5">{group.startTime} – {group.endTime} น.</p>
           </div>
         </div>
       ) : (
@@ -251,8 +251,8 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
       <div className="px-3 pt-3 pb-3">
         {!group.image && (
           <>
-            <p className="font-black text-gray-900 text-base leading-tight">{group.name}</p>
-            <p className="text-xs font-semibold text-emerald-600 mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
+            <p className="font-semibold text-gray-900 text-base leading-tight">{group.name}</p>
+            <p className="text-xs text-gray-400 mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
           </>
         )}
         <div className="flex items-center gap-1 flex-wrap mt-1 mb-2">
@@ -263,15 +263,15 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
             <span key={lv} className="text-xs px-2 py-0.5 rounded-full font-semibold bg-gray-100 text-gray-500">{lv}</span>
           ))}
         </div>
-        {group.notes && <p className="text-xs text-gray-500 mb-2 leading-relaxed">{group.notes}</p>}
+        {group.notes && <p className="text-xs text-gray-400 mb-2 leading-relaxed">{group.notes}</p>}
         <div className="border-t border-gray-100 pt-2 flex items-center justify-between gap-2">
           {review ? (
             <>
-              {review.notes && <p className="text-xs text-gray-500">{review.notes}</p>}
-              <button onClick={onReview} className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold flex-shrink-0">แก้ไข</button>
+              {review.notes && <p className="text-xs text-gray-400">{review.notes}</p>}
+              <button onClick={onReview} className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">แก้ไข</button>
             </>
           ) : (
-            <button onClick={onReview} className="text-xs text-emerald-600 font-semibold hover:text-emerald-700">+ เพิ่มรีวิว</button>
+            <button onClick={onReview} className="text-xs text-gray-400 hover:text-gray-600">+ เพิ่มรีวิว</button>
           )}
         </div>
       </div>
