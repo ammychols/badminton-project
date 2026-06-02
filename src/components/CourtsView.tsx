@@ -227,7 +227,9 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute top-2 right-2 flex gap-1">
             <button onClick={onEdit} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm backdrop-blur-sm">✎</button>
-            <button onClick={() => setConfirming(true)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-red-500/80 transition-colors text-lg leading-none backdrop-blur-sm">×</button>
+            <button onClick={() => setConfirming(true)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-red-500/80 transition-colors backdrop-blur-sm">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
           </div>
           <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
             <p className="font-black text-white text-lg leading-tight">{group.name}</p>
@@ -239,7 +241,9 @@ function GroupCard({ group, onDelete, onEdit, onReview }: { group: Group; onDele
           <span className="absolute -right-1 -top-2 text-6xl font-black text-white/20 leading-none select-none">{group.name.charAt(0)}</span>
           <div className="absolute top-2 right-2 flex gap-1">
             <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors text-xs">✎</button>
-            <button onClick={() => setConfirming(true)} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-red-500/60 transition-colors text-base leading-none">×</button>
+            <button onClick={() => setConfirming(true)} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-red-500/60 transition-colors">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
           </div>
         </div>
       )}
