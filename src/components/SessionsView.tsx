@@ -95,15 +95,18 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
             <div key={d} className="text-center text-xs text-gray-300 pb-1">{d}</div>
           ))}
           {Array(firstDow).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
-          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => (
-            <div key={d} className={`aspect-square flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
-              sessionDays.has(d)
-                ? 'bg-gray-900 text-white'
-                : d === now.getDate() ? 'ring-1 ring-gray-300 text-gray-500' : 'text-gray-300'
-            }`}>
-              {d}
-            </div>
-          ))}
+          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
+            const isToday = d === now.getDate();
+            const hasSession = sessionDays.has(d);
+            return (
+              <div key={d} className={`aspect-square flex flex-col items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                hasSession ? 'bg-gray-900 text-white' : isToday ? 'text-gray-800' : 'text-gray-300'
+              }`}>
+                {d}
+                {isToday && <span className={`w-1 h-1 rounded-full mt-0.5 ${hasSession ? 'bg-white/60' : 'bg-gray-900'}`} />}
+              </div>
+            );
+          })}
         </div>
       </div>
 
