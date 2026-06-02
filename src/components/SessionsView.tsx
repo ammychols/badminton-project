@@ -135,11 +135,15 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
         <div className="text-xs font-medium text-gray-500 mb-2">วันที่ตีบ่อย</div>
         <div className="flex gap-1.5 items-end">
           {DOW_LABELS.map((label, i) => {
-            const heightPct = Math.max((dowCount[i] / maxDow) * 32, dowCount[i] > 0 ? 4 : 2);
+            const count = dowCount[i];
+            const heightPct = Math.max((count / maxDow) * 32, count > 0 ? 4 : 2);
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                <div className="text-xs font-semibold text-gray-600" style={{ minHeight: '16px' }}>
+                  {count > 0 ? count : ''}
+                </div>
                 <div className="w-full flex items-end" style={{ height: '32px' }}>
-                  <div className="w-full rounded-t-md bg-green-400" style={{ height: `${heightPct}px`, opacity: dowCount[i] > 0 ? 1 : 0.2 }} />
+                  <div className="w-full rounded-t-md bg-green-400" style={{ height: `${heightPct}px`, opacity: count > 0 ? 1 : 0.2 }} />
                 </div>
                 <div className="text-xs text-gray-400">{label}</div>
               </div>
