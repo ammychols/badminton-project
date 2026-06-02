@@ -71,7 +71,6 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const handleSave = () => {
     if (!name.trim()) return;
     onSave({ name: name.trim(), address: address.trim(), placeId: selected?.placeId, lat, lng });
-    onClose();
   };
 
   return (
