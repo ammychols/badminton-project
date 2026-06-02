@@ -72,8 +72,7 @@ export default function App() {
           isNewCourt={modal.isNewCourt}
           onSave={data => {
             updateCourt(modal.courtId!, { info: data });
-            if (modal.isNewCourt) setModal({ type: 'addGroup', courtId: modal.courtId });
-            else closeModal();
+            closeModal();
           }}
         />
       )}
