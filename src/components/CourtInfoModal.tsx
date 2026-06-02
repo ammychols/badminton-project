@@ -68,7 +68,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="เช่น ค่าคอร์ต 80 บาท, มีน้ำดื่มฟรี"
+              placeholder="เช่น ค่าคอร์ท 80 บาท, มีน้ำดื่มฟรี"
               rows={3}
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none"
             />

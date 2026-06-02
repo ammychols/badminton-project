@@ -4,7 +4,7 @@ export type ParkingType = 'easy' | 'limited' | 'none';
 
 export const FLOOR_LABELS: Record<FloorType, string> = { concrete: 'พื้นปูน', wood: 'พื้นไม้', rubber: 'พื้นยาง' };
 export const AIR_LABELS: Record<AirType, string> = { aircon: 'มีแอร์', fan: 'พัดลม', stuffy: 'ถ่ายเทน้อย' };
-export const PARKING_LABELS: Record<ParkingType, string> = { easy: 'จอดรถง่าย', limited: 'จอดรถจำกัด', none: 'ไม่มีที่จอด' };
+export const PARKING_LABELS: Record<ParkingType, string> = { easy: 'จอดรถง่าย', limited: 'จอดรถจำกัด', none: 'ที่จอดรถน้อยมาก' };
 
 export interface CourtInfo {
   floor?: FloorType;
