@@ -131,39 +131,38 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
 
   const filteredCourts = courts.filter(c => c.groups.some(g => g.days.includes(selectedDow)));
-  const displayCourts = filteredCourts.length > 0 ? filteredCourts : courts;
+  const noCourtsToday = filteredCourts.length === 0;
 
   const selectedCourt = courts.find(c => c.id === courtId);
   const allGroups = selectedCourt?.groups ?? [];
-  const groups = allGroups.filter(g => g.days.includes(selectedDow));
-  const displayGroups = groups.length > 0 ? groups : allGroups;
+  const filteredGroups = allGroups.filter(g => g.days.includes(selectedDow));
+  const noGroupsToday = !noCourtsToday && filteredGroups.length === 0;
 
   const handleCourtChange = (id: string) => {
     setCourtId(id);
     const court = courts.find(c => c.id === id);
     const g = court?.groups.filter(g => g.days.includes(selectedDow)) ?? [];
-    setGroupId((g.length > 0 ? g : court?.groups ?? [])[0]?.id ?? '');
+    setGroupId(g[0]?.id ?? '');
   };
 
   const handleDateChange = (d: string) => {
     setDate(d);
     const dow = DOW_MAP[new Date(d + 'T00:00:00').getDay()];
     const filtered = courts.filter(c => c.groups.some(g => g.days.includes(dow)));
-    const newCourt = filtered.find(c => c.id === courtId) ? selectedCourt : (filtered[0] ?? courts[0]);
+    const newCourt = filtered.find(c => c.id === courtId) ?? filtered[0];
     if (newCourt && newCourt.id !== courtId) setCourtId(newCourt.id);
-    const g = newCourt?.groups.filter(g => g.days.includes(dow)) ?? [];
-    const newGroupId = (g.length > 0 ? g : newCourt?.groups ?? [])[0]?.id ?? '';
-    setGroupId(newGroupId);
+    const g = (newCourt ?? selectedCourt)?.groups.filter(g => g.days.includes(dow)) ?? [];
+    setGroupId(g[0]?.id ?? '');
   };
 
   const handleSave = () => {
-    if (!courtId || !groupId) return;
+    if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
     onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, notes: notes.trim() || undefined });
     onClose();
   };
 
   const saveButton = (
-    <button onClick={handleSave} disabled={!courtId || !groupId}
+    <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday}
       className="w-full bg-gray-900 text-white py-3 rounded-2xl font-medium hover:bg-gray-700 disabled:opacity-40 transition-colors">
       บันทึก
     </button>
@@ -177,29 +176,36 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
       </div>
 
       {/* Court + Group */}
-      <div className="grid grid-cols-2 gap-3 mb-1">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <div>
           <label className={text.label}>สนาม</label>
-          <select value={courtId} onChange={e => handleCourtChange(e.target.value)} className={input.base}>
-            {displayCourts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
-            {displayCourts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          <select
+            value={courtId}
+            onChange={e => handleCourtChange(e.target.value)}
+            disabled={noCourtsToday}
+            className={`${input.base} disabled:opacity-50 disabled:bg-gray-50`}
+          >
+            {noCourtsToday
+              ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
+              : filteredCourts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+            }
           </select>
         </div>
         <div>
           <label className={text.label}>ก๊วน</label>
-          <select value={groupId} onChange={e => setGroupId(e.target.value)} className={input.base}>
-            {displayGroups.length === 0 && <option value="">ไม่มีก๊วน</option>}
-            {displayGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          <select
+            value={groupId}
+            onChange={e => setGroupId(e.target.value)}
+            disabled={noCourtsToday || noGroupsToday}
+            className={`${input.base} disabled:opacity-50 disabled:bg-gray-50`}
+          >
+            {noCourtsToday || noGroupsToday
+              ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
+              : filteredGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)
+            }
           </select>
         </div>
       </div>
-      {filteredCourts.length === 0 && courts.length > 0 && (
-        <p className="text-xs text-amber-500 mb-3">⚠ ไม่มีก๊วนที่เปิดวันนี้ — แสดงทั้งหมด</p>
-      )}
-      {filteredCourts.length > 0 && groups.length === 0 && allGroups.length > 0 && (
-        <p className="text-xs text-amber-500 mb-3">⚠ ก๊วนนี้ไม่เปิดวันนี้ — แสดงทั้งหมด</p>
-      )}
-      {filteredCourts.length > 0 && groups.length > 0 && <div className="mb-3" />}
 
       {/* Time + Games */}
       <div className="grid grid-cols-3 gap-3 mb-4">
