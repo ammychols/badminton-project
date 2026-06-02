@@ -83,28 +83,26 @@ export default function App() {
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
           <AppIcon size={28} />
           <h1 className="text-lg font-bold text-gray-900">BadmintonTracker</h1>
-          <div className="relative">
-            <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
-              <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
-            </button>
-            {showUserMenu && (
-              <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden z-[70] min-w-[180px]" onClick={() => setShowUserMenu(false)}>
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
-                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                </div>
-                <button onClick={() => { signOut(); setShowUserMenu(false); }}
-                  className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
-                  ออกจากระบบ
-                </button>
-              </div>
-            )}
-          </div>
+          <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
+            <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
+          </button>
         </div>
       </header>
 
       {showUserMenu && (
-        <div className="fixed inset-0 z-[60]" onClick={() => setShowUserMenu(false)} />
+        <>
+          <div className="fixed inset-0 z-[60]" onClick={() => setShowUserMenu(false)} />
+          <div className="fixed top-14 right-4 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-[70] min-w-[200px]">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
+              <p className="text-xs text-gray-400 truncate">{user.email}</p>
+            </div>
+            <button onClick={() => { signOut(); setShowUserMenu(false); }}
+              className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
+              ออกจากระบบ
+            </button>
+          </div>
+        </>
       )}
 
       <main className="flex-1 pb-20">
