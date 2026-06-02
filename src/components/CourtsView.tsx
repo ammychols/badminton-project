@@ -102,6 +102,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 <button
                   key={court.id}
                   onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
+                  onMouseDown={e => e.preventDefault()}
                   className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all ${
                     isSelected ? 'bg-gray-800' : 'bg-gray-900/80 hover:bg-gray-800'
                   }`}
