@@ -107,11 +107,15 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         </div>
                         <p className="font-bold text-white text-lg leading-tight">{court.name}</p>
                       </div>
-                      {court.address && (
-                        <button onClick={() => setViewMode('map')} className="text-xs text-gray-400 ml-12 truncate block hover:text-green-400 transition-colors text-left">
-                          📍 {court.address}
-                        </button>
-                      )}
+                      {court.address && (() => {
+                        const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand');
+                        const short = parts.slice(-2).join(' · ');
+                        return (
+                          <button onClick={() => setViewMode('map')} title={court.address} className="text-xs text-gray-400 ml-12 block hover:text-green-400 transition-colors text-left">
+                            📍 {short}
+                          </button>
+                        );
+                      })()}
                       {/* Info chips */}
                       <div className="flex items-center gap-1.5 mt-2.5 ml-12 flex-wrap">
                         {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) ? (
