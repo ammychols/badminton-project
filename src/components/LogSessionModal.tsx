@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Court, Session } from '../types';
+import { Court, Session, DayOfWeek } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
 
@@ -127,12 +127,33 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(initialSession?.mood ?? 3);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
+  const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
+
+  const filteredCourts = courts.filter(c => c.groups.some(g => g.days.includes(selectedDow)));
+  const displayCourts = filteredCourts.length > 0 ? filteredCourts : courts;
+
   const selectedCourt = courts.find(c => c.id === courtId);
-  const groups = selectedCourt?.groups ?? [];
+  const allGroups = selectedCourt?.groups ?? [];
+  const groups = allGroups.filter(g => g.days.includes(selectedDow));
+  const displayGroups = groups.length > 0 ? groups : allGroups;
 
   const handleCourtChange = (id: string) => {
     setCourtId(id);
-    setGroupId(courts.find(c => c.id === id)?.groups[0]?.id ?? '');
+    const court = courts.find(c => c.id === id);
+    const g = court?.groups.filter(g => g.days.includes(selectedDow)) ?? [];
+    setGroupId((g.length > 0 ? g : court?.groups ?? [])[0]?.id ?? '');
+  };
+
+  const handleDateChange = (d: string) => {
+    setDate(d);
+    const dow = DOW_MAP[new Date(d + 'T00:00:00').getDay()];
+    const filtered = courts.filter(c => c.groups.some(g => g.days.includes(dow)));
+    const newCourt = filtered.find(c => c.id === courtId) ? selectedCourt : (filtered[0] ?? courts[0]);
+    if (newCourt && newCourt.id !== courtId) setCourtId(newCourt.id);
+    const g = newCourt?.groups.filter(g => g.days.includes(dow)) ?? [];
+    const newGroupId = (g.length > 0 ? g : newCourt?.groups ?? [])[0]?.id ?? '';
+    setGroupId(newGroupId);
   };
 
   const handleSave = () => {
@@ -152,7 +173,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
     <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
       {/* Calendar */}
       <div className="bg-gray-50 rounded-2xl p-3 mb-5">
-        <MiniCalendar selected={date} onChange={setDate} />
+        <MiniCalendar selected={date} onChange={handleDateChange} />
       </div>
 
       {/* Court */}
@@ -160,8 +181,8 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         <label className={text.label}>สนาม</label>
         <select value={courtId} onChange={e => handleCourtChange(e.target.value)}
           className={input.base}>
-          {courts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
-          {courts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {displayCourts.length === 0 && <option value="">ยังไม่มีสนาม</option>}
+          {displayCourts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>
 
@@ -170,8 +191,8 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         <label className={text.label}>ก๊วน</label>
         <select value={groupId} onChange={e => setGroupId(e.target.value)}
           className={input.base}>
-          {groups.length === 0 && <option value="">ยังไม่มีก๊วนในสนามนี้</option>}
-          {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          {displayGroups.length === 0 && <option value="">ยังไม่มีก๊วนในสนามนี้</option>}
+          {displayGroups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
       </div>
 
