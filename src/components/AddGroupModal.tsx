@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DayOfWeek, DAY_LABELS, GroupLevel, ALL_LEVELS } from '../types';
 import { BottomSheet } from './BottomSheet';
-import { text } from '../styles/tokens';
+import { text, input } from '../styles/tokens';
 
 interface AddGroupModalProps {
   courtName: string;
@@ -17,7 +17,7 @@ interface AddGroupModalProps {
 const ALL_DAYS: DayOfWeek[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
-const SELECT_CLS = 'flex-1 border border-gray-200 rounded-xl px-2 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 bg-white appearance-none text-center';
+const SELECT_CLS = input.timeSelect;
 
 function TimePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [h, m] = value.split(':');
@@ -81,7 +81,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
         <label className={text.label}>ชื่อก๊วน *</label>
         <input type="text" value={name} onChange={e => setName(e.target.value)}
           placeholder="เช่น ก๊วนเช้าวันเสาร์"
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400" />
+          className={input.base} />
       </div>
 
       <div className="mb-4">
@@ -142,7 +142,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
       <div className="mb-2">
         <label className={text.label}>โน้ต (ไม่บังคับ)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={4}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none" />
+          className={input.textarea} />
       </div>
     </BottomSheet>
   );

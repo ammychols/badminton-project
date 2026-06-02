@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Court } from '../types';
 import { BottomSheet } from './BottomSheet';
-import { text } from '../styles/tokens';
+import { text, input } from '../styles/tokens';
 
 interface ReviewModalProps {
   court: Court;
@@ -36,7 +36,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
       <div>
         <label className={text.label}>โน้ต (ไม่บังคับ)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-green-400 resize-none" />
+          className={input.textarea} />
       </div>
     </BottomSheet>
   );

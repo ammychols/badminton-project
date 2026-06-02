@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
 import { CourtsMap } from './CourtsMap';
-import { btn, emptyState } from '../styles/tokens';
+import { btn, emptyState, text } from '../styles/tokens';
 
 interface CourtsViewProps {
   courts: Court[];
@@ -53,7 +53,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold text-gray-900">สนามของฉัน</h2>
+        <h2 className={text.pageTitle}>สนามของฉัน</h2>
         <button onClick={onAddCourt} className={btn.primaryIcon}>
           <span className="text-lg leading-none">+</span> เพิ่มสนาม
         </button>
