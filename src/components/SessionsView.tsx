@@ -265,7 +265,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             return (
               <div
                 key={session.id}
-                className={`${card.base} overflow-hidden flex`}
+                onClick={() => onEditSession(session)}
+                className={`${card.base} overflow-hidden flex cursor-pointer active:scale-[0.99] transition-transform`}
               >
                 {/* Mood accent bar */}
                 <div className={`w-1 flex-shrink-0 ${MOOD_ACCENT[session.mood]}`} />
@@ -283,26 +284,15 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                           {getGroupName(session.courtId, session.groupId)} · วัน{day} {full}
                         </div>
                       </div>
-                      <div className="flex items-center gap-0.5 flex-shrink-0 -mt-0.5 -mr-1">
-                        <button
-                          onClick={() => onEditSession(session)}
-                          className="text-gray-200 hover:text-gray-600 transition-colors p-1"
-                          title="แก้ไข"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => setConfirmDeleteId(session.id)}
-                          className="text-gray-200 hover:text-red-400 transition-colors p-1"
-                          title="ลบ"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
+                      <button
+                        onClick={e => { e.stopPropagation(); setConfirmDeleteId(session.id); }}
+                        className="text-gray-200 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1"
+                        title="ลบ"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     </div>
 
                     <div className="mt-2 flex items-center gap-2 flex-wrap">
