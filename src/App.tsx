@@ -24,7 +24,7 @@ interface ModalState {
   sessionId?: string;
 }
 
-function LoginScreen({ onSignIn }: { onSignIn: () => void }) {
+function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string | null }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
       <div className="mb-8 text-center">
@@ -44,13 +44,14 @@ function LoginScreen({ onSignIn }: { onSignIn: () => void }) {
         </svg>
         <span className="text-sm font-medium text-gray-700">เข้าสู่ระบบด้วย Google</span>
       </button>
+      {error && <p className="mt-4 text-xs text-red-500 text-center max-w-xs">{error}</p>}
       <p className="mt-6 text-xs text-gray-400 text-center">ข้อมูลจะ sync ทุก device ที่ใช้ account เดียวกัน</p>
     </div>
   );
 }
 
 export default function App() {
-  const { user, loading, signIn, signOut } = useAuth();
+  const { user, loading, signIn, signOut, error } = useAuth();
   const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'courts');
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
@@ -70,7 +71,7 @@ export default function App() {
     );
   }
 
-  if (!user) return <LoginScreen onSignIn={signIn} />;
+  if (!user) return <LoginScreen onSignIn={signIn} error={error} />;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
