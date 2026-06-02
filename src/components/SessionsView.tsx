@@ -73,9 +73,9 @@ function Heatmap({ sessions }: { sessions: { date: string }[] }) {
   const sessionDays = new Set(sessions.filter(s => s.date.startsWith(viewYM)).map(s => parseInt(s.date.slice(8))));
   const isViewingCurrentMonth = viewYM === currentYM;
 
-  // Day-of-week frequency (all time)
+  // Day-of-week frequency for selected month
   const dowCount = Array(7).fill(0);
-  sessions.forEach(s => { const d = new Date(s.date + 'T00:00:00'); dowCount[d.getDay()]++; });
+  sessions.filter(s => s.date.startsWith(viewYM)).forEach(s => { const d = new Date(s.date + 'T00:00:00'); dowCount[d.getDay()]++; });
   const maxDow = Math.max(...dowCount, 1);
 
   return (
