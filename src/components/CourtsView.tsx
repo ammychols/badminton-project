@@ -107,9 +107,16 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                         </div>
                         <p className="font-bold text-white text-lg leading-tight">{court.name}</p>
                       </div>
-                      {court.address && (
-                        <p className="text-xs text-gray-400 ml-12 truncate">{court.address}</p>
-                      )}
+                      {court.address && (() => {
+                        const mapsUrl = court.lat && court.lng
+                          ? `https://www.google.com/maps?q=${court.lat},${court.lng}`
+                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.address)}`;
+                        return (
+                          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 ml-12 truncate block hover:text-green-400 transition-colors">
+                            📍 {court.address}
+                          </a>
+                        );
+                      })()}
                       {/* Info chips */}
                       <div className="flex items-center gap-1.5 mt-2.5 ml-12 flex-wrap">
                         {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) ? (
