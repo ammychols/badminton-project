@@ -180,7 +180,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
 
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
-  const thisMonthSessions = sessions.filter(s => s.date.startsWith(thisMonth)).length;
+  const thisMonthSessions = sessions.filter(s => s.date.startsWith(thisMonth));
+  const thisMonthDays = new Set(thisMonthSessions.map(s => s.date)).size;
+  const thisMonthGames = thisMonthSessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
+  const avgGamesPerDay = thisMonthDays > 0 ? (thisMonthGames / thisMonthDays).toFixed(1) : null;
   const hasSessionToday = sessions.some(s => s.date === today);
   const streak = calcStreak(sessions);
 
@@ -205,8 +208,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       <div className="bg-gray-900 rounded-3xl p-5 mb-4 text-white">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <div className="text-xs text-gray-400 mb-0.5">ครั้งทั้งหมด</div>
-            <div className="text-5xl font-black leading-none">{totalSessions}</div>
+            <div className="text-xs text-gray-400 mb-0.5">ตีไปทั้งหมด</div>
+            <div className="flex items-end gap-1.5 leading-none">
+              <span className="text-5xl font-black">{totalGames}</span>
+              <span className="text-lg text-gray-400 mb-1">เกม</span>
+            </div>
           </div>
           {streak >= 2 && (
             <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
@@ -217,18 +223,18 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         </div>
         <div className="flex gap-4 border-t border-white/10 pt-4">
           <div>
-            <div className="text-2xl font-bold">{totalGames}</div>
-            <div className="text-xs text-gray-400">เกมทั้งหมด</div>
+            <div className="text-2xl font-bold">{thisMonthDays}</div>
+            <div className="text-xs text-gray-400">วันที่ตีเดือนนี้</div>
           </div>
           <div className="w-px bg-white/10" />
           <div>
-            <div className="text-2xl font-bold">{thisMonthSessions}</div>
-            <div className="text-xs text-gray-400">เดือนนี้</div>
+            <div className="text-2xl font-bold">{thisMonthGames}</div>
+            <div className="text-xs text-gray-400">เกมเดือนนี้</div>
           </div>
           <div className="w-px bg-white/10" />
           <div>
-            <div className="text-2xl font-bold">{totalSessions > 0 ? (totalGames / totalSessions).toFixed(1) : '—'}</div>
-            <div className="text-xs text-gray-400">เกม/ครั้ง</div>
+            <div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div>
+            <div className="text-xs text-gray-400">เกม/วัน</div>
           </div>
         </div>
       </div>
