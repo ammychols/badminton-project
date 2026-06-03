@@ -18,6 +18,11 @@ html {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: max(16px, 1em);
+  }
 }
 
 @keyframes slide-up {
