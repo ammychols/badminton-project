@@ -71,16 +71,16 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
     <div className="select-none">
       {/* Month nav */}
       <div className="flex items-center justify-between mb-3">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg">‹</button>
-        <span className="text-sm font-semibold text-[#1a3329]">{MONTH_LABELS[viewMonth]} {viewYear + 543}</span>
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)] text-[var(--text-4)] transition-colors text-lg">‹</button>
+        <span className="text-sm font-semibold text-[var(--text-1)]">{MONTH_LABELS[viewMonth]} {viewYear + 543}</span>
         <button onClick={nextMonth} disabled={isNextDisabled}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg disabled:opacity-20 disabled:cursor-default">›</button>
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)] text-[var(--text-4)] transition-colors text-lg disabled:opacity-20 disabled:cursor-default">›</button>
       </div>
 
       {/* Day-of-week headers */}
       <div className="grid grid-cols-7 mb-1">
         {DOW.map(d => (
-          <div key={d} className="text-center text-xs text-[#8a9e90] py-1">{d}</div>
+          <div key={d} className="text-center text-xs text-[var(--text-3)] py-1">{d}</div>
         ))}
       </div>
 
@@ -97,17 +97,18 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
               key={d}
               disabled={isFuture}
               onClick={() => onChange(dateStr)}
-              className={`aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all mx-0.5 ${
-                isSel
-                  ? 'bg-[#3d6b4f] text-white'
-                  : isFuture
-                  ? 'text-[#c5d4bf] cursor-default'
-                  : 'text-[#3a5045] hover:bg-[#e8f0e4]'
-              }`}
+              className="aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all mx-0.5"
+              style={{
+                backgroundColor: isSel ? 'var(--cal-sel)' : undefined,
+                color: isSel ? 'white' : isFuture ? 'var(--dashed)' : 'var(--text-2)',
+                cursor: isFuture ? 'default' : undefined,
+              }}
+              onMouseEnter={e => { if (!isSel && !isFuture) e.currentTarget.style.backgroundColor = 'var(--hover-bg)'; }}
+              onMouseLeave={e => { if (!isSel) e.currentTarget.style.backgroundColor = ''; }}
             >
               {d}
               {isToday && (
-                <span className={`w-1 h-1 rounded-full mt-0.5 ${isSel ? 'bg-white/60' : 'bg-[#3d6b4f]'}`} />
+                <span className="w-1 h-1 rounded-full mt-0.5" style={{ backgroundColor: isSel ? 'rgba(255,255,255,0.6)' : 'var(--cal-sel)' }} />
               )}
             </button>
           );
@@ -134,16 +135,17 @@ function NoteField({ value, onChange }: { value: string; onChange: (v: string) =
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); } if (e.key === 'Escape') commit(); }}
           placeholder="เช่น วันนี้เล่นดีมาก!"
           rows={2}
-          className="w-full text-sm text-[#3a5045] bg-[#f2f5ef] border border-[#cdd7c8] rounded-xl px-3 py-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#3d6b4f]"
+          className="w-full text-sm text-[var(--text-2)] border border-[var(--input-b)] rounded-xl px-3 py-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+          style={{ backgroundColor: 'var(--app-bg)' }}
         />
       </div>
     );
   }
   return (
-    <button type="button" onClick={() => setEditing(true)} className="w-full text-left mb-2 px-3 py-2.5 rounded-xl border border-dashed border-[#c5d4bf] hover:border-[#3d6b4f] transition-colors">
+    <button type="button" onClick={() => setEditing(true)} className="w-full text-left mb-2 px-3 py-2.5 rounded-xl border border-dashed border-[var(--dashed)] hover:border-[var(--p)] transition-colors">
       {value
-        ? <p className="text-sm text-[#3a5045] leading-relaxed">{value}</p>
-        : <p className="text-sm text-[#8a9e90]">+ เพิ่มโน้ต...</p>
+        ? <p className="text-sm text-[var(--text-2)] leading-relaxed">{value}</p>
+        : <p className="text-sm text-[var(--text-3)]">+ เพิ่มโน้ต...</p>
       }
     </button>
   );
@@ -199,7 +201,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
 
   const saveButton = (
     <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday}
-      className="w-full bg-[#3d6b4f] text-white py-3 rounded-2xl font-medium hover:bg-[#2e5540] disabled:opacity-40 transition-colors">
+      className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
       บันทึก
     </button>
   );
@@ -207,7 +209,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   return (
     <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
       {/* Calendar */}
-      <div className="bg-[#f2f5ef] rounded-2xl p-3 mb-4">
+      <div className="rounded-2xl p-3 mb-4" style={{ backgroundColor: 'var(--app-bg)' }}>
         <MiniCalendar selected={date} onChange={handleDateChange} />
       </div>
 
@@ -219,7 +221,8 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
             value={courtId}
             onChange={e => handleCourtChange(e.target.value)}
             disabled={noCourtsToday}
-            className={`${input.base} disabled:opacity-50 disabled:bg-[#f2f5ef]`}
+            className={`${input.base} disabled:opacity-50`}
+            style={{ '--disabled-bg': 'var(--app-bg)' } as React.CSSProperties}
           >
             {noCourtsToday
               ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
@@ -233,7 +236,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
             value={groupId}
             onChange={e => setGroupId(e.target.value)}
             disabled={noCourtsToday || noGroupsToday}
-            className={`${input.base} disabled:opacity-50 disabled:bg-[#f2f5ef]`}
+            className={`${input.base} disabled:opacity-50`}
           >
             {noCourtsToday || noGroupsToday
               ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
@@ -257,10 +260,10 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
           <label className={text.label}>เกม</label>
           <div className="flex items-center gap-1.5 h-[42px]">
             <button type="button" onClick={() => setGamesPlayed(g => Math.max(0, g - 1))}
-              className="w-8 h-8 rounded-full bg-[#e8f0e4] text-[#3a5045] text-lg font-bold hover:bg-[#dce8d8] flex items-center justify-center flex-shrink-0">−</button>
-            <span className="text-lg font-bold text-[#1a3329] flex-1 text-center">{gamesPlayed}</span>
+              className="w-8 h-8 rounded-full bg-[var(--chip-bg)] text-[var(--text-2)] text-lg font-bold hover:bg-[var(--bar-i)] flex items-center justify-center flex-shrink-0">−</button>
+            <span className="text-lg font-bold text-[var(--text-1)] flex-1 text-center">{gamesPlayed}</span>
             <button type="button" onClick={() => setGamesPlayed(g => g + 1)}
-              className="w-8 h-8 rounded-full bg-[#e8f0e4] text-[#3a5045] text-lg font-bold hover:bg-[#dce8d8] flex items-center justify-center flex-shrink-0">+</button>
+              className="w-8 h-8 rounded-full bg-[var(--chip-bg)] text-[var(--text-2)] text-lg font-bold hover:bg-[var(--bar-i)] flex items-center justify-center flex-shrink-0">+</button>
           </div>
         </div>
       </div>
@@ -271,7 +274,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         <div className="flex gap-2">
           {([1, 2, 3, 4, 5] as const).map(m => (
             <button key={m} type="button" onClick={() => setMood(m)}
-              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[#3d6b4f] scale-105' : 'bg-[#e8f0e4] opacity-50 hover:opacity-80'}`}>
+              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[var(--p)] scale-105' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}
             </button>
           ))}

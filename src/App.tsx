@@ -55,6 +55,15 @@ export default function App() {
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
 
+  const [theme, setTheme] = useState<'white' | 'forest'>(() =>
+    (localStorage.getItem('theme') as 'white' | 'forest') ?? 'white'
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme === 'forest' ? 'forest' : '');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -77,7 +86,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f2f5ef] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--app-bg)' }}>
         <div className="text-3xl animate-spin">🏸</div>
       </div>
     );
@@ -86,21 +95,33 @@ export default function App() {
   if (!user) return <LoginScreen onSignIn={signIn} error={error} />;
 
   return (
-    <div className="min-h-screen bg-[#f2f5ef] flex flex-col">
-      <header className="bg-[#fafcf8] border-b border-[#e2e8dd] sticky top-0 z-40">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
+      <header className="sticky top-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-[#1a3329]">🏸 BadmintonTracker</h1>
-          <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
-            <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
-          </button>
+          <h1 className="text-lg font-bold" style={{ color: 'var(--text-1)' }}>🏸 BadmintonTracker</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setTheme(t => t === 'white' ? 'forest' : 'white')}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-base transition-colors"
+              style={{ color: 'var(--text-3)' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
+              title={theme === 'white' ? 'เปลี่ยนเป็น Pastel Forest' : 'เปลี่ยนเป็น White Mode'}
+            >
+              {theme === 'white' ? '🌿' : '☀️'}
+            </button>
+            <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
+              <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
+            </button>
+          </div>
         </div>
       </header>
 
       {showUserMenu && (
-        <div ref={userMenuRef} className="fixed top-14 right-4 bg-[#fafcf8] border border-[#e2e8dd] rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]">
-          <div className="px-4 py-3 border-b border-[#e2e8dd]">
-            <p className="text-xs font-semibold text-[#1a3329] truncate">{user.displayName}</p>
-            <p className="text-xs text-[#8a9e90] truncate">{user.email}</p>
+        <div ref={userMenuRef} className="fixed top-14 right-4 rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]" style={{ backgroundColor: 'var(--nav-bg)', border: '1px solid var(--nav-border)' }}>
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--nav-border)' }}>
+            <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-1)' }}>{user.displayName}</p>
+            <p className="text-xs truncate" style={{ color: 'var(--text-3)' }}>{user.email}</p>
           </div>
           <button onClick={() => { signOut(); setShowUserMenu(false); }}
             className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
@@ -136,14 +157,14 @@ export default function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#fafcf8] border-t border-[#e2e8dd] z-40">
+      <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)' }}>
         <div className="flex items-center justify-center gap-2 px-6 py-2">
           <button onClick={() => switchTab('sessions')}
-            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'sessions' ? 'bg-[#3d6b4f] text-white' : 'text-[#6b8070] hover:text-[#1a3329]'}`}>
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'sessions' ? 'bg-[var(--p)] text-white' : 'text-[var(--text-4)] hover:text-[var(--text-1)]'}`}>
             <span>📝</span><span>บันทึก</span>
           </button>
           <button onClick={() => switchTab('courts')}
-            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'courts' ? 'bg-[#3d6b4f] text-white' : 'text-[#6b8070] hover:text-[#1a3329]'}`}>
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'courts' ? 'bg-[var(--p)] text-white' : 'text-[var(--text-4)] hover:text-[var(--text-1)]'}`}>
             <span>🏸</span><span>สนาม</span>
           </button>
         </div>
