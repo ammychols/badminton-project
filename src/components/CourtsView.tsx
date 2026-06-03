@@ -39,10 +39,14 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCourtId, setSelectedCourtId] = useState<string | null>(() => courts[0]?.id ?? null);
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
+  const [search, setSearch] = useState('');
 
-  const filteredCourts = selectedDay === 'all'
-    ? courts
-    : courts.filter(court => court.groups.some(g => g.days.includes(selectedDay as DayOfWeek)));
+  const q = search.trim().toLowerCase();
+  const filteredCourts = courts.filter(court => {
+    const dayMatch = selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek));
+    const searchMatch = !q || court.name.toLowerCase().includes(q) || court.groups.some(g => g.name.toLowerCase().includes(q));
+    return dayMatch && searchMatch;
+  });
 
   const selectedCourt = courts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
   const visibleGroups = selectedCourt
@@ -73,6 +77,25 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         ))}
       </div>
 
+      {/* Search */}
+      <div className="relative mb-4">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+        </svg>
+        <input
+          type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="ค้นหาสนาม หรือก๊วน..."
+          className="w-full pl-9 pr-8 py-2.5 text-sm bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder-gray-300"
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       {/* List / Map toggle */}
       <div className="flex rounded-full border border-gray-200 overflow-hidden text-sm w-fit mb-5 bg-white">
         <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}>รายการ</button>
@@ -93,6 +116,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       ) : (
         <>
           {/* Court grid */}
+          {filteredCourts.length === 0 && q && (
+            <div className="text-center text-sm text-gray-400 py-10">ไม่พบ "{search}"</div>
+          )}
           <div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:mb-6 flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
