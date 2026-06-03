@@ -8,6 +8,7 @@ interface SessionsViewProps {
   onLogSession: () => void;
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
+  onUpdateNote: (id: string, notes: string | undefined) => void;
 }
 
 const MOOD_EMOJIS: Record<number, string> = {
@@ -149,26 +150,12 @@ function thisMonthString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-const MOOD_GRADIENT: Record<number, string> = {
-  1: 'from-slate-100 to-white',
-  2: 'from-blue-50 to-white',
-  3: 'from-amber-50 to-white',
-  4: 'from-emerald-50 to-white',
-  5: 'from-orange-50 via-rose-50 to-white',
-};
-const MOOD_BORDER: Record<number, string> = {
-  1: 'border-slate-200',
-  2: 'border-blue-100',
-  3: 'border-amber-100',
-  4: 'border-emerald-100',
-  5: 'border-orange-200',
-};
 const MOOD_ACCENT: Record<number, string> = {
   1: 'bg-slate-300',
   2: 'bg-blue-400',
   3: 'bg-amber-400',
   4: 'bg-emerald-400',
-  5: 'bg-gradient-to-b from-orange-400 to-rose-500',
+  5: 'bg-orange-500',
 };
 
 function calcStreak(sessions: { date: string }[]): number {
@@ -188,7 +175,63 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
-export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, onEditSession }: SessionsViewProps) {
+function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelete, onUpdateNote }: {
+  session: Session; courtName: string; groupName: string; dateLabel: string;
+  onEdit: () => void; onDelete: () => void; onUpdateNote: (notes: string | undefined) => void;
+}) {
+  const [editingNote, setEditingNote] = useState(false);
+  const [noteText, setNoteText] = useState(session.notes ?? '');
+  const commitNote = () => {
+    setEditingNote(false);
+    const trimmed = noteText.trim() || undefined;
+    if (trimmed !== session.notes) onUpdateNote(trimmed);
+  };
+  return (
+    <div className={`${card.base} overflow-hidden flex`}>
+      <div className={`w-1.5 flex-shrink-0 rounded-l-2xl ${MOOD_ACCENT[session.mood]}`} />
+      <div className="flex-1 px-4 py-3.5 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex gap-3 items-start flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
+            <div className="text-2xl leading-none mt-0.5 select-none">{MOOD_EMOJIS[session.mood]}</div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-gray-900 leading-snug">{courtName}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{groupName} · {dateLabel}</div>
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.startTime} – {session.endTime}</span>
+                {session.gamesPlayed > 0 && <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.gamesPlayed} เกม</span>}
+              </div>
+            </div>
+          </div>
+          <button onClick={onDelete} className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        {/* Inline note */}
+        <div className="mt-2 border-t border-gray-100 pt-2">
+          {editingNote ? (
+            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+              onBlur={commitNote}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
+              placeholder="เพิ่มโน้ต..." rows={2}
+              className="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
+          ) : (
+            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }} className="w-full text-left">
+              {session.notes
+                ? <p className="text-xs text-gray-500 leading-relaxed hover:text-gray-700 transition-colors">{session.notes}</p>
+                : <p className="text-xs text-gray-300 hover:text-gray-400 transition-colors">+ เพิ่มโน้ต</p>
+              }
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
   const today = todayString();
   const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -318,60 +361,20 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
             )}
             {viewedSessions.map(session => {
-
-            const { day, full } = formatDate(session.date);
-            return (
-              <div
-                key={session.id}
-                onClick={() => onEditSession(session)}
-                className={`bg-gradient-to-r ${MOOD_GRADIENT[session.mood]} border ${MOOD_BORDER[session.mood]} rounded-2xl overflow-hidden flex cursor-pointer active:scale-[0.99] transition-all shadow-sm hover:shadow-md`}
-              >
-                {/* Mood accent bar */}
-                <div className={`w-1.5 flex-shrink-0 ${MOOD_ACCENT[session.mood]}`} />
-
-                <div className="flex-1 px-4 py-3.5 flex gap-3 items-start min-w-0">
-                  <div className="text-2xl leading-none mt-0.5 select-none">{MOOD_EMOJIS[session.mood]}</div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900 leading-snug">
-                          {getCourtName(session.courtId)}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-0.5">
-                          {getGroupName(session.courtId, session.groupId)} · วัน{day} {full}
-                        </div>
-                      </div>
-                      <button
-                        onClick={e => { e.stopPropagation(); setConfirmDeleteId(session.id); }}
-                        className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1"
-                        title="ลบ"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="mt-2 flex items-center gap-2 flex-wrap">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">
-                        {session.startTime} – {session.endTime}
-                      </span>
-                      {session.gamesPlayed > 0 && (
-                        <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">
-                          {session.gamesPlayed} เกม
-                        </span>
-                      )}
-                    </div>
-
-                    {session.notes && (
-                      <div className="mt-2 text-xs text-gray-500 leading-relaxed">{session.notes}</div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              const { day, full } = formatDate(session.date);
+              return (
+                <SessionCard
+                  key={session.id}
+                  session={session}
+                  courtName={getCourtName(session.courtId)}
+                  groupName={getGroupName(session.courtId, session.groupId)}
+                  dateLabel={`วัน${day} ${full}`}
+                  onEdit={() => onEditSession(session)}
+                  onDelete={() => setConfirmDeleteId(session.id)}
+                  onUpdateNote={notes => onUpdateNote(session.id, notes)}
+                />
+              );
+            })}
             {/* Add session button at bottom of list */}
             <button
               onClick={onLogSession}

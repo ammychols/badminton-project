@@ -149,10 +149,7 @@ function NoteField({ value, onChange }: { value: string; onChange: (v: string) =
 }
 
 function defaultTimes() {
-  const now = new Date();
-  const h = now.getMinutes() >= 30 ? now.getHours() + 1 : now.getHours();
-  const fmt = (hh: number) => `${String(hh % 24).padStart(2, '0')}:00`;
-  return { start: fmt(h), end: fmt(h + 2) };
+  return { start: '00:00', end: '00:00' };
 }
 
 export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {

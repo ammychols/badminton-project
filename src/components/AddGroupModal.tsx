@@ -37,13 +37,8 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
-function roundedTime(offsetHours = 0) {
-  const now = new Date();
-  const h = (now.getMinutes() >= 30 ? now.getHours() + 1 : now.getHours()) + offsetHours;
-  return `${String(h % 24).padStart(2, '0')}:00`;
-}
-const defaultStart = roundedTime(0);
-const defaultEnd = roundedTime(2);
+const defaultStart = '00:00';
+const defaultEnd = '00:00';
 
 export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, onSave }: AddGroupModalProps) {
   const [name, setName] = useState(initialValues?.name ?? '');

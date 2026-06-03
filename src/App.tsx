@@ -128,6 +128,10 @@ export default function App() {
             onLogSession={() => openModal({ type: 'logSession' })}
             onDeleteSession={deleteSession}
             onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
+            onUpdateNote={(id, notes) => {
+              const s = sessions.find(s => s.id === id);
+              if (s) updateSession(id, { ...s, notes });
+            }}
           />
         )}
       </main>
