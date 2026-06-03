@@ -254,6 +254,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
   const today = todayString();
   const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+  const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
+  const getGroupName = (courtId: string, groupId: string) =>
+    courts.find(c => c.id === courtId)?.groups.find(g => g.id === groupId)?.name ?? 'ไม่พบก๊วน';
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -270,7 +275,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
     else setViewMonth(m => m + 1);
   };
   const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
-  const viewedSessions = sessions.filter(s => s.date.startsWith(viewYM));
+  const q = search.trim().toLowerCase();
+  const viewedSessions = sessions.filter(s => {
+    if (!s.date.startsWith(viewYM)) return false;
+    if (!q) return true;
+    return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
+  });
 
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
@@ -294,10 +304,6 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       ? `${Math.floor(avgMinutes / 60)}ชม.${avgMinutes % 60 > 0 ? `${avgMinutes % 60}น.` : ''}`
       : `${avgMinutes}น.`
     : null;
-
-  const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
-  const getGroupName = (courtId: string, groupId: string) =>
-    courts.find(c => c.id === courtId)?.groups.find(g => g.id === groupId)?.name ?? 'ไม่พบก๊วน';
 
   return (
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
@@ -376,14 +382,33 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </div>
           ) : (
           <div className="flex flex-col gap-2">
-            <button
-              onClick={onLogSession}
-              className="w-full py-3.5 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 text-sm font-medium hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="text-lg leading-none">+</span> บันทึกการตี
-            </button>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+                </svg>
+                <input
+                  type="text" value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="ค้นหาก๊วน หรือสนาม..."
+                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder-gray-300"
+                />
+                {search && (
+                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={onLogSession}
+                className="flex-shrink-0 px-4 py-2.5 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 text-sm font-medium hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1.5"
+              >
+                <span className="text-base leading-none">+</span> บันทึก
+              </button>
+            </div>
             {viewedSessions.length === 0 && (
-              <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
+              <div className="text-center text-sm text-gray-400 py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
             )}
             {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
               const { day, full } = formatDate(session.date);
