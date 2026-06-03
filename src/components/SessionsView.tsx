@@ -357,6 +357,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </div>
           ) : (
           <div className="flex flex-col gap-2">
+            <button
+              onClick={onLogSession}
+              className="w-full py-3.5 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 text-sm font-medium hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="text-lg leading-none">+</span> บันทึกการตี
+            </button>
             {viewedSessions.length === 0 && (
               <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
             )}
@@ -375,13 +381,6 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 />
               );
             })}
-            {/* Add session button at bottom of list */}
-            <button
-              onClick={onLogSession}
-              className="w-full mt-2 py-3.5 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 text-sm font-medium hover:border-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="text-lg leading-none">+</span> บันทึกการตี
-            </button>
           </div>
           )}
         </div>{/* end right col */}
