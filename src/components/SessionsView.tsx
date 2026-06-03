@@ -96,13 +96,15 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
             const isToday = isViewingCurrentMonth && d === now.getDate();
             const hasSession = sessionDays.has(d);
             return (
-              <div key={d} className="aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all"
+              <div key={d} className="aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-all"
                 style={{
-                  backgroundColor: hasSession ? 'var(--cal-sel)' : undefined,
-                  color: hasSession ? 'white' : isToday ? 'var(--text-1)' : 'var(--dashed)',
+                  fontWeight: hasSession ? 600 : undefined,
+                  color: isToday ? 'var(--text-1)' : hasSession ? 'var(--text-1)' : 'var(--dashed)',
                 }}>
                 {d}
-                {isToday && <span className="w-1 h-1 rounded-full mt-0.5" style={{ backgroundColor: hasSession ? 'rgba(255,255,255,0.6)' : 'var(--cal-sel)' }} />}
+                <span className="w-1 h-1 rounded-full mt-0.5" style={{
+                  backgroundColor: hasSession ? 'var(--bar-a)' : isToday ? 'var(--bar-a)' : 'transparent'
+                }} />
               </div>
             );
           })}
