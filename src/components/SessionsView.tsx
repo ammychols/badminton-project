@@ -18,21 +18,6 @@ const MOOD_EMOJIS: Record<number, string> = {
   5: '🔥',
 };
 
-const MOOD_BG: Record<number, string> = {
-  1: 'bg-gray-50',
-  2: 'bg-blue-50',
-  3: 'bg-yellow-50',
-  4: 'bg-green-50',
-  5: 'bg-orange-50',
-};
-
-const MOOD_BORDER: Record<number, string> = {
-  1: 'border-gray-200',
-  2: 'border-blue-100',
-  3: 'border-yellow-100',
-  4: 'border-green-100',
-  5: 'border-orange-200',
-};
 
 const DAY_NAMES = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
 const MONTH_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
@@ -164,12 +149,26 @@ function thisMonthString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+const MOOD_GRADIENT: Record<number, string> = {
+  1: 'from-slate-100 to-white',
+  2: 'from-blue-50 to-white',
+  3: 'from-amber-50 to-white',
+  4: 'from-emerald-50 to-white',
+  5: 'from-orange-50 via-rose-50 to-white',
+};
+const MOOD_BORDER: Record<number, string> = {
+  1: 'border-slate-200',
+  2: 'border-blue-100',
+  3: 'border-amber-100',
+  4: 'border-emerald-100',
+  5: 'border-orange-200',
+};
 const MOOD_ACCENT: Record<number, string> = {
-  1: 'bg-gray-400',
+  1: 'bg-slate-300',
   2: 'bg-blue-400',
-  3: 'bg-yellow-400',
-  4: 'bg-green-400',
-  5: 'bg-orange-400',
+  3: 'bg-amber-400',
+  4: 'bg-emerald-400',
+  5: 'bg-gradient-to-b from-orange-400 to-rose-500',
 };
 
 function calcStreak(sessions: { date: string }[]): number {
@@ -249,10 +248,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         {/* Left column: stats + calendar */}
         <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
           {/* Hero stats */}
-          <div className="bg-gray-900 rounded-3xl p-5 mb-4 text-white">
-            <div className="flex items-end justify-between mb-4">
+          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%)'}}>
+            <div className="absolute inset-0 opacity-30" style={{background: 'radial-gradient(ellipse at 20% 80%, #f97316 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #8b5cf6 0%, transparent 50%)'}} />
+            <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
-                <div className="text-xs text-gray-400 mb-0.5">ตีไปทั้งหมด</div>
+                <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
                 <div className="flex items-end gap-1.5 leading-none">
                   <span className="text-5xl font-black">{totalGames}</span>
                   <span className="text-lg text-gray-400 mb-1">เกม</span>
@@ -265,7 +265,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+            <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
               <div>
                 <div className="text-2xl font-bold">{thisMonthDays}</div>
                 <div className="text-xs text-gray-400">วันที่ตีเดือนนี้</div>
@@ -324,10 +324,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               <div
                 key={session.id}
                 onClick={() => onEditSession(session)}
-                className={`${card.base} overflow-hidden flex cursor-pointer active:scale-[0.99] transition-transform`}
+                className={`bg-gradient-to-r ${MOOD_GRADIENT[session.mood]} border ${MOOD_BORDER[session.mood]} rounded-2xl overflow-hidden flex cursor-pointer active:scale-[0.99] transition-all shadow-sm hover:shadow-md`}
               >
                 {/* Mood accent bar */}
-                <div className={`w-1 flex-shrink-0 ${MOOD_ACCENT[session.mood]}`} />
+                <div className={`w-1.5 flex-shrink-0 ${MOOD_ACCENT[session.mood]}`} />
 
                 <div className="flex-1 px-4 py-3.5 flex gap-3 items-start min-w-0">
                   <div className="text-2xl leading-none mt-0.5 select-none">{MOOD_EMOJIS[session.mood]}</div>
@@ -344,7 +344,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                       </div>
                       <button
                         onClick={e => { e.stopPropagation(); setConfirmDeleteId(session.id); }}
-                        className="text-gray-200 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1"
+                        className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1"
                         title="ลบ"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
