@@ -148,14 +148,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             <div>
               {/* Court detail bar */}
               <div className="mb-4 pb-3 border-b border-gray-200">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
                   <h3 className="text-base font-semibold text-gray-900 leading-tight">{selectedCourt.name}</h3>
-                  <button
-                    onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                    className="bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors whitespace-nowrap flex-shrink-0"
-                  >
-                    + ก๊วน
-                  </button>
                 </div>
                 <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                   {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking || selectedCourt.info?.notes) ? (
@@ -171,23 +165,25 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 </div>
               </div>
 
-              {visibleGroups.length === 0 ? (
-                <p className="text-xs text-gray-400 text-center py-12">
-                  {selectedCourt.groups.length === 0 ? 'ยังไม่มีก๊วน' : 'ไม่มีก๊วนในวันนี้'}
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {visibleGroups.map(group => (
-                    <GroupCard
-                      key={group.id}
-                      group={group}
-                      onDelete={() => onDeleteGroup(selectedCourt.id, group.id)}
-                      onEdit={() => onEditGroup(selectedCourt.id, group.id)}
-                      onSaveNote={(notes) => onAddReview(selectedCourt.id, group.id, notes)}
-                    />
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {visibleGroups.map(group => (
+                  <GroupCard
+                    key={group.id}
+                    group={group}
+                    onDelete={() => onDeleteGroup(selectedCourt.id, group.id)}
+                    onEdit={() => onEditGroup(selectedCourt.id, group.id)}
+                    onSaveNote={(notes) => onAddReview(selectedCourt.id, group.id, notes)}
+                  />
+                ))}
+                {/* Add group card */}
+                <button
+                  onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                  className="min-h-[88px] border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <span className="text-2xl leading-none">+</span>
+                  <span className="text-xs font-medium">เพิ่มก๊วน</span>
+                </button>
+              </div>
             </div>
           )}
         </>

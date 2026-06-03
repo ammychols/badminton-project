@@ -244,85 +244,84 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
-        <button
-          onClick={onLogSession}
-          className={btn.primaryIcon}
-        >
+        <button onClick={onLogSession} className={btn.primaryIcon}>
           <span className="text-lg leading-none">+</span> บันทึก
         </button>
       </div>
 
-      {/* Hero stats */}
-      <div className="bg-gray-900 rounded-3xl p-5 mb-4 text-white">
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <div className="text-xs text-gray-400 mb-0.5">ตีไปทั้งหมด</div>
-            <div className="flex items-end gap-1.5 leading-none">
-              <span className="text-5xl font-black">{totalGames}</span>
-              <span className="text-lg text-gray-400 mb-1">เกม</span>
+      <div className="sm:flex sm:gap-6 sm:items-start">
+        {/* Left column: stats + calendar */}
+        <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
+          {/* Hero stats */}
+          <div className="bg-gray-900 rounded-3xl p-5 mb-4 text-white">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">ตีไปทั้งหมด</div>
+                <div className="flex items-end gap-1.5 leading-none">
+                  <span className="text-5xl font-black">{totalGames}</span>
+                  <span className="text-lg text-gray-400 mb-1">เกม</span>
+                </div>
+              </div>
+              {streak >= 2 && (
+                <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
+                  <span className="text-lg">🔥</span>
+                  <span className="text-sm font-semibold">{streak} วันติด</span>
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+              <div>
+                <div className="text-2xl font-bold">{thisMonthDays}</div>
+                <div className="text-xs text-gray-400">วันที่ตีเดือนนี้</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{thisMonthGames}</div>
+                <div className="text-xs text-gray-400">เกมเดือนนี้</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div>
+                <div className="text-xs text-gray-400">เกม/วัน</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{avgDuration ?? '—'}</div>
+                <div className="text-xs text-gray-400">เฉลี่ย/ครั้ง</div>
+              </div>
             </div>
           </div>
-          {streak >= 2 && (
-            <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
-              <span className="text-lg">🔥</span>
-              <span className="text-sm font-semibold">{streak} วันติด</span>
+
+          {/* Today nudge */}
+          {!hasSessionToday && sessions.length > 0 && (
+            <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
+              <span className="text-xl">🏸</span>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div>
+                <div className="text-xs text-amber-600">กดบันทึกเลย</div>
+              </div>
+              <span className="text-amber-400 text-lg">›</span>
+            </button>
+          )}
+
+          {/* Heatmap */}
+          {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+        </div>
+
+        {/* Right column: session list */}
+        <div className="sm:flex-1 sm:min-w-0">
+          {sessions.length === 0 ? (
+            <div className={emptyState.wrapper}>
+              <div className={emptyState.icon}>🏸</div>
+              <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+              <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+              <button onClick={onLogSession} className={btn.primaryLg}>
+                + บันทึกครั้งแรก
+              </button>
             </div>
-          )}
-        </div>
-        <div className="flex gap-4 border-t border-white/10 pt-4">
-          <div>
-            <div className="text-2xl font-bold">{thisMonthDays}</div>
-            <div className="text-xs text-gray-400">วันที่ตีเดือนนี้</div>
-          </div>
-          <div className="w-px bg-white/10" />
-          <div>
-            <div className="text-2xl font-bold">{thisMonthGames}</div>
-            <div className="text-xs text-gray-400">เกมเดือนนี้</div>
-          </div>
-          <div className="w-px bg-white/10" />
-          <div>
-            <div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div>
-            <div className="text-xs text-gray-400">เกม/วัน</div>
-          </div>
-          <div className="w-px bg-white/10" />
-          <div>
-            <div className="text-2xl font-bold">{avgDuration ?? '—'}</div>
-            <div className="text-xs text-gray-400">เฉลี่ย/ครั้ง</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Today nudge */}
-      {!hasSessionToday && sessions.length > 0 && (
-        <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
-          <span className="text-xl">🏸</span>
-          <div className="flex-1">
-            <div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div>
-            <div className="text-xs text-amber-600">กดบันทึกเลย</div>
-          </div>
-          <span className="text-amber-400 text-lg">›</span>
-        </button>
-      )}
-
-      {/* Heatmap */}
-      {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
-
-      {/* Session list */}
-      {sessions.length === 0 ? (
-        <div className={emptyState.wrapper}>
-          <div className={emptyState.icon}>🏸</div>
-          <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
-          <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
-          <button onClick={onLogSession} className={btn.primaryLg}>
-            + บันทึกครั้งแรก
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {viewedSessions.length === 0 && (
-            <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
-          )}
-          {viewedSessions.map(session => {
+          ) : (
+          <div className="flex flex-col gap-2">
+            {viewedSessions.length === 0 && (
+              <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
+            )}
+            {viewedSessions.map(session => {
             const { day, full } = formatDate(session.date);
             return (
               <div
@@ -376,8 +375,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               </div>
             );
           })}
-        </div>
-      )}
+          </div>
+          )}
+        </div>{/* end right col */}
+      </div>{/* end sm:flex */}
 
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
