@@ -197,7 +197,7 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
               <div className="text-sm font-semibold text-gray-900 leading-snug">{courtName}</div>
               <div className="text-xs text-gray-400 mt-0.5">{groupName} · {dateLabel}</div>
               <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.startTime} – {session.endTime}</span>
+                <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.startTime} – {session.endTime}{(() => { const [sh,sm]=session.startTime.split(':').map(Number); const [eh,em]=session.endTime.split(':').map(Number); const d=(eh*60+em)-(sh*60+sm); if(d<=0) return ''; const h=Math.floor(d/60); const m=d%60; return ' ('+( h>0?h+'ชม.':'')+( m>0?m+'น.':'')+')'; })()}</span>
                 {session.gamesPlayed > 0 && <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.gamesPlayed} เกม</span>}
               </div>
             </div>
@@ -360,7 +360,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             {viewedSessions.length === 0 && (
               <div className="text-center text-sm text-gray-400 py-8">ไม่มีบันทึกในเดือนนี้</div>
             )}
-            {viewedSessions.map(session => {
+            {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
               const { day, full } = formatDate(session.date);
               return (
                 <SessionCard

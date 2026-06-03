@@ -121,28 +121,30 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     })()}
                     <p className="text-xs text-gray-500 mt-1">{court.groups.length} ก๊วน</p>
                   </button>
-                  <button
-                    onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
-                    className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-white/40 hover:bg-red-500/80 hover:text-white transition-colors"
-                    title="ลบสนาม"
-                  >
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  </button>
-                  {(court.lat && court.lng) || court.address ? (
-                    <a
-                      href={court.lat && court.lng
-                        ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
-                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + court.address)}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      className="absolute bottom-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-white/40 hover:bg-blue-500/80 hover:text-white transition-colors"
-                      title="นำทาง"
+                  <div className="absolute top-2 right-2 flex gap-1">
+                    {(court.lat && court.lng) || court.address ? (
+                      <a
+                        href={court.lat && court.lng
+                          ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
+                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + court.address)}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-white/40 hover:bg-blue-500/80 hover:text-white transition-colors"
+                        title="นำทาง"
+                      >
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      </a>
+                    ) : null}
+                    <button
+                      onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10 text-white/40 hover:bg-red-500/80 hover:text-white transition-colors"
+                      title="ลบสนาม"
                     >
-                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                    </a>
-                  ) : null}
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                  </div>
                 </div>
               );
             })}
