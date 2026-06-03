@@ -84,7 +84,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         </svg>
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="ค้นหาสนาม หรือก๊วน..."
+          placeholder="ค้นหาก๊วน หรือสนาม..."
           className="w-full pl-9 pr-8 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
         />
         {search && (
@@ -132,9 +132,21 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--p-h)')}
                     onMouseLeave={e => (e.currentTarget.style.backgroundColor = isSelected ? 'var(--p-h)' : 'var(--p)')}
                   >
-                    <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
+                    {/* Grain texture */}
+                    <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,backgroundSize:'180px 180px'}} />
+                    {/* Big letter */}
+                    <span className="absolute -right-2 -bottom-3 text-8xl font-black text-white/[0.07] leading-none select-none pointer-events-none tracking-tighter">
                       {court.name.charAt(0).toUpperCase()}
                     </span>
+                    {/* Leaf SVG decoration */}
+                    <svg className="absolute bottom-1 right-8 pointer-events-none" width="32" height="40" viewBox="0 0 32 40" fill="white" style={{opacity:'var(--leaf-opacity,0)'}}>
+                      <path d="M16 1 C16 1 30 10 29 25 C28 35 16 39 16 39 C16 39 4 35 3 25 C2 10 16 1 16 1Z" opacity="0.9"/>
+                      <line x1="16" y1="5" x2="16" y2="37" stroke="white" strokeWidth="0.8" opacity="0.5"/>
+                      <line x1="16" y1="14" x2="9" y2="22" stroke="white" strokeWidth="0.5" opacity="0.4"/>
+                      <line x1="16" y1="14" x2="23" y2="22" stroke="white" strokeWidth="0.5" opacity="0.4"/>
+                      <line x1="16" y1="22" x2="10" y2="29" stroke="white" strokeWidth="0.5" opacity="0.3"/>
+                      <line x1="16" y1="22" x2="22" y2="29" stroke="white" strokeWidth="0.5" opacity="0.3"/>
+                    </svg>
                     <p className="font-semibold text-white text-sm leading-tight truncate mb-1 pr-5">{court.name}</p>
                     {court.address && (() => {
                       const parts = court.address
