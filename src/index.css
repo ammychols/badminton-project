@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --p: #111827;
+  --p-h: #374151;
+  --app-bg: #f9fafb;
+  --nav-bg: #ffffff;
+  --nav-border: #f3f4f6;
+  --card-border: #f3f4f6;
+  --text-1: #111827;
+  --text-2: #374151;
+  --text-3: #9ca3af;
+  --text-4: #6b7280;
+  --input-b: #e5e7eb;
+  --input-f: #6b7280;
+  --chip-bg: #f3f4f6;
+  --chip-t: #4b5563;
+  --bar-a: #111827;
+  --bar-i: #e5e7eb;
+  --dashed: #e5e7eb;
+  --cal-sel: #111827;
+  --hover-bg: #f9fafb;
+  --hero-from: #1a1a2e;
+  --hero-to: #533483;
+}
+
+[data-theme="forest"] {
+  --p: #3d6b4f;
+  --p-h: #2e5540;
+  --app-bg: #f2f5ef;
+  --nav-bg: #fafcf8;
+  --nav-border: #e2e8dd;
+  --card-border: #e2e8dd;
+  --text-1: #1a3329;
+  --text-2: #3a5045;
+  --text-3: #8a9e90;
+  --text-4: #6b8070;
+  --input-b: #cdd7c8;
+  --input-f: #3d6b4f;
+  --chip-bg: #e8f0e4;
+  --chip-t: #4a7060;
+  --bar-a: #3d6b4f;
+  --bar-i: #dce8d8;
+  --dashed: #c5d4bf;
+  --cal-sel: #3d6b4f;
+  --hover-bg: #e8f0e4;
+  --hero-from: #1a3329;
+  --hero-to: #4e9468;
+}
+
 html {
   overflow-y: scroll;
 }
@@ -12,8 +60,8 @@ html {
     font-size: 17px;
     line-height: 1.7;
     letter-spacing: 0.01em;
-    background-color: #f2f5ef;
-    color: #1a3329;
+    background-color: var(--app-bg);
+    color: var(--text-1);
   }
 
   button, [role="button"] {

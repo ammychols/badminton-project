@@ -58,7 +58,7 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
 
   return (
     <div className={`${card.padded} mb-4`}>
-      <div className="text-sm font-semibold text-[#1a3329] mb-4">สถิติรายเดือน</div>
+      <div className="text-sm font-semibold text-[var(--text-1)] mb-4">สถิติรายเดือน</div>
 
       {/* Monthly bars */}
       <div className="flex items-end gap-1.5 mb-5">
@@ -67,11 +67,11 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
           const heightPct = Math.max((count / maxMonth) * 80, count > 0 ? 8 : 3);
           return (
             <div key={ym} className="flex-1 flex flex-col items-center gap-1">
-              <div className="text-xs font-semibold text-[#3a5045]">{count > 0 ? count : ''}</div>
+              <div className="text-xs font-semibold text-[var(--text-2)]">{count > 0 ? count : ''}</div>
               <div className="w-full flex items-end" style={{ height: '80px' }}>
-                <div className={`w-full rounded-t-xl transition-all ${isCurrent ? 'bg-[#3d6b4f]' : 'bg-[#dce8d8]'}`} style={{ height: `${heightPct}px` }} />
+                <div className="w-full rounded-t-xl transition-all" style={{ height: `${heightPct}px`, backgroundColor: isCurrent ? 'var(--bar-a)' : 'var(--bar-i)' }} />
               </div>
-              <div className={`text-xs ${isCurrent ? 'font-bold text-[#3d6b4f]' : 'text-[#8a9e90]'}`}>{label}</div>
+              <div className="text-xs" style={{ fontWeight: isCurrent ? 'bold' : 'normal', color: isCurrent ? 'var(--bar-a)' : 'var(--text-3)' }}>{label}</div>
             </div>
           );
         })}
@@ -80,14 +80,14 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
       {/* Calendar */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={onPrev} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg">‹</button>
-          <span className="text-sm font-semibold text-[#3a5045]">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
+          <button onClick={onPrev} className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg" style={{ color: 'var(--text-4)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>‹</button>
+          <span className="text-sm font-semibold text-[var(--text-2)]">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
           <button onClick={onNext} disabled={isNextDisabled}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg disabled:opacity-20 disabled:cursor-default">›</button>
+            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg disabled:opacity-20 disabled:cursor-default" style={{ color: 'var(--text-4)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>›</button>
         </div>
         <div className="grid grid-cols-7 mb-1">
           {DOW_LABELS.map(d => (
-            <div key={d} className="text-center text-xs text-[#8a9e90] py-1">{d}</div>
+            <div key={d} className="text-center text-xs py-1" style={{ color: 'var(--text-3)' }}>{d}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
@@ -96,11 +96,13 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
             const isToday = isViewingCurrentMonth && d === now.getDate();
             const hasSession = sessionDays.has(d);
             return (
-              <div key={d} className={`aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all ${
-                hasSession ? 'bg-[#3d6b4f] text-white' : isToday ? 'text-[#1a3329]' : 'text-[#c5d4bf]'
-              }`}>
+              <div key={d} className="aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all"
+                style={{
+                  backgroundColor: hasSession ? 'var(--cal-sel)' : undefined,
+                  color: hasSession ? 'white' : isToday ? 'var(--text-1)' : 'var(--dashed)',
+                }}>
                 {d}
-                {isToday && <span className={`w-1 h-1 rounded-full mt-0.5 ${hasSession ? 'bg-white/60' : 'bg-[#3d6b4f]'}`} />}
+                {isToday && <span className="w-1 h-1 rounded-full mt-0.5" style={{ backgroundColor: hasSession ? 'rgba(255,255,255,0.6)' : 'var(--cal-sel)' }} />}
               </div>
             );
           })}
@@ -109,18 +111,18 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
 
       {/* DOW frequency */}
       <div>
-        <div className="text-xs font-medium text-[#6b8070] mb-2">วันที่ตีบ่อย</div>
+        <div className="text-xs font-medium mb-2" style={{ color: 'var(--text-4)' }}>วันที่ตีบ่อย</div>
         <div className="flex gap-1.5 items-end">
           {DOW_LABELS.map((label, i) => {
             const count = dowCount[i];
             const heightPct = Math.max((count / maxDow) * 40, count > 0 ? 4 : 2);
             return (
               <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                <div className="text-xs font-semibold text-[#4a7060]" style={{ minHeight: '16px' }}>{count > 0 ? count : ''}</div>
+                <div className="text-xs font-semibold text-[var(--chip-t)]" style={{ minHeight: '16px' }}>{count > 0 ? count : ''}</div>
                 <div className="w-full flex items-end" style={{ height: '40px' }}>
-                  <div className={`w-full rounded-t-lg ${count > 0 ? 'bg-[#3d6b4f]' : 'bg-[#dce8d8]'}`} style={{ height: `${heightPct}px` }} />
+                  <div className="w-full rounded-t-lg" style={{ height: `${heightPct}px`, backgroundColor: count > 0 ? 'var(--bar-a)' : 'var(--bar-i)' }} />
                 </div>
-                <div className="text-xs text-[#8a9e90]">{label}</div>
+                <div className="text-xs text-[var(--text-3)]">{label}</div>
               </div>
             );
           })}
@@ -206,41 +208,42 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
           {/* Info */}
           <div className="min-w-0 flex-1 cursor-pointer" onClick={onEdit}>
             <div className="text-sm leading-snug truncate">
-              <span className="font-semibold text-[#1a3329]">{groupName}</span>
-              <span className="text-[#8a9e90] font-normal"> · {courtName}</span>
+              <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
+              <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
             </div>
-            <div className="text-xs text-[#8a9e90] mt-0.5 truncate">
+            <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
               {dateLabel}{hasTime ? ` · ${session.startTime} – ${session.endTime}` : ''}
             </div>
           </div>
           {/* Right: duration + games */}
           {(durLabel || session.gamesPlayed > 0) && (
             <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-              {durLabel && <div className="text-sm font-bold text-[#1a3329] tabular-nums leading-tight">{durLabel}</div>}
-              {session.gamesPlayed > 0 && <div className="text-xs text-[#8a9e90] mt-0.5">{session.gamesPlayed} เกม</div>}
+              {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
+              {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
             </div>
           )}
           {/* Delete */}
-          <button onClick={onDelete} className="text-[#c5d4bf] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
+          <button onClick={onDelete} className="text-[var(--dashed)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
         </div>
         {/* Inline note */}
-        <div className="border-t border-[#e2e8dd] pt-2">
+        <div className="border-t border-[var(--card-border)] pt-2">
           {editingNote ? (
             <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)} onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
               onBlur={commitNote}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
               placeholder="เพิ่มโน้ต..." rows={2}
-              className="w-full text-xs text-[#3a5045] bg-[#f2f5ef] border border-[#cdd7c8] rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#3d6b4f]"
+              className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+              style={{ backgroundColor: 'var(--app-bg)' }}
             />
           ) : (
             <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }} className="w-full text-left">
               {session.notes
-                ? <p className="text-xs text-[#6b8070] leading-relaxed hover:text-[#3a5045] transition-colors">{session.notes}</p>
-                : <p className="text-xs text-[#c5d4bf] hover:text-[#8a9e90] transition-colors">+ เพิ่มโน้ต</p>
+                ? <p className="text-xs text-[var(--text-4)] leading-relaxed hover:text-[var(--text-2)] transition-colors">{session.notes}</p>
+                : <p className="text-xs text-[var(--dashed)] hover:text-[var(--text-3)] transition-colors">+ เพิ่มโน้ต</p>
               }
             </button>
           )}
@@ -316,8 +319,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         {/* Left column: stats + calendar */}
         <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
           {/* Hero stats */}
-          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, #1a3329 0%, #2d5a3d 30%, #3a7a50 65%, #4e9468 100%)'}}>
-            <div className="absolute inset-0 opacity-30" style={{background: 'radial-gradient(ellipse at 20% 80%, #a8d5b5 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #6baa82 0%, transparent 50%)'}} />
+          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+            <div className="absolute inset-0 opacity-30" style={{background: 'radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 50%)'}} />
             <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
                 <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
@@ -384,16 +387,16 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#c5d4bf] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
                 </svg>
                 <input
                   type="text" value={search} onChange={e => setSearch(e.target.value)}
                   placeholder="ค้นหาก๊วน หรือสนาม..."
-                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[#cdd7c8] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#3d6b4f] placeholder-[#c5d4bf]"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
                 />
                 {search && (
-                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c5d4bf] hover:text-[#8a9e90]">
+                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -402,13 +405,13 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               </div>
               <button
                 onClick={onLogSession}
-                className="flex-shrink-0 px-4 py-2.5 rounded-2xl border-2 border-dashed border-[#c5d4bf] text-[#8a9e90] text-sm font-medium hover:border-[#3d6b4f] hover:text-[#3d6b4f] transition-colors flex items-center gap-1.5"
+                className="flex-shrink-0 px-4 py-2.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center gap-1.5"
               >
                 <span className="text-base leading-none">+</span> บันทึก
               </button>
             </div>
             {viewedSessions.length === 0 && (
-              <div className="text-center text-sm text-[#8a9e90] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
             )}
             {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
               const { day, full } = formatDate(session.date);
@@ -433,10 +436,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
           <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-            <p className="text-base font-semibold text-[#1a3329] mb-1">ลบบันทึก</p>
-            <p className="text-sm text-[#8a9e90] mb-5">ลบรายการนี้ออกจากประวัติ?</p>
+            <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบบันทึก</p>
+            <p className="text-sm text-[var(--text-3)] mb-5">ลบรายการนี้ออกจากประวัติ?</p>
             <div className="flex gap-2">
-              <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[#cdd7c8] text-sm text-[#3a5045] hover:bg-[#f2f5ef] transition-colors">ยกเลิก</button>
+              <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--input-b)] text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors">ยกเลิก</button>
               <button onClick={() => { onDeleteSession(confirmDeleteId); setConfirmDeleteId(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
             </div>
           </div>

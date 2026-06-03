@@ -79,16 +79,16 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
 
       {/* Search */}
       <div className="relative mb-4">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#c5d4bf] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
         </svg>
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="ค้นหาสนาม หรือก๊วน..."
-          className="w-full pl-9 pr-8 py-2.5 text-sm bg-white border border-[#cdd7c8] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#3d6b4f] placeholder-[#c5d4bf]"
+          className="w-full pl-9 pr-8 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
         />
         {search && (
-          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c5d4bf] hover:text-[#8a9e90]">
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -97,9 +97,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       </div>
 
       {/* List / Map toggle */}
-      <div className="flex rounded-full border border-[#cdd7c8] overflow-hidden text-sm w-fit mb-5 bg-white">
-        <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-[#3d6b4f] text-white' : 'text-[#8a9e90] hover:text-[#3a5045]'}`}>รายการ</button>
-        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-[#3d6b4f] text-white' : 'text-[#8a9e90] hover:text-[#3a5045]'}`}>แผนที่</button>
+      <div className="flex rounded-full border border-[var(--input-b)] overflow-hidden text-sm w-fit mb-5 bg-white">
+        <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-[var(--p)] text-white' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>รายการ</button>
+        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-[var(--p)] text-white' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>แผนที่</button>
       </div>
 
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
@@ -117,7 +117,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
         <>
           {/* Court grid */}
           {filteredCourts.length === 0 && q && (
-            <div className="text-center text-sm text-[#8a9e90] py-10">ไม่พบ "{search}"</div>
+            <div className="text-center text-sm text-[var(--text-3)] py-10">ไม่พบ "{search}"</div>
           )}
           <div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:mb-6 flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
             {filteredCourts.map(court => {
@@ -127,9 +127,10 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                   <button
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                     onMouseDown={e => e.preventDefault()}
-                    className={`relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full ${
-                      isSelected ? 'bg-[#234d32]' : 'bg-[#2d5a3d]/90 hover:bg-[#234d32]'
-                    }`}
+                    className="relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full"
+                    style={{ backgroundColor: isSelected ? 'var(--p-h)' : 'var(--p)', opacity: isSelected ? 1 : 0.9 }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--p-h)')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = isSelected ? 'var(--p-h)' : 'var(--p)')}
                   >
                     <span className="absolute -right-1 -bottom-2 text-6xl font-black text-white/5 leading-none select-none pointer-events-none">
                       {court.name.charAt(0).toUpperCase()}
@@ -178,7 +179,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             <div className="flex-shrink-0 w-48 sm:w-auto">
               <button
                 onClick={onAddCourt}
-                className="w-full h-full min-h-[88px] border-2 border-dashed border-[#c5d4bf] rounded-2xl flex flex-col items-center justify-center gap-1 text-[#8a9e90] hover:border-[#3d6b4f] hover:text-[#3d6b4f] transition-colors"
+                className="w-full h-full min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
               >
                 <span className="text-2xl leading-none">+</span>
                 <span className="text-xs font-medium">เพิ่มสนาม</span>
@@ -190,20 +191,20 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
           {selectedCourt && (
             <div>
               {/* Court detail bar */}
-              <div className="mb-4 pb-3 border-b border-[#cdd7c8]">
+              <div className="mb-4 pb-3 border-b border-[var(--input-b)]">
                 <div className="flex items-start gap-3">
-                  <h3 className="text-base font-semibold text-[#1a3329] leading-tight">{selectedCourt.name}</h3>
+                  <h3 className="text-base font-semibold text-[var(--text-1)] leading-tight">{selectedCourt.name}</h3>
                 </div>
                 <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                   {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking || selectedCourt.info?.notes) ? (
                     <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 flex-wrap hover:opacity-70 transition-opacity">
-                      {selectedCourt.info.floor && <span className="bg-[#e8f0e4] text-[#4a7060] text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
-                      {selectedCourt.info.air   && <span className="bg-[#e8f0e4] text-[#4a7060] text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
-                      {selectedCourt.info.parking && <span className="bg-[#e8f0e4] text-[#4a7060] text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
-                      {selectedCourt.info.notes && <span className="bg-[#e8f0e4] text-[#4a7060] text-xs px-2 py-0.5 rounded-full">{selectedCourt.info.notes}</span>}
+                      {selectedCourt.info.floor && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
+                      {selectedCourt.info.air   && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
+                      {selectedCourt.info.parking && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
+                      {selectedCourt.info.notes && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{selectedCourt.info.notes}</span>}
                     </button>
                   ) : (
-                    <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-[#8a9e90] hover:text-[#3d6b4f]">+ ข้อมูลสนาม</button>
+                    <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-[var(--text-3)] hover:text-[var(--p)]">+ ข้อมูลสนาม</button>
                   )}
                 </div>
               </div>
@@ -221,7 +222,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 {/* Add group card */}
                 <button
                   onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                  className="min-h-[88px] border-2 border-dashed border-[#c5d4bf] rounded-2xl flex flex-col items-center justify-center gap-1 text-[#8a9e90] hover:border-[#3d6b4f] hover:text-[#3d6b4f] transition-colors"
+                  className="min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
                 >
                   <span className="text-2xl leading-none">+</span>
                   <span className="text-xs font-medium">เพิ่มก๊วน</span>
@@ -235,8 +236,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
       {confirmDeleteCourt && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteCourt(null)}>
           <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-            <p className="text-base font-semibold text-[#1a3329] mb-1">ลบสนาม</p>
-            <p className="text-sm text-[#8a9e90] mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
+            <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบสนาม</p>
+            <p className="text-sm text-[var(--text-3)] mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDeleteCourt(null)} className={btn.cancel}>ยกเลิก</button>
               <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }} className={btn.danger}>ลบ</button>
@@ -252,7 +253,7 @@ function MiniStars({ val }: { val: number }) {
   return (
     <span className="text-sm leading-none">
       <span className="text-yellow-400">{'★'.repeat(val)}</span>
-      <span className="text-[#c5d4bf]">{'★'.repeat(5 - val)}</span>
+      <span className="text-[var(--dashed)]">{'★'.repeat(5 - val)}</span>
     </span>
   );
 }
@@ -261,8 +262,8 @@ function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm:
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={onCancel}>
       <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-        <p className="text-base font-semibold text-[#1a3329] mb-1">ลบก๊วน</p>
-        <p className="text-sm text-[#8a9e90] mb-5">"{name}"</p>
+        <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบก๊วน</p>
+        <p className="text-sm text-[var(--text-3)] mb-5">"{name}"</p>
         <div className="flex gap-2">
           <button onClick={onCancel} className={btn.cancel}>ยกเลิก</button>
           <button onClick={onConfirm} className={btn.danger}>ลบ</button>
@@ -285,7 +286,7 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2e8dd]">
+    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[var(--card-border)]">
       {group.image ? (
         <div className="relative h-40 overflow-hidden">
           <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
@@ -302,7 +303,7 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
           </div>
         </div>
       ) : (
-        <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[#6b8070]'} overflow-hidden`}>
+        <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[var(--text-4)]'} overflow-hidden`}>
           <span className="absolute -right-1 -top-2 text-6xl font-black text-white/20 leading-none select-none">{group.name.charAt(0)}</span>
           <div className="absolute top-2 right-2 flex gap-1">
             <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors text-xs">✎</button>
@@ -316,8 +317,8 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
       <div className="px-3 pt-3 pb-3">
         {!group.image && (
           <>
-            <p className="font-semibold text-[#1a3329] text-base leading-tight">{group.name}</p>
-            <p className="text-xs text-[#8a9e90] mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
+            <p className="font-semibold text-[var(--text-1)] text-base leading-tight">{group.name}</p>
+            <p className="text-xs text-[var(--text-3)] mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
           </>
         )}
         <div className="flex items-center gap-1 flex-wrap mt-1 mb-2">
@@ -325,11 +326,11 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
             <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-bold ${DAY_COLORS[day].pill}`}>{DAY_LABELS[day]}</span>
           ))}
           {group.levels?.slice().sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).map(lv => (
-            <span key={lv} className="text-xs px-2 py-0.5 rounded-full font-semibold bg-[#e8f0e4] text-[#4a7060]">{lv}</span>
+            <span key={lv} className="text-xs px-2 py-0.5 rounded-full font-semibold bg-[var(--chip-bg)] text-[var(--chip-t)]">{lv}</span>
           ))}
         </div>
-        {group.notes && <p className="text-xs text-[#8a9e90] mb-2 leading-relaxed">{group.notes}</p>}
-        <div className="border-t border-[#e2e8dd] pt-2">
+        {group.notes && <p className="text-xs text-[var(--text-3)] mb-2 leading-relaxed">{group.notes}</p>}
+        <div className="border-t border-[var(--card-border)] pt-2">
           {editingNote ? (
             <textarea
               autoFocus
@@ -340,7 +341,8 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(review?.notes ?? ''); setEditingNote(false); } }}
               placeholder="บันทึกความเห็น..."
               rows={2}
-              className="w-full text-xs text-[#3a5045] bg-[#f2f5ef] border border-[#cdd7c8] rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#3d6b4f]"
+              className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+              style={{ backgroundColor: 'var(--app-bg)' }}
             />
           ) : (
             <button
@@ -348,8 +350,8 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
               className="w-full text-left"
             >
               {review?.notes
-                ? <p className="text-xs text-[#6b8070] leading-relaxed hover:text-[#3a5045] transition-colors">{review.notes}</p>
-                : <p className="text-xs text-[#c5d4bf] hover:text-[#8a9e90] transition-colors">+ บันทึกความเห็น</p>
+                ? <p className="text-xs text-[var(--text-4)] leading-relaxed hover:text-[var(--text-2)] transition-colors">{review.notes}</p>
+                : <p className="text-xs text-[var(--dashed)] hover:text-[var(--text-3)] transition-colors">+ บันทึกความเห็น</p>
               }
             </button>
           )}
