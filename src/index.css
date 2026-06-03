@@ -12,6 +12,8 @@ html {
     font-size: 17px;
     line-height: 1.7;
     letter-spacing: 0.01em;
+    background-color: #f2f5ef;
+    color: #1a3329;
   }
 
   button, [role="button"] {
