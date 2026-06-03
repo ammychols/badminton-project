@@ -10,7 +10,7 @@ interface LogSessionModalProps {
   initialSession?: Session;
 }
 
-const MOOD_EMOJIS: Record<number, string> = { 1: '😴', 2: '😐', 3: '🙂', 4: '😄', 5: '🔥' };
+const MOOD_EMOJIS: Record<number, string> = { 1: '😡', 2: '😐', 3: '🙂', 4: '😄', 5: '🔥' };
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
 const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];

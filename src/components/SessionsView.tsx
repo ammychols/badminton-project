@@ -12,7 +12,7 @@ interface SessionsViewProps {
 }
 
 const MOOD_EMOJIS: Record<number, string> = {
-  1: '😴',
+  1: '😡',
   2: '😐',
   3: '🙂',
   4: '😄',
