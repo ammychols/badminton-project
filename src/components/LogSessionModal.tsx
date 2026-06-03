@@ -117,12 +117,23 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
   );
 }
 
+function defaultTimes() {
+  const now = new Date();
+  const roundedMin = Math.round(now.getMinutes() / 15) * 15;
+  const startH = roundedMin === 60 ? now.getHours() + 1 : now.getHours();
+  const startM = roundedMin === 60 ? 0 : roundedMin;
+  const endH = (startH + 2) % 24;
+  const fmt = (h: number, m: number) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  return { start: fmt(startH, startM), end: fmt(endH, startM) };
+}
+
 export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {
+  const { start: defaultStart, end: defaultEnd } = defaultTimes();
   const [date, setDate] = useState(initialSession?.date ?? todayString());
   const [courtId, setCourtId] = useState(initialSession?.courtId ?? courts[0]?.id ?? '');
   const [groupId, setGroupId] = useState(initialSession?.groupId ?? courts[0]?.groups[0]?.id ?? '');
-  const [startTime, setStartTime] = useState(initialSession?.startTime ?? '08:00');
-  const [endTime, setEndTime] = useState(initialSession?.endTime ?? '10:00');
+  const [startTime, setStartTime] = useState(initialSession?.startTime ?? defaultStart);
+  const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(initialSession?.mood ?? 3);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
