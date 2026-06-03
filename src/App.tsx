@@ -77,7 +77,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f2f5ef] flex items-center justify-center">
         <div className="text-3xl animate-spin">🏸</div>
       </div>
     );
@@ -86,10 +86,10 @@ export default function App() {
   if (!user) return <LoginScreen onSignIn={signIn} error={error} />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
+    <div className="min-h-screen bg-[#f2f5ef] flex flex-col">
+      <header className="bg-[#fafcf8] border-b border-[#e2e8dd] sticky top-0 z-40">
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">🏸 BadmintonTracker</h1>
+          <h1 className="text-lg font-bold text-[#1a3329]">🏸 BadmintonTracker</h1>
           <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
             <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
           </button>
@@ -97,10 +97,10 @@ export default function App() {
       </header>
 
       {showUserMenu && (
-        <div ref={userMenuRef} className="fixed top-14 right-4 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-800 truncate">{user.displayName}</p>
-            <p className="text-xs text-gray-400 truncate">{user.email}</p>
+        <div ref={userMenuRef} className="fixed top-14 right-4 bg-[#fafcf8] border border-[#e2e8dd] rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]">
+          <div className="px-4 py-3 border-b border-[#e2e8dd]">
+            <p className="text-xs font-semibold text-[#1a3329] truncate">{user.displayName}</p>
+            <p className="text-xs text-[#8a9e90] truncate">{user.email}</p>
           </div>
           <button onClick={() => { signOut(); setShowUserMenu(false); }}
             className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors">
@@ -136,14 +136,14 @@ export default function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40">
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#fafcf8] border-t border-[#e2e8dd] z-40">
         <div className="flex items-center justify-center gap-2 px-6 py-2">
           <button onClick={() => switchTab('sessions')}
-            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'sessions' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-800'}`}>
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'sessions' ? 'bg-[#3d6b4f] text-white' : 'text-[#6b8070] hover:text-[#1a3329]'}`}>
             <span>📝</span><span>บันทึก</span>
           </button>
           <button onClick={() => switchTab('courts')}
-            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'courts' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-800'}`}>
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${tab === 'courts' ? 'bg-[#3d6b4f] text-white' : 'text-[#6b8070] hover:text-[#1a3329]'}`}>
             <span>🏸</span><span>สนาม</span>
           </button>
         </div>

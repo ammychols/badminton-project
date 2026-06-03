@@ -71,16 +71,16 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
     <div className="select-none">
       {/* Month nav */}
       <div className="flex items-center justify-between mb-3">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-600 transition-colors text-lg">‹</button>
-        <span className="text-sm font-semibold text-gray-800">{MONTH_LABELS[viewMonth]} {viewYear + 543}</span>
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg">‹</button>
+        <span className="text-sm font-semibold text-[#1a3329]">{MONTH_LABELS[viewMonth]} {viewYear + 543}</span>
         <button onClick={nextMonth} disabled={isNextDisabled}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-600 transition-colors text-lg disabled:opacity-20 disabled:cursor-default">›</button>
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e8f0e4] text-[#6b8070] transition-colors text-lg disabled:opacity-20 disabled:cursor-default">›</button>
       </div>
 
       {/* Day-of-week headers */}
       <div className="grid grid-cols-7 mb-1">
         {DOW.map(d => (
-          <div key={d} className="text-center text-xs text-gray-400 py-1">{d}</div>
+          <div key={d} className="text-center text-xs text-[#8a9e90] py-1">{d}</div>
         ))}
       </div>
 
@@ -99,15 +99,15 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
               onClick={() => onChange(dateStr)}
               className={`aspect-square flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all mx-0.5 ${
                 isSel
-                  ? 'bg-gray-900 text-white'
+                  ? 'bg-[#3d6b4f] text-white'
                   : isFuture
-                  ? 'text-gray-200 cursor-default'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'text-[#c5d4bf] cursor-default'
+                  : 'text-[#3a5045] hover:bg-[#e8f0e4]'
               }`}
             >
               {d}
               {isToday && (
-                <span className={`w-1 h-1 rounded-full mt-0.5 ${isSel ? 'bg-white/60' : 'bg-gray-900'}`} />
+                <span className={`w-1 h-1 rounded-full mt-0.5 ${isSel ? 'bg-white/60' : 'bg-[#3d6b4f]'}`} />
               )}
             </button>
           );
@@ -134,16 +134,16 @@ function NoteField({ value, onChange }: { value: string; onChange: (v: string) =
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); } if (e.key === 'Escape') commit(); }}
           placeholder="เช่น วันนี้เล่นดีมาก!"
           rows={2}
-          className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-gray-300"
+          className="w-full text-sm text-[#3a5045] bg-[#f2f5ef] border border-[#cdd7c8] rounded-xl px-3 py-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#3d6b4f]"
         />
       </div>
     );
   }
   return (
-    <button type="button" onClick={() => setEditing(true)} className="w-full text-left mb-2 px-3 py-2.5 rounded-xl border border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+    <button type="button" onClick={() => setEditing(true)} className="w-full text-left mb-2 px-3 py-2.5 rounded-xl border border-dashed border-[#c5d4bf] hover:border-[#3d6b4f] transition-colors">
       {value
-        ? <p className="text-sm text-gray-700 leading-relaxed">{value}</p>
-        : <p className="text-sm text-gray-400">+ เพิ่มโน้ต...</p>
+        ? <p className="text-sm text-[#3a5045] leading-relaxed">{value}</p>
+        : <p className="text-sm text-[#8a9e90]">+ เพิ่มโน้ต...</p>
       }
     </button>
   );
@@ -199,7 +199,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
 
   const saveButton = (
     <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday}
-      className="w-full bg-gray-900 text-white py-3 rounded-2xl font-medium hover:bg-gray-700 disabled:opacity-40 transition-colors">
+      className="w-full bg-[#3d6b4f] text-white py-3 rounded-2xl font-medium hover:bg-[#2e5540] disabled:opacity-40 transition-colors">
       บันทึก
     </button>
   );
@@ -207,7 +207,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   return (
     <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
       {/* Calendar */}
-      <div className="bg-gray-50 rounded-2xl p-3 mb-4">
+      <div className="bg-[#f2f5ef] rounded-2xl p-3 mb-4">
         <MiniCalendar selected={date} onChange={handleDateChange} />
       </div>
 
@@ -219,7 +219,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
             value={courtId}
             onChange={e => handleCourtChange(e.target.value)}
             disabled={noCourtsToday}
-            className={`${input.base} disabled:opacity-50 disabled:bg-gray-50`}
+            className={`${input.base} disabled:opacity-50 disabled:bg-[#f2f5ef]`}
           >
             {noCourtsToday
               ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
@@ -233,7 +233,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
             value={groupId}
             onChange={e => setGroupId(e.target.value)}
             disabled={noCourtsToday || noGroupsToday}
-            className={`${input.base} disabled:opacity-50 disabled:bg-gray-50`}
+            className={`${input.base} disabled:opacity-50 disabled:bg-[#f2f5ef]`}
           >
             {noCourtsToday || noGroupsToday
               ? <option value="">ไม่มีก๊วนเปิดวันนี้</option>
@@ -257,10 +257,10 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
           <label className={text.label}>เกม</label>
           <div className="flex items-center gap-1.5 h-[42px]">
             <button type="button" onClick={() => setGamesPlayed(g => Math.max(0, g - 1))}
-              className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 text-lg font-bold hover:bg-gray-200 flex items-center justify-center flex-shrink-0">−</button>
-            <span className="text-lg font-bold text-gray-800 flex-1 text-center">{gamesPlayed}</span>
+              className="w-8 h-8 rounded-full bg-[#e8f0e4] text-[#3a5045] text-lg font-bold hover:bg-[#dce8d8] flex items-center justify-center flex-shrink-0">−</button>
+            <span className="text-lg font-bold text-[#1a3329] flex-1 text-center">{gamesPlayed}</span>
             <button type="button" onClick={() => setGamesPlayed(g => g + 1)}
-              className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 text-lg font-bold hover:bg-gray-200 flex items-center justify-center flex-shrink-0">+</button>
+              className="w-8 h-8 rounded-full bg-[#e8f0e4] text-[#3a5045] text-lg font-bold hover:bg-[#dce8d8] flex items-center justify-center flex-shrink-0">+</button>
           </div>
         </div>
       </div>
@@ -271,7 +271,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         <div className="flex gap-2">
           {([1, 2, 3, 4, 5] as const).map(m => (
             <button key={m} type="button" onClick={() => setMood(m)}
-              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-gray-900 scale-105' : 'bg-gray-100 opacity-50 hover:opacity-80'}`}>
+              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[#3d6b4f] scale-105' : 'bg-[#e8f0e4] opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}
             </button>
           ))}

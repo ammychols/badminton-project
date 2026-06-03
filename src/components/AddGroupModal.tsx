@@ -70,14 +70,14 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   const saveButton = (
     <button onClick={handleSave} disabled={!name.trim() || days.length === 0}
-      className="w-full bg-gray-900 text-white py-3 rounded-2xl font-medium hover:bg-gray-700 disabled:opacity-40 transition-colors">
+      className="w-full bg-[#3d6b4f] text-white py-3 rounded-2xl font-medium hover:bg-[#2e5540] disabled:opacity-40 transition-colors">
       {initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
     </button>
   );
 
   return (
     <BottomSheet title={initialValues ? 'แก้ไขก๊วน' : 'เพิ่มก๊วน'} onClose={onClose} footer={saveButton}>
-      <p className="text-xs text-gray-400 -mt-3 mb-4">{courtName}</p>
+      <p className="text-xs text-[#8a9e90] -mt-3 mb-4">{courtName}</p>
 
       <div className="mb-4">
         <label className={text.label}>ชื่อก๊วน *</label>
@@ -87,28 +87,28 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">รูปก๊วน (ไม่บังคับ)</label>
+        <label className="block text-sm font-medium text-[#3a5045] mb-2">รูปก๊วน (ไม่บังคับ)</label>
         {image ? (
           <div className="relative">
             <img src={image} alt="group" className="w-full h-36 object-cover rounded-xl" />
             <button type="button" onClick={() => setImage(undefined)} className="absolute top-2 right-2 bg-black/50 text-white w-7 h-7 rounded-full text-lg leading-none flex items-center justify-center hover:bg-black/70">×</button>
           </div>
         ) : (
-          <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+          <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-[#c5d4bf] rounded-xl cursor-pointer hover:bg-[#f2f5ef] transition-colors">
             <span className="text-2xl mb-1">📷</span>
-            <span className="text-xs text-gray-400">กดเพื่อเลือกรูป</span>
+            <span className="text-xs text-[#8a9e90]">กดเพื่อเลือกรูป</span>
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           </label>
         )}
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">วันที่เปิด *</label>
+        <label className="block text-sm font-medium text-[#3a5045] mb-2">วันที่เปิด *</label>
         <div className="flex gap-2 flex-wrap">
           {ALL_DAYS.map(day => (
             <button key={day} onClick={() => toggleDay(day)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                days.includes(day) ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                days.includes(day) ? 'bg-[#3d6b4f] text-white' : 'bg-[#e8f0e4] text-[#4a7060] hover:bg-[#dce8d8]'
               }`}>
               {DAY_LABELS[day]}
             </button>
@@ -117,12 +117,12 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">มือ (ระดับ)</label>
+        <label className="block text-sm font-medium text-[#3a5045] mb-2">มือ (ระดับ)</label>
         <div className="flex gap-2 flex-wrap">
           {ALL_LEVELS.map(lv => (
             <button key={lv} type="button" onClick={() => toggleLevel(lv)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                levels.includes(lv) ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                levels.includes(lv) ? 'bg-[#3d6b4f] text-white' : 'bg-[#e8f0e4] text-[#4a7060] hover:bg-[#dce8d8]'
               }`}>
               {lv}
             </button>
