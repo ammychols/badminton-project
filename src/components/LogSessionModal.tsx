@@ -149,10 +149,9 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
     setDate(d);
     const dow = DOW_MAP[new Date(d + 'T00:00:00').getDay()];
     const filtered = courts.filter(c => c.groups.some(g => g.days.includes(dow)));
-    const newCourt = filtered.find(c => c.id === courtId) ?? filtered[0];
-    if (newCourt && newCourt.id !== courtId) setCourtId(newCourt.id);
-    const g = (newCourt ?? selectedCourt)?.groups.filter(g => g.days.includes(dow)) ?? [];
-    setGroupId(g[0]?.id ?? '');
+    const newCourt = filtered[0];
+    setCourtId(newCourt?.id ?? '');
+    setGroupId(newCourt?.groups.filter(g => g.days.includes(dow))[0]?.id ?? '');
   };
 
   const handleSave = () => {
