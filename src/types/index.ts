@@ -75,6 +75,6 @@ export interface Session {
   startTime: string; // HH:MM
   endTime: string; // HH:MM
   gamesPlayed: number;
-  mood: 1 | 2 | 3 | 4 | 5;
+  mood: 1 | 2 | 3 | 4 | 5 | 6;
   notes?: string;
 }

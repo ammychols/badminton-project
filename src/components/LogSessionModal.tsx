@@ -10,7 +10,7 @@ interface LogSessionModalProps {
   initialSession?: Session;
 }
 
-const MOOD_EMOJIS: Record<number, string> = { 1: '😡', 2: '😐', 3: '🙂', 4: '😄', 5: '🔥' };
+const MOOD_EMOJIS: Record<number, string> = { 1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥' };
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
 const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
@@ -169,7 +169,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [startTime, setStartTime] = useState(initialSession?.startTime ?? defaultStart);
   const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
-  const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(initialSession?.mood ?? 3);
+  const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | 6>(initialSession?.mood ?? 3);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
@@ -277,7 +277,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
       <div className="mb-4">
         <label className={text.label}>อารมณ์</label>
         <div className="flex gap-2">
-          {([1, 2, 3, 4, 5] as const).map(m => (
+          {([1, 2, 3, 4, 5, 6] as const).map(m => (
             <button key={m} type="button" onClick={() => setMood(m)}
               className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[var(--p)] scale-105' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}

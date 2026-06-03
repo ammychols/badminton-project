@@ -13,10 +13,11 @@ interface SessionsViewProps {
 
 const MOOD_EMOJIS: Record<number, string> = {
   1: '😡',
-  2: '😐',
-  3: '🙂',
-  4: '😄',
-  5: '🔥',
+  2: '😴',
+  3: '😐',
+  4: '🙂',
+  5: '😄',
+  6: '🔥',
 };
 
 
@@ -154,11 +155,12 @@ function thisMonthString() {
 }
 
 const MOOD_BUBBLE: Record<number, string> = {
-  1: 'bg-slate-100',
-  2: 'bg-blue-50',
-  3: 'bg-amber-50',
-  4: 'bg-emerald-50',
-  5: 'bg-orange-50',
+  1: 'bg-red-50',
+  2: 'bg-slate-100',
+  3: 'bg-blue-50',
+  4: 'bg-amber-50',
+  5: 'bg-emerald-50',
+  6: 'bg-orange-50',
 };
 
 function calcStreak(sessions: { date: string }[]): number {
