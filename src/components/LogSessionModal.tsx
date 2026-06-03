@@ -129,6 +129,7 @@ function NoteField({ value, onChange }: { value: string; onChange: (v: string) =
           autoFocus
           value={value}
           onChange={e => onChange(e.target.value)}
+          onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
           onBlur={commit}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); } if (e.key === 'Escape') commit(); }}
           placeholder="เช่น วันนี้เล่นดีมาก!"

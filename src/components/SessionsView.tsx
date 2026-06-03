@@ -211,7 +211,7 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
         {/* Inline note */}
         <div className="mt-2 border-t border-gray-100 pt-2">
           {editingNote ? (
-            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)} onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
               onBlur={commitNote}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
               placeholder="เพิ่มโน้ต..." rows={2}

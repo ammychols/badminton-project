@@ -292,6 +292,7 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
               autoFocus
               value={noteText}
               onChange={e => setNoteText(e.target.value)}
+              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
               onBlur={commitNote}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(review?.notes ?? ''); setEditingNote(false); } }}
               placeholder="บันทึกความเห็น..."
