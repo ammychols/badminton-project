@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Court, Session, DayOfWeek } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
@@ -114,6 +114,37 @@ function MiniCalendar({ selected, onChange }: { selected: string; onChange: (d: 
         })}
       </div>
     </div>
+  );
+}
+
+function NoteField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const commit = () => setEditing(false);
+  if (editing) {
+    return (
+      <div className="mb-2">
+        <textarea
+          ref={ref}
+          autoFocus
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); } if (e.key === 'Escape') commit(); }}
+          placeholder="เช่น วันนี้เล่นดีมาก!"
+          rows={2}
+          className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 resize-none focus:outline-none focus:ring-1 focus:ring-gray-300"
+        />
+      </div>
+    );
+  }
+  return (
+    <button type="button" onClick={() => setEditing(true)} className="w-full text-left mb-2 px-3 py-2.5 rounded-xl border border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+      {value
+        ? <p className="text-sm text-gray-700 leading-relaxed">{value}</p>
+        : <p className="text-sm text-gray-400">+ เพิ่มโน้ต...</p>
+      }
+    </button>
   );
 }
 
@@ -252,13 +283,8 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
-      {/* Notes */}
-      <div className="mb-2">
-        <label className={text.label}>โน้ต (ไม่บังคับ)</label>
-        <textarea value={notes} onChange={e => setNotes(e.target.value)}
-          placeholder="เช่น วันนี้เล่นดีมาก!" rows={2}
-          className={input.textarea} />
-      </div>
+      {/* Notes — inline tap-to-edit */}
+      <NoteField value={notes} onChange={setNotes} />
     </BottomSheet>
   );
 }
