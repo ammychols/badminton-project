@@ -278,8 +278,6 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
-      {/* Notes — inline tap-to-edit */}
-      <NoteField value={notes} onChange={setNotes} />
     </BottomSheet>
   );
 }
