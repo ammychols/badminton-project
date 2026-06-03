@@ -39,9 +39,8 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
 
 function roundedTime(offsetHours = 0) {
   const now = new Date();
-  const m = Math.round(now.getMinutes() / 15) * 15;
-  const h = (now.getHours() + offsetHours + (m === 60 ? 1 : 0)) % 24;
-  return `${String(h).padStart(2, '0')}:${String(m === 60 ? 0 : m).padStart(2, '0')}`;
+  const h = (now.getMinutes() >= 30 ? now.getHours() + 1 : now.getHours()) + offsetHours;
+  return `${String(h % 24).padStart(2, '0')}:00`;
 }
 const defaultStart = roundedTime(0);
 const defaultEnd = roundedTime(2);

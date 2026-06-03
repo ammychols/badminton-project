@@ -150,12 +150,9 @@ function NoteField({ value, onChange }: { value: string; onChange: (v: string) =
 
 function defaultTimes() {
   const now = new Date();
-  const roundedMin = Math.round(now.getMinutes() / 15) * 15;
-  const startH = roundedMin === 60 ? now.getHours() + 1 : now.getHours();
-  const startM = roundedMin === 60 ? 0 : roundedMin;
-  const endH = (startH + 2) % 24;
-  const fmt = (h: number, m: number) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-  return { start: fmt(startH, startM), end: fmt(endH, startM) };
+  const h = now.getMinutes() >= 30 ? now.getHours() + 1 : now.getHours();
+  const fmt = (hh: number) => `${String(hh % 24).padStart(2, '0')}:00`;
+  return { start: fmt(h), end: fmt(h + 2) };
 }
 
 export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {
