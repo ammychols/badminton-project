@@ -100,11 +100,11 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
                 style={{
                   fontWeight: hasSession ? 600 : undefined,
                   color: isToday ? 'var(--text-1)' : hasSession ? 'var(--text-1)' : 'var(--dashed)',
+                  boxShadow: isToday ? 'inset 0 0 0 1.5px var(--bar-a)' : undefined,
                 }}>
                 {d}
-                <span className="w-1 h-1 rounded-full mt-0.5" style={{
-                  backgroundColor: hasSession ? 'var(--bar-a)' : isToday ? 'var(--bar-a)' : 'transparent'
-                }} />
+                {hasSession && <span className="w-1 h-1 rounded-full mt-0.5" style={{ backgroundColor: 'var(--bar-a)' }} />}
+                {!hasSession && <span className="w-1 h-1 mt-0.5" />}
               </div>
             );
           })}
