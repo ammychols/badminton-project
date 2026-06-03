@@ -186,30 +186,49 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
     const trimmed = noteText.trim() || undefined;
     if (trimmed !== session.notes) onUpdateNote(trimmed);
   };
+  const [sh, sm] = session.startTime.split(':').map(Number);
+  const [eh, em] = session.endTime.split(':').map(Number);
+  const start = sh * 60 + sm;
+  const end = eh * 60 + em;
+  const durMin = (() => { if (start === 0 && end === 0) return 0; let d = end - start; if (d <= 0) d += 24 * 60; return (d > 0 && d < 24 * 60) ? d : 0; })();
+  const durLabel = durMin > 0 ? (Math.floor(durMin / 60) > 0 ? `${Math.floor(durMin / 60)}ชม.` : '') + (durMin % 60 > 0 ? `${durMin % 60}น.` : '') : null;
+  const hasTime = !(start === 0 && end === 0);
+
   return (
     <div className={`${card.base} overflow-hidden flex`}>
       <div className={`w-1.5 flex-shrink-0 rounded-l-2xl ${MOOD_ACCENT[session.mood]}`} />
-      <div className="flex-1 px-4 py-3.5 min-w-0">
-        <div className="flex items-start justify-between gap-2">
+      <div className="flex-1 px-4 py-3.5 min-w-0 flex flex-col gap-2">
+        {/* Main row */}
+        <div className="flex items-start gap-3">
+          {/* Left: emoji + info */}
           <div className="flex gap-3 items-start flex-1 min-w-0 cursor-pointer" onClick={onEdit}>
             <div className="text-2xl leading-none mt-0.5 select-none">{MOOD_EMOJIS[session.mood]}</div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-gray-900 leading-snug">{courtName}</div>
               <div className="text-xs text-gray-400 mt-0.5">{groupName} · {dateLabel}</div>
-              <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.startTime} – {session.endTime}{(() => { const [sh,sm]=session.startTime.split(':').map(Number); const [eh,em]=session.endTime.split(':').map(Number); const start=sh*60+sm; const end=eh*60+em; if(start===0&&end===0) return ''; let d=end-start; if(d<=0) d+=24*60; if(d<=0||d>=24*60) return ''; const h=Math.floor(d/60); const m=d%60; return ' ('+(h>0?h+'ชม.':'')+(m>0?m+'น.':'')+')'; })()}</span>
-                {session.gamesPlayed > 0 && <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full">{session.gamesPlayed} เกม</span>}
-              </div>
             </div>
           </div>
-          <button onClick={onDelete} className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1">
+          {/* Right: time stats */}
+          <div className="flex-shrink-0 text-right flex flex-col items-end gap-0.5 cursor-pointer" onClick={onEdit}>
+            {hasTime && (
+              <div className="text-sm font-medium text-gray-700 tabular-nums">{session.startTime} – {session.endTime}</div>
+            )}
+            {durLabel && (
+              <div className="text-xs text-gray-400">{durLabel}</div>
+            )}
+            {session.gamesPlayed > 0 && (
+              <div className="text-xs text-gray-400">{session.gamesPlayed} เกม</div>
+            )}
+          </div>
+          {/* Delete */}
+          <button onClick={onDelete} className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1 self-start">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
         </div>
         {/* Inline note */}
-        <div className="mt-2 border-t border-gray-100 pt-2">
+        <div className="border-t border-gray-100 pt-2">
           {editingNote ? (
             <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)} onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
               onBlur={commitNote}
