@@ -205,21 +205,19 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
             <div className="text-2xl leading-none mt-0.5 select-none">{MOOD_EMOJIS[session.mood]}</div>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-gray-900 leading-snug">{groupName}</div>
-              <div className="text-xs text-gray-400 mt-0.5">{courtName} · {dateLabel}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{courtName}</div>
+              <div className="text-xs text-gray-400 mt-0.5">
+                {dateLabel}{hasTime ? ` · ${session.startTime} – ${session.endTime}` : ''}
+              </div>
             </div>
           </div>
-          {/* Right: time stats */}
-          <div className="flex-shrink-0 text-right flex flex-col items-end gap-0.5 cursor-pointer" onClick={onEdit}>
-            {hasTime && (
-              <div className="text-sm font-medium text-gray-700 tabular-nums">{session.startTime} – {session.endTime}</div>
-            )}
-            {durLabel && (
-              <div className="text-xs text-gray-400">{durLabel}</div>
-            )}
-            {session.gamesPlayed > 0 && (
-              <div className="text-xs text-gray-400">{session.gamesPlayed} เกม</div>
-            )}
-          </div>
+          {/* Right: duration + games prominent */}
+          {(durLabel || session.gamesPlayed > 0) && (
+            <div className="flex-shrink-0 text-right flex flex-col items-end justify-center gap-0.5 cursor-pointer self-center" onClick={onEdit}>
+              {durLabel && <div className="text-base font-bold text-gray-800 tabular-nums leading-tight">{durLabel}</div>}
+              {session.gamesPlayed > 0 && <div className="text-xs font-medium text-gray-400">{session.gamesPlayed} เกม</div>}
+            </div>
+          )}
           {/* Delete */}
           <button onClick={onDelete} className="text-gray-300 hover:text-red-400 transition-colors flex-shrink-0 p-1 -mt-0.5 -mr-1 self-start">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
