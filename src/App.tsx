@@ -55,15 +55,6 @@ export default function App() {
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [modal, setModal] = useState<ModalState | null>(null);
 
-  const [theme, setTheme] = useState<'white' | 'forest'>(() =>
-    (localStorage.getItem('theme') as 'white' | 'forest') ?? 'white'
-  );
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme === 'forest' ? 'forest' : '');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -100,14 +91,6 @@ export default function App() {
         <div className="max-w-none mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-bold" style={{ color: 'var(--text-1)' }}>🏸 BadmintonTracker</h1>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(t => t === 'white' ? 'forest' : 'white')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all"
-              style={{ borderColor: 'var(--input-b)', color: 'var(--text-2)', backgroundColor: 'var(--hover-bg)' }}
-            >
-              <span>{theme === 'white' ? '🌿' : '☀️'}</span>
-              <span>{theme === 'white' ? 'Forest' : 'White'}</span>
-            </button>
             <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
               <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
             </button>

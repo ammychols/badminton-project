@@ -27,33 +27,6 @@
   --hero-to: #533483;
 }
 
-[data-theme="forest"] {
-  --p: #3d6b4f;
-  --p-h: #2e5540;
-  --app-bg: #f2f5ef;
-  --nav-bg: #fafcf8;
-  --nav-border: #e2e8dd;
-  --card-border: #e2e8dd;
-  --text-1: #1a3329;
-  --text-2: #3a5045;
-  --text-3: #8a9e90;
-  --text-4: #6b8070;
-  --input-b: #cdd7c8;
-  --input-f: #3d6b4f;
-  --chip-bg: #e8f0e4;
-  --chip-t: #4a7060;
-  --bar-a: #3d6b4f;
-  --bar-i: #dce8d8;
-  --dashed: #c5d4bf;
-  --cal-sel: #3d6b4f;
-  --hover-bg: #e8f0e4;
-  --hero-from: #1a3329;
-  --hero-to: #3a7a50;
-  --hero-gold: rgba(212, 167, 60, 0.55);
-  --hero-gold2: rgba(251, 211, 99, 0.30);
-  --leaf-opacity: 0.09;
-  --bg-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-}
 
 html {
   overflow-y: scroll;
