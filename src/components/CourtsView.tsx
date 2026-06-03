@@ -128,9 +128,9 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                     onMouseDown={e => e.preventDefault()}
                     className="relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full"
-                    style={{ backgroundColor: isSelected ? 'var(--p-h)' : 'var(--p)', opacity: isSelected ? 1 : 0.9 }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--p-h)')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = isSelected ? 'var(--p-h)' : 'var(--p)')}
+                    style={{ backgroundColor: 'var(--p)', opacity: isSelected ? 1 : 0.72 }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = isSelected ? '1' : '0.72')}
                   >
                     {/* Grain texture */}
                     <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,backgroundSize:'180px 180px'}} />

@@ -69,7 +69,7 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
             <div key={ym} className="flex-1 flex flex-col items-center gap-1">
               <div className="text-xs font-semibold text-[var(--text-2)]">{count > 0 ? count : ''}</div>
               <div className="w-full flex items-end" style={{ height: '80px' }}>
-                <div className="w-full rounded-t-xl transition-all" style={{ height: `${heightPct}px`, backgroundColor: isCurrent ? 'var(--bar-a)' : 'var(--bar-i)' }} />
+                <div className="w-full rounded-t-xl" style={{ height: `${heightPct}px`, backgroundColor: isCurrent ? 'var(--bar-a)' : 'var(--bar-i)' }} />
               </div>
               <div className="text-xs" style={{ fontWeight: isCurrent ? 'bold' : 'normal', color: isCurrent ? 'var(--bar-a)' : 'var(--text-3)' }}>{label}</div>
             </div>
@@ -96,15 +96,13 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
             const isToday = isViewingCurrentMonth && d === now.getDate();
             const hasSession = sessionDays.has(d);
             return (
-              <div key={d} className="aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-all"
+              <div key={d} className="aspect-square flex items-center justify-center rounded-full text-sm"
                 style={{
-                  fontWeight: hasSession ? 600 : undefined,
-                  color: isToday ? 'var(--text-1)' : hasSession ? 'var(--text-1)' : 'var(--dashed)',
-                  boxShadow: isToday ? 'inset 0 0 0 1.5px var(--bar-a)' : undefined,
+                  fontWeight: isToday || hasSession ? 600 : undefined,
+                  color: isToday ? 'white' : hasSession ? 'var(--text-1)' : 'var(--text-3)',
+                  backgroundColor: isToday ? 'var(--bar-a)' : hasSession ? 'var(--chip-bg)' : undefined,
                 }}>
                 {d}
-                {hasSession && <span className="w-1 h-1 rounded-full mt-0.5" style={{ backgroundColor: 'var(--bar-a)' }} />}
-                {!hasSession && <span className="w-1 h-1 mt-0.5" />}
               </div>
             );
           })}
