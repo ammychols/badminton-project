@@ -37,11 +37,20 @@ function TimePicker({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
+function roundedTime(offsetHours = 0) {
+  const now = new Date();
+  const m = Math.round(now.getMinutes() / 15) * 15;
+  const h = (now.getHours() + offsetHours + (m === 60 ? 1 : 0)) % 24;
+  return `${String(h).padStart(2, '0')}:${String(m === 60 ? 0 : m).padStart(2, '0')}`;
+}
+const defaultStart = roundedTime(0);
+const defaultEnd = roundedTime(2);
+
 export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, onSave }: AddGroupModalProps) {
   const [name, setName] = useState(initialValues?.name ?? '');
   const [days, setDays] = useState<DayOfWeek[]>(initialValues?.days ?? (defaultDay ? [defaultDay] : []));
-  const [startTime, setStartTime] = useState(initialValues?.startTime ?? '08:00');
-  const [endTime, setEndTime] = useState(initialValues?.endTime ?? '12:00');
+  const [startTime, setStartTime] = useState(initialValues?.startTime ?? defaultStart);
+  const [endTime, setEndTime] = useState(initialValues?.endTime ?? defaultEnd);
   const [levels, setLevels] = useState<GroupLevel[]>(initialValues?.levels ?? []);
   const [image, setImage] = useState<string | undefined>(initialValues?.image);
 
