@@ -47,7 +47,9 @@
   --cal-sel: #3d6b4f;
   --hover-bg: #e8f0e4;
   --hero-from: #1a3329;
-  --hero-to: #4e9468;
+  --hero-to: #3a7a50;
+  --hero-gold: rgba(212, 167, 60, 0.55);
+  --hero-gold2: rgba(251, 211, 99, 0.30);
 }
 
 html {

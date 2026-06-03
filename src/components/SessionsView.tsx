@@ -320,10 +320,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
           {/* Hero stats */}
           <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
-            {/* Blob shapes — white so they show on any bg color */}
+            {/* Blob shapes */}
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-            <div className="absolute top-4 left-1/3 w-24 h-24 rounded-full blur-2xl" style={{background: 'rgba(255,255,255,0.12)'}} />
+            {/* Golden light — แสงลอดผ่านใบไม้ (forest mode only, fades on white) */}
+            <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
+            <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
             {/* Shine streak */}
             <div className="absolute -top-4 -left-4 w-2/3 h-px rotate-[30deg] origin-left" style={{background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)'}} />
             {/* Grain texture */}
