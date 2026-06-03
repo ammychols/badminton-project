@@ -48,7 +48,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
     return dayMatch && searchMatch;
   });
 
-  const selectedCourt = courts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
+  const selectedCourt = filteredCourts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
   const visibleGroups = selectedCourt
     ? (selectedDay === 'all' ? selectedCourt.groups : selectedCourt.groups.filter(g => g.days.includes(selectedDay as DayOfWeek)))
     : [];
