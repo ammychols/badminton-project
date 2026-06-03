@@ -74,73 +74,71 @@ function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
     <div className={`${card.padded} mb-4`}>
       <div className="text-sm font-semibold text-gray-800 mb-4">สถิติรายเดือน</div>
 
-      {/* Monthly bars */}
-      <div className="flex items-end gap-1.5 mb-5">
-        {monthStats.map(({ label, count, ym }) => {
-          const isCurrent = ym === currentYM;
-          const heightPct = Math.max((count / maxMonth) * 64, count > 0 ? 8 : 4);
-          return (
-            <div key={ym} className="flex-1 flex flex-col items-center gap-1">
-              <div className="text-xs font-semibold text-gray-700">{count > 0 ? count : ''}</div>
-              <div className="w-full flex items-end" style={{ height: '64px' }}>
-                <div
-                  className={`w-full rounded-t-lg transition-all ${isCurrent ? 'bg-gray-900' : 'bg-gray-200'}`}
-                  style={{ height: `${heightPct}px` }}
-                />
-              </div>
-              <div className={`text-xs ${isCurrent ? 'font-semibold text-gray-900' : 'text-gray-400'}`}>{label}</div>
+      <div className="sm:flex sm:gap-6 sm:items-start">
+        {/* Left: bars + dow frequency */}
+        <div className="sm:flex-1">
+          <div className="flex items-end gap-1.5 mb-5">
+            {monthStats.map(({ label, count, ym }) => {
+              const isCurrent = ym === currentYM;
+              const heightPct = Math.max((count / maxMonth) * 64, count > 0 ? 8 : 4);
+              return (
+                <div key={ym} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="text-xs font-semibold text-gray-700">{count > 0 ? count : ''}</div>
+                  <div className="w-full flex items-end" style={{ height: '64px' }}>
+                    <div className={`w-full rounded-t-lg transition-all ${isCurrent ? 'bg-gray-900' : 'bg-gray-200'}`} style={{ height: `${heightPct}px` }} />
+                  </div>
+                  <div className={`text-xs ${isCurrent ? 'font-semibold text-gray-900' : 'text-gray-400'}`}>{label}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div>
+            <div className="text-xs font-medium text-gray-500 mb-2">วันที่ตีบ่อย</div>
+            <div className="flex gap-1.5 items-end">
+              {DOW_LABELS.map((label, i) => {
+                const count = dowCount[i];
+                const heightPct = Math.max((count / maxDow) * 32, count > 0 ? 4 : 2);
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                    <div className="text-xs font-semibold text-gray-600" style={{ minHeight: '16px' }}>{count > 0 ? count : ''}</div>
+                    <div className="w-full flex items-end" style={{ height: '32px' }}>
+                      <div className="w-full rounded-t-md bg-green-400" style={{ height: `${heightPct}px`, opacity: count > 0 ? 1 : 0.2 }} />
+                    </div>
+                    <div className="text-xs text-gray-400">{label}</div>
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
-
-      {/* Calendar with month nav */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <button onClick={onPrev} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none">‹</button>
-          <span className="text-xs font-medium text-gray-600">{MONTH_SHORT[viewMonth]} {viewYear + 543} — วันที่ตี</span>
-          <button onClick={onNext} disabled={isNextDisabled}
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none disabled:opacity-20 disabled:cursor-default">›</button>
+          </div>
         </div>
-        <div className="grid grid-cols-7 gap-1">
-          {DOW_LABELS.map(d => (
-            <div key={d} className="text-center text-xs text-gray-300 pb-1">{d}</div>
-          ))}
-          {Array(firstDow).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
-          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
-            const isToday = isViewingCurrentMonth && d === now.getDate();
-            const hasSession = sessionDays.has(d);
-            return (
-              <div key={d} className={`aspect-square flex flex-col items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                hasSession ? 'bg-gray-900 text-white' : isToday ? 'text-gray-800' : 'text-gray-300'
-              }`}>
-                {d}
-                {isToday && <span className={`w-1 h-1 rounded-full mt-0.5 ${hasSession ? 'bg-white/60' : 'bg-gray-900'}`} />}
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Day of week frequency */}
-      <div>
-        <div className="text-xs font-medium text-gray-500 mb-2">วันที่ตีบ่อย</div>
-        <div className="flex gap-1.5 items-end">
-          {DOW_LABELS.map((label, i) => {
-            const count = dowCount[i];
-            const heightPct = Math.max((count / maxDow) * 32, count > 0 ? 4 : 2);
-            return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                <div className="text-xs font-semibold text-gray-600" style={{ minHeight: '16px' }}>
-                  {count > 0 ? count : ''}
+        {/* Right: calendar */}
+        <div className="sm:w-64 mt-4 sm:mt-0">
+          <div className="flex items-center justify-between mb-2">
+            <button onClick={onPrev} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none">‹</button>
+            <span className="text-xs font-medium text-gray-600">{MONTH_SHORT[viewMonth]} {viewYear + 543} — วันที่ตี</span>
+            <button onClick={onNext} disabled={isNextDisabled}
+              className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors text-lg leading-none disabled:opacity-20 disabled:cursor-default">›</button>
+          </div>
+          <div className="grid grid-cols-7 gap-0.5">
+            {DOW_LABELS.map(d => (
+              <div key={d} className="text-center text-xs text-gray-300 pb-1">{d}</div>
+            ))}
+            {Array(firstDow).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
+            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
+              const isToday = isViewingCurrentMonth && d === now.getDate();
+              const hasSession = sessionDays.has(d);
+              return (
+                <div key={d} className={`aspect-square flex flex-col items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                  hasSession ? 'bg-gray-900 text-white' : isToday ? 'text-gray-800' : 'text-gray-300'
+                }`}>
+                  {d}
+                  {isToday && <span className={`w-1 h-1 rounded-full mt-0.5 ${hasSession ? 'bg-white/60' : 'bg-gray-900'}`} />}
                 </div>
-                <div className="w-full flex items-end" style={{ height: '32px' }}>
-                  <div className="w-full rounded-t-md bg-green-400" style={{ height: `${heightPct}px`, opacity: count > 0 ? 1 : 0.2 }} />
-                </div>
-                <div className="text-xs text-gray-400">{label}</div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
