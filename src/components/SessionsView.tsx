@@ -320,14 +320,16 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
           {/* Hero stats */}
           <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
-            {/* Blob shapes */}
-            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full opacity-20 blur-2xl" style={{background: 'var(--hero-to)'}} />
-            <div className="absolute -bottom-10 -left-6 w-48 h-48 rounded-full opacity-15 blur-3xl" style={{background: 'var(--hero-from)'}} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full opacity-10 blur-2xl bg-white" />
+            {/* Blob shapes — white so they show on any bg color */}
+            <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
+            <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
+            <div className="absolute top-4 left-1/3 w-24 h-24 rounded-full blur-2xl" style={{background: 'rgba(255,255,255,0.12)'}} />
+            {/* Shine streak */}
+            <div className="absolute -top-4 -left-4 w-2/3 h-px rotate-[30deg] origin-left" style={{background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)'}} />
             {/* Grain texture */}
-            <div className="absolute inset-0 opacity-[0.06]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-            {/* Subtle inner border highlight */}
-            <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.1)'}} />
+            <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
+            {/* Inner border highlight */}
+            <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
             <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
                 <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
