@@ -52,11 +52,8 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   return (
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center mb-5">
         <h2 className={text.pageTitle}>สนามของฉัน</h2>
-        <button onClick={onAddCourt} className={btn.primaryIcon}>
-          <span className="text-lg leading-none">+</span> เพิ่มสนาม
-        </button>
       </div>
 
       {/* Day filter tabs */}
@@ -134,6 +131,16 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
                 </div>
               );
             })}
+            {/* Add court card */}
+            <div className="flex-shrink-0 w-48 sm:w-auto">
+              <button
+                onClick={onAddCourt}
+                className="w-full h-full min-h-[88px] border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="text-2xl leading-none">+</span>
+                <span className="text-xs font-medium">เพิ่มสนาม</span>
+              </button>
+            </div>
           </div>
 
           {/* Selected court groups */}
