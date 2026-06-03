@@ -102,13 +102,11 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setTheme(t => t === 'white' ? 'forest' : 'white')}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-base transition-colors"
-              style={{ color: 'var(--text-3)' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-              title={theme === 'white' ? 'เปลี่ยนเป็น Pastel Forest' : 'เปลี่ยนเป็น White Mode'}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all"
+              style={{ borderColor: 'var(--input-b)', color: 'var(--text-2)', backgroundColor: 'var(--hover-bg)' }}
             >
-              {theme === 'white' ? '🌿' : '☀️'}
+              <span>{theme === 'white' ? '🌿' : '☀️'}</span>
+              <span>{theme === 'white' ? 'Forest' : 'White'}</span>
             </button>
             <button onClick={() => setShowUserMenu(v => !v)} className="flex items-center gap-2">
               <img src={user.photoURL ?? ''} alt="" className="w-7 h-7 rounded-full" />
