@@ -157,16 +157,21 @@ function defaultTimes() {
 
 export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {
   const { start: defaultStart, end: defaultEnd } = defaultTimes();
-  const [date, setDate] = useState(initialSession?.date ?? todayString());
-  const [courtId, setCourtId] = useState(initialSession?.courtId ?? courts[0]?.id ?? '');
-  const [groupId, setGroupId] = useState(initialSession?.groupId ?? courts[0]?.groups[0]?.id ?? '');
+  const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const initDate = initialSession?.date ?? todayString();
+  const initDow = DOW_MAP[new Date(initDate + 'T00:00:00').getDay()];
+  const defaultCourt = courts.find(c => c.groups.some(g => g.days.includes(initDow)));
+  const defaultGroup = defaultCourt?.groups.find(g => g.days.includes(initDow));
+
+  const [date, setDate] = useState(initDate);
+  const [courtId, setCourtId] = useState(initialSession?.courtId ?? defaultCourt?.id ?? '');
+  const [groupId, setGroupId] = useState(initialSession?.groupId ?? defaultGroup?.id ?? '');
   const [startTime, setStartTime] = useState(initialSession?.startTime ?? defaultStart);
   const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5>(initialSession?.mood ?? 3);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
-  const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
 
   const filteredCourts = courts.filter(c => c.groups.some(g => g.days.includes(selectedDow)));
