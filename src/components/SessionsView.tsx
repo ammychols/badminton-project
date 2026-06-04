@@ -327,54 +327,36 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       <div className="hidden sm:block">
         {/* Row 1: 4 stat tiles */}
         <div className="grid grid-cols-4 gap-4 mb-5">
-          {/* Tile 1: ตีไปทั้งหมด */}
           <div className={card.padded}>
-            <div>
-              <div className="text-xs text-[var(--text-3)] mb-1">ตีไปทั้งหมด</div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-3xl font-bold text-[var(--text-1)]">{totalGames}</span>
-                <span className="text-sm text-[var(--text-3)] mb-0.5">เกม</span>
-              </div>
+            <div className="text-xs text-[var(--text-3)] mb-2">ตีไปทั้งหมด</div>
+            <div className="flex items-end gap-1.5">
+              <span className="text-4xl font-bold text-[var(--text-1)]">{totalGames}</span>
+              <span className="text-sm text-[var(--text-3)] mb-1">เกม</span>
             </div>
+            <div className="text-xs text-[var(--text-3)] mt-2">{sessions.length} ครั้ง</div>
           </div>
-          {/* Tile 2: วันที่ตีเดือนนี้ */}
           <div className={card.padded}>
-            <div>
-              <div className="text-xs text-[var(--text-3)] mb-1">วันที่ตีเดือนนี้</div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-3xl font-bold text-[var(--text-1)]">{thisMonthDays}</span>
-                <span className="text-sm text-[var(--text-3)] mb-0.5">เดือนนี้</span>
-              </div>
+            <div className="text-xs text-[var(--text-3)] mb-2">วันที่ตีเดือนนี้</div>
+            <div className="flex items-end gap-1.5">
+              <span className="text-4xl font-bold text-[var(--text-1)]">{thisMonthDays}</span>
+              <span className="text-sm text-[var(--text-3)] mb-1">วัน</span>
             </div>
+            <div className="text-xs text-[var(--text-3)] mt-2">{thisMonthGames} เกมเดือนนี้</div>
           </div>
-          {/* Tile 3: เฉลี่ย/ครั้ง */}
           <div className={card.padded}>
-            <div>
-              <div className="text-xs text-[var(--text-3)] mb-1">เฉลี่ย/ครั้ง</div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-3xl font-bold text-[var(--text-1)]">{avgDuration ?? '—'}</span>
-                <span className="text-sm text-[var(--text-3)] mb-0.5">ระยะเวลา</span>
-              </div>
+            <div className="text-xs text-[var(--text-3)] mb-2">เฉลี่ย/ครั้ง</div>
+            <div className="flex items-end gap-1.5">
+              <span className="text-4xl font-bold text-[var(--text-1)]">{avgDuration ?? '—'}</span>
             </div>
+            <div className="text-xs text-[var(--text-3)] mt-2">{avgGamesPerDay ? `${avgGamesPerDay} เกม/วัน` : '—'}</div>
           </div>
-          {/* Tile 4: วันติดต่อกัน */}
           <div className={card.padded}>
-            <div>
-              <div className="text-xs text-[var(--text-3)] mb-1">วันติดต่อกัน</div>
-              <div className="flex items-end gap-1.5">
-                {streak >= 2 ? (
-                  <>
-                    <span className="text-3xl font-bold text-[var(--text-1)]">{streak}</span>
-                    <span className="text-sm text-[var(--text-3)] mb-0.5">วันติด 🔥</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-3xl font-bold text-[var(--text-3)]">{streak}</span>
-                    <span className="text-sm text-[var(--text-3)] mb-0.5">วันติด</span>
-                  </>
-                )}
-              </div>
+            <div className="text-xs text-[var(--text-3)] mb-2">วันติดต่อกัน</div>
+            <div className="flex items-end gap-1.5">
+              <span className="text-4xl font-bold text-[var(--text-1)]">{streak}</span>
+              <span className="text-sm text-[var(--text-3)] mb-1">วัน{streak >= 2 ? ' 🔥' : ''}</span>
             </div>
+            <div className="text-xs text-[var(--text-3)] mt-2">{streak >= 2 ? 'streak ต่อเนื่อง' : 'เริ่มตีวันนี้เลย!'}</div>
           </div>
         </div>
 
