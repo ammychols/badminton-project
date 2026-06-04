@@ -201,58 +201,79 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const hasTime = !(start === 0 && end === 0);
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[var(--hover-bg)] transition-colors group${isLast ? '' : ' border-b border-[var(--card-border)]'}`}>
-      {/* Mood avatar */}
-      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
-        {MOOD_EMOJIS[session.mood]}
-      </div>
-      {/* Info */}
-      <div className="min-w-0 w-52 flex-shrink-0 cursor-pointer" onClick={onEdit}>
-        <div className="text-sm leading-snug truncate">
-          <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
-          <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
+    <div className={`group${isLast ? '' : ' border-b border-[var(--card-border)]'}`}>
+      {/* Main row */}
+      <div className="flex items-center gap-3 px-4 pt-3.5 pb-2 hover:bg-[var(--hover-bg)] transition-colors">
+        {/* Mood avatar */}
+        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
+          {MOOD_EMOJIS[session.mood]}
         </div>
-        <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
-          {hasTime ? `${session.startTime} – ${session.endTime}` : '—'}
+        {/* Info */}
+        <div className="min-w-0 w-52 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+          <div className="text-sm leading-snug truncate">
+            <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
+            <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
+          </div>
+          <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
+            {hasTime ? `${session.startTime} – ${session.endTime}` : '—'}
+          </div>
         </div>
-        {session.notes && (
-          <div className="sm:hidden text-xs text-[var(--text-4)] mt-0.5 truncate italic">{session.notes}</div>
+        {/* Note — desktop only inline */}
+        <div className="hidden sm:block flex-1 min-w-0">
+          {editingNote ? (
+            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
+              onBlur={commitNote}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
+              placeholder="+ โน้ต..." rows={1}
+              className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+              style={{ backgroundColor: 'var(--app-bg)' }}
+            />
+          ) : (
+            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
+              className="w-full text-left px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)] transition-colors">
+              {session.notes
+                ? <p className="text-xs text-[var(--text-4)] leading-snug truncate">{session.notes}</p>
+                : <p className="text-xs text-[var(--dashed)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
+              }
+            </button>
+          )}
+        </div>
+        {/* Duration + games */}
+        {(durLabel || session.gamesPlayed > 0) && (
+          <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
+            {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
+            {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
+          </div>
         )}
+        {/* Delete */}
+        <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
       </div>
-      {/* Note — desktop */}
-      <div className="hidden sm:block flex-1 min-w-0">
+      {/* Note — mobile: full-width row below */}
+      <div className="sm:hidden px-4 pb-3">
         {editingNote ? (
           <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
             onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
             onBlur={commitNote}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
-            placeholder="+ โน้ต..." rows={1}
+            placeholder="เพิ่มโน้ต..." rows={2}
             className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
             style={{ backgroundColor: 'var(--app-bg)' }}
           />
         ) : (
           <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
-            className="w-full text-left px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)] transition-colors">
+            className="w-full text-left">
             {session.notes
-              ? <p className="text-xs text-[var(--text-4)] leading-snug truncate">{session.notes}</p>
-              : <p className="text-xs text-[var(--dashed)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
+              ? <p className="text-xs text-[var(--text-4)] leading-relaxed">{session.notes}</p>
+              : <p className="text-xs text-[var(--dashed)]">+ เพิ่มโน้ต</p>
             }
           </button>
         )}
       </div>
-      {/* Duration + games */}
-      {(durLabel || session.gamesPlayed > 0) && (
-        <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-          {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
-          {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
-        </div>
-      )}
-      {/* Delete */}
-      <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-      </button>
     </div>
   );
 }
