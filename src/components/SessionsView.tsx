@@ -664,16 +664,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
           </div>
         </div>
-        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-          <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left transition-colors ${ns.wrap}`}>
-            <span className="text-xl">{nudge.emoji}</span>
-            <div className="flex-1">
-              <div className={`text-sm font-medium ${ns.text}`}>{nudge.message}</div>
-              {nudge.sub && <div className={`text-xs opacity-75 ${ns.text}`}>{nudge.sub}</div>}
-            </div>
-            <span className={`text-lg ${ns.btn.split(' ')[0]}`}>›</span>
-          </button>
-        ); })()}
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {activeInsight && (
           <div className={`${card.padded} mb-4 flex flex-col gap-3`}>
@@ -698,6 +688,16 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             )}
           </div>
         )}
+        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+          <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left transition-colors ${ns.wrap}`}>
+            <span className="text-xl">{nudge.emoji}</span>
+            <div className="flex-1">
+              <div className={`text-sm font-medium ${ns.text}`}>{nudge.message}</div>
+              {nudge.sub && <div className={`text-xs opacity-75 ${ns.text}`}>{nudge.sub}</div>}
+            </div>
+            <span className={`text-xs font-semibold whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</span>
+          </button>
+        ); })()}
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
             <div className={emptyState.icon}>🏸</div>
