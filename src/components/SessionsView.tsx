@@ -566,30 +566,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           {sessions.length > 0 && (
             <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
-          {/* Insight card — desktop left col */}
-          {activeInsight && (
-            <div className={`${card.padded} flex flex-col gap-3`}>
-              <div className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
-                <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
-              </div>
-              {insights.length > 1 && (
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-1.5">
-                    {insights.map((_, i) => (
-                      <button key={i} onClick={() => setInsightIdx(i)}
-                        className="rounded-full transition-all"
-                        style={{ width: i === insightIdx % insights.length ? '20px' : '6px', height: '6px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
-                    ))}
-                  </div>
-                  <button onClick={() => setInsightIdx(i => i + 1)}
-                    className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
-                    ถัดไป ›
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Col 3: Session feed */}
@@ -619,12 +595,39 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   </button>
                 )}
               </div>
-              {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-                <div className={`hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
-                  <span className={`text-sm font-medium ${ns.text}`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
-                  <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
+              {(activeInsight || nudge) && (
+                <div className="hidden sm:flex gap-2">
+                  {/* Insight — left */}
+                  {activeInsight && (
+                    <div className="flex-1 flex flex-col gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
+                        <span className="text-sm text-[var(--text-2)] truncate">{activeInsight.text}</span>
+                      </div>
+                      {insights.length > 1 && (
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-1.5">
+                            {insights.map((_, i) => (
+                              <button key={i} onClick={() => setInsightIdx(i)}
+                                className="rounded-full transition-all"
+                                style={{ width: i === insightIdx % insights.length ? '16px' : '5px', height: '5px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
+                            ))}
+                          </div>
+                          <button onClick={() => setInsightIdx(i => i + 1)}
+                            className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">ถัดไป ›</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* State nudge — right */}
+                  {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+                    <div className={`flex-1 flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
+                      <span className={`text-sm font-medium ${ns.text} min-w-0 truncate`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
+                      <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
+                    </div>
+                  ); })()}
                 </div>
-              ); })()}
+              )}
               <button onClick={onLogSession}
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
