@@ -602,13 +602,16 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                     <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0">
                       <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
                       <span className="text-sm text-[var(--text-2)] flex-1 min-w-0 truncate">{activeInsight.text}</span>
-                      {insights.length > 1 && (
-                        <button onClick={() => setInsightIdx(i => i + 1)}
-                          className="flex items-center gap-1 flex-shrink-0 text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
-                          <span className="tabular-nums">{(insightIdx % insights.length) + 1}/{insights.length}</span>
-                          <span className="text-base leading-none">›</span>
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {insights.map((_, i) => (
+                          <span key={i} className="rounded-full transition-all inline-block"
+                            style={{ width: i === insightIdx % insights.length ? '14px' : '5px', height: '5px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)', opacity: i === insightIdx % insights.length ? 1 : 0.4 }} />
+                        ))}
+                        {insights.length > 1 && (
+                          <button onClick={() => setInsightIdx(i => i + 1)}
+                            className="ml-1 text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors leading-none">›</button>
+                        )}
+                      </div>
                     </div>
                   )}
                   {/* State nudge — right */}
