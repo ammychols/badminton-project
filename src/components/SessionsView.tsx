@@ -499,10 +499,10 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   })();
 
   const NUDGE_STYLES: Record<NudgeStyle, { wrap: string; text: string; btn: string }> = {
-    emerald: { wrap: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-800', btn: 'text-emerald-700 hover:text-emerald-900' },
-    orange:  { wrap: 'bg-orange-50 border-orange-100',   text: 'text-orange-800',  btn: 'text-orange-700 hover:text-orange-900'   },
-    amber:   { wrap: 'bg-amber-50 border-amber-100',     text: 'text-amber-800',   btn: 'text-amber-700 hover:text-amber-900'     },
-    slate:   { wrap: 'bg-slate-100 border-slate-200',    text: 'text-slate-700',   btn: 'text-slate-600 hover:text-slate-900'     },
+    emerald: { wrap: 'bg-emerald-100 border-emerald-200', text: 'text-emerald-800', btn: 'text-emerald-700 hover:text-emerald-900' },
+    orange:  { wrap: 'bg-orange-100 border-orange-200',   text: 'text-orange-800',  btn: 'text-orange-700 hover:text-orange-900'   },
+    amber:   { wrap: 'bg-amber-100 border-amber-200',     text: 'text-amber-800',   btn: 'text-amber-700 hover:text-amber-900'     },
+    slate:   { wrap: 'bg-slate-200 border-slate-300',     text: 'text-slate-700',   btn: 'text-slate-600 hover:text-slate-900'     },
   };
 
   const insights = computeInsights(sessions, getCourtName, getGroupName);
@@ -610,7 +610,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                             {insights.map((_, i) => (
                               <button key={i} onClick={() => setInsightIdx(i)}
                                 className="rounded-full transition-all"
-                                style={{ width: i === insightIdx % insights.length ? '16px' : '5px', height: '5px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
+                                style={{ width: i === insightIdx % insights.length ? '18px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
                             ))}
                           </div>
                           <button onClick={() => setInsightIdx(i => i + 1)}
@@ -699,7 +699,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   {insights.map((_, i) => (
                     <button key={i} onClick={() => setInsightIdx(i)}
                       className="rounded-full transition-all"
-                      style={{ width: i === insightIdx % insights.length ? '20px' : '6px', height: '6px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
+                      style={{ width: i === insightIdx % insights.length ? '20px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
                   ))}
                 </div>
                 <button onClick={() => setInsightIdx(i => i + 1)}
