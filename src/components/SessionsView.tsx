@@ -566,6 +566,30 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           {sessions.length > 0 && (
             <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
+          {/* Insight card — desktop left col */}
+          {activeInsight && (
+            <div className={`${card.padded} flex flex-col gap-3`}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
+                <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
+              </div>
+              {insights.length > 1 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-1.5">
+                    {insights.map((_, i) => (
+                      <button key={i} onClick={() => setInsightIdx(i)}
+                        className="rounded-full transition-all"
+                        style={{ width: i === insightIdx % insights.length ? '20px' : '6px', height: '6px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
+                    ))}
+                  </div>
+                  <button onClick={() => setInsightIdx(i => i + 1)}
+                    className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
+                    ถัดไป ›
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Col 3: Session feed */}
@@ -595,24 +619,12 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   </button>
                 )}
               </div>
-              {nudge ? (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+              {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
                 <div className={`hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
                   <span className={`text-sm font-medium ${ns.text}`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
                   <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
                 </div>
-              ); })() : activeInsight ? (
-                <div className="hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)]">
-                  <span className="text-base">{activeInsight.emoji}</span>
-                  <span className="text-sm text-[var(--text-2)] flex-1">{activeInsight.text}</span>
-                  {insights.length > 1 && (
-                    <button onClick={() => setInsightIdx(i => i + 1)}
-                      className="text-xs text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors whitespace-nowrap flex items-center gap-1">
-                      <span>{((insightIdx % insights.length) + 1)}/{insights.length}</span>
-                      <span className="text-base leading-none">›</span>
-                    </button>
-                  )}
-                </div>
-              ) : null}
+              ); })()}
               <button onClick={onLogSession}
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
@@ -661,7 +673,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
           </div>
         </div>
-        {nudge ? (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
           <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left transition-colors ${ns.wrap}`}>
             <span className="text-xl">{nudge.emoji}</span>
             <div className="flex-1">
@@ -670,20 +682,31 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             </div>
             <span className={`text-lg ${ns.btn.split(' ')[0]}`}>›</span>
           </button>
-        ); })() : activeInsight ? (
-          <div className="w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 bg-[var(--chip-bg)] border-[var(--card-border)]">
-            <span className="text-xl">{activeInsight.emoji}</span>
-            <span className="text-sm text-[var(--text-2)] flex-1">{activeInsight.text}</span>
+        ); })()}
+        {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+        {activeInsight && (
+          <div className={`${card.padded} mb-4 flex flex-col gap-3`}>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
+              <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
+            </div>
             {insights.length > 1 && (
-              <button onClick={() => setInsightIdx(i => i + 1)}
-                className="text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors flex items-center gap-0.5 text-xs">
-                <span>{((insightIdx % insights.length) + 1)}/{insights.length}</span>
-                <span className="text-lg leading-none">›</span>
-              </button>
+              <div className="flex items-center justify-between">
+                <div className="flex gap-1.5">
+                  {insights.map((_, i) => (
+                    <button key={i} onClick={() => setInsightIdx(i)}
+                      className="rounded-full transition-all"
+                      style={{ width: i === insightIdx % insights.length ? '20px' : '6px', height: '6px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--bar-i)' }} />
+                  ))}
+                </div>
+                <button onClick={() => setInsightIdx(i => i + 1)}
+                  className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
+                  ถัดไป ›
+                </button>
+              </div>
             )}
           </div>
-        ) : null}
-        {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+        )}
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
             <div className={emptyState.icon}>🏸</div>
