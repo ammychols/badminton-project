@@ -25,8 +25,8 @@ export interface Court {
   info?: CourtInfo;
 }
 
-export type GroupLevel = 'BB' | 'BG' | 'N-' | 'N' | 'S' | 'P';
-export const ALL_LEVELS: GroupLevel[] = ['BB', 'BG', 'N-', 'N', 'S', 'P'];
+export type GroupLevel = 'BB' | 'BG' | 'N-' | 'N' | 'S' | 'P-' | 'P';
+export const ALL_LEVELS: GroupLevel[] = ['BB', 'BG', 'N-', 'N', 'S', 'P-', 'P'];
 
 export interface Group {
   id: string;
