@@ -207,7 +207,7 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
           {MOOD_EMOJIS[session.mood]}
         </div>
         {/* Info */}
-        <div className="min-w-0 w-36 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <div className="min-w-0 w-56 flex-shrink-0 cursor-pointer" onClick={onEdit}>
           <div className="text-sm leading-snug truncate">
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
             <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
