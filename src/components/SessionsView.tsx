@@ -180,9 +180,10 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
-function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelete, onUpdateNote }: {
-  session: Session; courtName: string; groupName: string; dateLabel: string;
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, isLast }: {
+  session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void; onUpdateNote: (notes: string | undefined) => void;
+  isLast: boolean;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
@@ -200,61 +201,100 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
   const hasTime = !(start === 0 && end === 0);
 
   return (
-    <div className={`${card.base} overflow-hidden hover:shadow-lg transition-shadow`}>
-      <div className="px-4 py-3.5 flex items-center gap-3">
-        {/* Mood bubble */}
-        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-xl select-none ${MOOD_BUBBLE[session.mood]}`}>
-          {MOOD_EMOJIS[session.mood]}
-        </div>
-        {/* Info */}
-        <div className="min-w-0 w-56 flex-shrink-0 cursor-pointer" onClick={onEdit}>
-          <div className="text-sm leading-snug truncate">
-            <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
-            <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
-          </div>
-          <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
-            {dateLabel}{hasTime ? ` · ${session.startTime} – ${session.endTime}` : ''}
-          </div>
-          {/* Mobile: note shown inline under date */}
-          {session.notes && (
-            <div className="sm:hidden text-xs text-[var(--text-4)] mt-0.5 truncate italic">{session.notes}</div>
-          )}
-        </div>
-        {/* Note sub-box — desktop only */}
-        <div className="hidden sm:block flex-1 min-w-0 mx-1">
-          {editingNote ? (
-            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
-              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
-              onBlur={commitNote}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
-              placeholder="เพิ่มโน้ต..." rows={1}
-              className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
-              style={{ backgroundColor: 'var(--app-bg)' }}
-            />
-          ) : (
-            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
-              className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-[var(--hover-bg)] transition-colors">
-              {session.notes
-                ? <p className="text-xs text-[var(--text-4)] leading-snug truncate">{session.notes}</p>
-                : <p className="text-xs text-[var(--dashed)]">+ โน้ต</p>
-              }
-            </button>
-          )}
-        </div>
-        {/* Right: duration + games */}
-        {(durLabel || session.gamesPlayed > 0) && (
-          <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-            {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
-            {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
-          </div>
-        )}
-        {/* Delete */}
-        <button onClick={onDelete} className="text-[var(--dashed)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
+    <div className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[var(--hover-bg)] transition-colors group${isLast ? '' : ' border-b border-[var(--card-border)]'}`}>
+      {/* Mood avatar */}
+      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
+        {MOOD_EMOJIS[session.mood]}
       </div>
+      {/* Info */}
+      <div className="min-w-0 w-52 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <div className="text-sm leading-snug truncate">
+          <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
+          <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
+        </div>
+        <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
+          {hasTime ? `${session.startTime} – ${session.endTime}` : '—'}
+        </div>
+        {session.notes && (
+          <div className="sm:hidden text-xs text-[var(--text-4)] mt-0.5 truncate italic">{session.notes}</div>
+        )}
+      </div>
+      {/* Note — desktop */}
+      <div className="hidden sm:block flex-1 min-w-0">
+        {editingNote ? (
+          <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+            onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
+            onBlur={commitNote}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
+            placeholder="+ โน้ต..." rows={1}
+            className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+            style={{ backgroundColor: 'var(--app-bg)' }}
+          />
+        ) : (
+          <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
+            className="w-full text-left px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)] transition-colors">
+            {session.notes
+              ? <p className="text-xs text-[var(--text-4)] leading-snug truncate">{session.notes}</p>
+              : <p className="text-xs text-[var(--dashed)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
+            }
+          </button>
+        )}
+      </div>
+      {/* Duration + games */}
+      {(durLabel || session.gamesPlayed > 0) && (
+        <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
+          {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
+          {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
+        </div>
+      )}
+      {/* Delete */}
+      <button onClick={onDelete} className="text-[var(--dashed)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1 opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote }: {
+  sessions: Session[];
+  getCourtName: (id: string) => string;
+  getGroupName: (courtId: string, groupId: string) => string;
+  onEditSession: (s: Session) => void;
+  setConfirmDeleteId: (id: string) => void;
+  onUpdateNote: (id: string, notes: string | undefined) => void;
+}) {
+  const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
+  // Group by date
+  const groups: { date: string; label: string; items: Session[] }[] = [];
+  for (const s of sorted) {
+    const last = groups[groups.length - 1];
+    if (last && last.date === s.date) { last.items.push(s); }
+    else {
+      const { day, full } = formatDate(s.date);
+      groups.push({ date: s.date, label: `วัน${day} ${full}`, items: [s] });
+    }
+  }
+  return (
+    <div className={`${card.base} overflow-hidden`}>
+      {groups.map((g, gi) => (
+        <div key={g.date}>
+          {/* Date separator */}
+          <div className={`px-4 py-2 flex items-center gap-3${gi > 0 ? ' border-t border-[var(--card-border)]' : ''}`}
+            style={{ backgroundColor: 'var(--app-bg)' }}>
+            <span className="text-xs font-semibold text-[var(--text-3)]">{g.label}</span>
+          </div>
+          {g.items.map((s, si) => (
+            <SessionRow key={s.id} session={s}
+              courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
+              onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
+              onUpdateNote={notes => onUpdateNote(s.id, notes)}
+              isLast={si === g.items.length - 1 && gi === groups.length - 1}
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -398,14 +438,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
               )}
-              {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-                const { day, full } = formatDate(session.date);
-                return <SessionCard key={session.id} session={session}
-                  courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
-                  dateLabel={`วัน${day} ${full}`}
-                  onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
-                  onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
-              })}
+              {viewedSessions.length > 0 && (
+                <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} />
+              )}
             </div>
           )}
         </div>
@@ -482,14 +518,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             {viewedSessions.length === 0 && (
               <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
             )}
-            {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-              const { day, full } = formatDate(session.date);
-              return <SessionCard key={session.id} session={session}
-                courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
-                dateLabel={`วัน${day} ${full}`}
-                onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
-                onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
-            })}
+            {viewedSessions.length > 0 && (
+              <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
+                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} />
+            )}
           </div>
         )}
       </div>
