@@ -13,27 +13,29 @@ interface SessionsViewProps {
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
+  // Head centered at x=190 (shifted right in viewBox so left edge never clips)
+  const cx = 190, cy = 115, rx = 90, ry = 70;
   const ys = [-56, -42, -28, -14, 0, 14, 28, 42, 56];
   const xs = [-72, -54, -36, -18, 0, 18, 36, 54, 72];
   return (
-    <svg width="260" height="400" viewBox="0 0 260 400" fill="none"
+    <svg width="280" height="400" viewBox="0 0 280 400" fill="none"
       className="absolute bottom-0 right-0 opacity-[0.13] pointer-events-none select-none"
-      style={{ transform: 'translate(8%, 10%)' }}>
+      style={{ zIndex: 2, right: '-30px', bottom: '-15px' }}>
       <defs>
         <clipPath id={clipId}>
-          <ellipse cx="130" cy="115" rx="88" ry="68" />
+          <ellipse cx={cx} cy={cy} rx={rx - 2} ry={ry - 2} />
         </clipPath>
       </defs>
-      <g transform="rotate(-30, 130, 230)">
-        <ellipse cx="130" cy="115" rx="90" ry="70" stroke="white" strokeWidth="3.5" />
+      <g transform={`rotate(-30, ${cx}, 230)`}>
+        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} stroke="white" strokeWidth="3.5" />
         {ys.map(dy => (
-          <line key={dy} x1="40" y1={115 + dy} x2="220" y2={115 + dy} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
+          <line key={dy} x1={cx - rx} y1={cy + dy} x2={cx + rx} y2={cy + dy} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
         ))}
         {xs.map(dx => (
-          <line key={dx} x1={130 + dx} y1="45" x2={130 + dx} y2="183" stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
+          <line key={dx} x1={cx + dx} y1={cy - ry} x2={cx + dx} y2={cy + ry} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
         ))}
-        <line x1="130" y1="185" x2="130" y2="315" stroke="white" strokeWidth="5" />
-        <rect x="119" y="315" width="22" height="65" rx="9" stroke="white" strokeWidth="3.5" />
+        <line x1={cx} y1={cy + ry + 2} x2={cx} y2="315" stroke="white" strokeWidth="5" />
+        <rect x={cx - 11} y="315" width="22" height="65" rx="9" stroke="white" strokeWidth="3.5" />
       </g>
     </svg>
   );
