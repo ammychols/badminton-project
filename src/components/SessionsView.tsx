@@ -604,9 +604,11 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 <div className="hidden sm:flex gap-2">
                   {/* Insight — left */}
                   {activeInsight && (
-                    <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0">
-                      <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
-                      <span className="text-sm text-[var(--text-2)] flex-1 min-w-0 truncate">{activeInsight.text}</span>
+                    <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0 overflow-hidden">
+                      <span key={insightIdx % insights.length} className="flex items-center gap-2 flex-1 min-w-0 animate-insight-in">
+                        <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
+                        <span className="text-sm text-[var(--text-2)] min-w-0 truncate">{activeInsight.text}</span>
+                      </span>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         {insights.map((_, i) => (
                           <span key={i} className="rounded-full transition-all inline-block"
@@ -674,8 +676,8 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
         </div>
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {activeInsight && (
-          <div className={`${card.padded} mb-4 flex flex-col gap-3`}>
-            <div className="flex items-start gap-3">
+          <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}>
+            <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
               <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
               <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
             </div>
