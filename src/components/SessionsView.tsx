@@ -326,7 +326,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       {/* ── Desktop: 3-column dashboard ── */}
       <div className="hidden sm:flex sm:gap-5 sm:items-start">
         {/* Col 1: Hero stats + nudge (fixed ~260px) */}
-        <div className="w-64 flex-shrink-0 sticky top-4">
+        <div className="w-64 flex-shrink-0">
           <div className="relative rounded-3xl p-5 mb-3 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
