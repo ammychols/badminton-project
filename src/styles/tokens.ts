@@ -13,8 +13,8 @@ export const btn = {
 };
 
 export const card = {
-  base: 'bg-white border border-[var(--card-border)] rounded-2xl',
-  padded: 'bg-white border border-[var(--card-border)] rounded-2xl p-4',
+  base: 'bg-white border border-[var(--card-border)] rounded-2xl shadow-sm',
+  padded: 'bg-white border border-[var(--card-border)] rounded-2xl p-4 shadow-sm',
   dark: 'bg-[var(--p)] rounded-3xl p-5 text-white',
 };
 
