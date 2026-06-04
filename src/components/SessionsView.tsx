@@ -11,6 +11,33 @@ interface SessionsViewProps {
   onUpdateNote: (id: string, notes: string | undefined) => void;
 }
 
+function RacketSVG({ clipId }: { clipId: string }) {
+  const ys = [-56, -42, -28, -14, 0, 14, 28, 42, 56];
+  const xs = [-72, -54, -36, -18, 0, 18, 36, 54, 72];
+  return (
+    <svg width="260" height="400" viewBox="0 0 260 400" fill="none"
+      className="absolute bottom-0 right-0 opacity-[0.13] pointer-events-none select-none"
+      style={{ transform: 'translate(28%, 12%)' }}>
+      <defs>
+        <clipPath id={clipId}>
+          <ellipse cx="130" cy="115" rx="88" ry="68" />
+        </clipPath>
+      </defs>
+      <g transform="rotate(-30, 130, 230)">
+        <ellipse cx="130" cy="115" rx="90" ry="70" stroke="white" strokeWidth="3.5" />
+        {ys.map(dy => (
+          <line key={dy} x1="40" y1={115 + dy} x2="220" y2={115 + dy} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
+        ))}
+        {xs.map(dx => (
+          <line key={dx} x1={130 + dx} y1="45" x2={130 + dx} y2="183" stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
+        ))}
+        <line x1="130" y1="185" x2="130" y2="315" stroke="white" strokeWidth="5" />
+        <rect x="119" y="315" width="22" height="65" rx="9" stroke="white" strokeWidth="3.5" />
+      </g>
+    </svg>
+  );
+}
+
 const MOOD_EMOJIS: Record<number, string> = {
   1: '😡',
   2: '😴',
@@ -400,6 +427,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
             <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
             <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
+            <RacketSVG clipId="rh-desk" />
             <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
                 <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
@@ -438,13 +466,6 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {/* Nudge banner — desktop only */}
-              {!hasSessionToday && (
-                <div className="hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-100">
-                  <span className="text-sm text-amber-800">🏸 วันนี้ยังไม่ได้ตี</span>
-                  <button onClick={onLogSession} className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors whitespace-nowrap">บันทึกเลย →</button>
-                </div>
-              )}
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
@@ -461,6 +482,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                   </button>
                 )}
               </div>
+              {!hasSessionToday && (
+                <div className="hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-100">
+                  <span className="text-sm text-amber-800">🏸 วันนี้ยังไม่ได้ตี</span>
+                  <button onClick={onLogSession} className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors whitespace-nowrap">บันทึกเลย →</button>
+                </div>
+              )}
               <button onClick={onLogSession}
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
@@ -486,6 +513,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
           <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
           <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
           <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
+          <RacketSVG clipId="rh-mob" />
           <div className="relative z-10 flex items-end justify-between mb-4">
             <div>
               <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
