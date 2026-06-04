@@ -215,9 +215,13 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
           <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
             {dateLabel}{hasTime ? ` · ${session.startTime} – ${session.endTime}` : ''}
           </div>
+          {/* Mobile: note shown inline under date */}
+          {session.notes && (
+            <div className="sm:hidden text-xs text-[var(--text-4)] mt-0.5 truncate italic">{session.notes}</div>
+          )}
         </div>
-        {/* Note sub-box */}
-        <div className="flex-1 min-w-0 mx-1">
+        {/* Note sub-box — desktop only */}
+        <div className="hidden sm:block flex-1 min-w-0 mx-1">
           {editingNote ? (
             <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
               onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
