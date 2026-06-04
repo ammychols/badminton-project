@@ -371,9 +371,14 @@ function computeInsights(
     out.push({ emoji: '🏸', text: `ก๊วน ${getGroupName(topG[1].courtId, topG[0])} เป็นที่ที่ไปบ่อยที่สุด (${topG[1].count} ครั้ง)` });
 
   // Best single session
-  const best = sessions.reduce((b, s) => s.gamesPlayed > b.gamesPlayed ? s : b, sessions[0]);
-  if (best.gamesPlayed >= 3)
-    out.push({ emoji: '⚡', text: `สถิติสูงสุด ${best.gamesPlayed} เกมใน 1 ครั้ง — ${getGroupName(best.courtId, best.groupId)}` });
+  const maxGames = Math.max(...sessions.map(s => s.gamesPlayed));
+  if (maxGames >= 3) {
+    const topSessions = sessions.filter(s => s.gamesPlayed === maxGames);
+    const label = topSessions.length === 1
+      ? ` — ${getGroupName(topSessions[0].courtId, topSessions[0].groupId)}`
+      : '';
+    out.push({ emoji: '⚡', text: `สถิติสูงสุด ${maxGames} เกมใน 1 ครั้ง${label}` });
+  }
 
   // Favourite day of week
   const dc: Record<number, number> = {};
