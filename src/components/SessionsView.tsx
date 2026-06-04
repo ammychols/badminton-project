@@ -323,20 +323,16 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
       </div>
 
-      <div className="sm:flex sm:gap-6 sm:items-start">
-        {/* Left column: hero + nudge only (sticky, fits viewport) */}
-        <div className="sm:w-72 sm:flex-shrink-0 sm:sticky sm:top-4">
-          {/* Hero stats */}
-          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
-            {/* Blob shapes */}
+      {/* ── Desktop top row: hero+nudge (left) | heatmap (right) ── */}
+      <div className="hidden sm:flex sm:gap-6 sm:items-start mb-6">
+        {/* Hero + nudge */}
+        <div className="w-72 flex-shrink-0">
+          <div className="relative rounded-3xl p-5 mb-3 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-            {/* Golden dappled light (forest mode) */}
             <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
             <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
-            {/* Grain texture */}
             <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-            {/* Inner border highlight */}
             <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
             <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
@@ -354,120 +350,127 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               )}
             </div>
             <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
-              <div>
-                <div className="text-2xl font-bold">{thisMonthDays}</div>
-                <div className="text-xs text-white/60">วันที่ตีเดือนนี้</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{thisMonthGames}</div>
-                <div className="text-xs text-white/60">เกมเดือนนี้</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div>
-                <div className="text-xs text-white/60">เกม/วัน</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{avgDuration ?? '—'}</div>
-                <div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div>
-              </div>
+              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตีเดือนนี้</div></div>
+              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกมเดือนนี้</div></div>
+              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
+              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
             </div>
           </div>
-
-          {/* Today nudge */}
           {!hasSessionToday && sessions.length > 0 && (
-            <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
+            <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
               <span className="text-xl">🏸</span>
-              <div className="flex-1">
-                <div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div>
-                <div className="text-xs text-amber-600">กดบันทึกเลย</div>
-              </div>
+              <div className="flex-1"><div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div><div className="text-xs text-amber-600">กดบันทึกเลย</div></div>
               <span className="text-amber-400 text-lg">›</span>
             </button>
           )}
+        </div>
+        {/* Heatmap (right of hero) */}
+        {sessions.length > 0 && (
+          <div className="flex-1 min-w-0">
+            <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
+          </div>
+        )}
+      </div>
 
-          {/* Heatmap: mobile only (below hero in left col) */}
-          <div className="sm:hidden">
-            {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+      {/* ── Mobile layout: hero + nudge + heatmap stacked ── */}
+      <div className="sm:hidden">
+        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
+          <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
+          <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
+          <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
+          <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
+          <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
+          <div className="relative z-10 flex items-end justify-between mb-4">
+            <div>
+              <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
+              <div className="flex items-end gap-1.5 leading-none">
+                <span className="text-5xl font-black">{totalGames}</span>
+                <span className="text-lg text-white/60 mb-1">เกม</span>
+              </div>
+            </div>
+            {streak >= 2 && (
+              <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
+                <span className="text-lg">🔥</span>
+                <span className="text-sm font-semibold">{streak} วันติด</span>
+              </div>
+            )}
+          </div>
+          <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+            <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตีเดือนนี้</div></div>
+            <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกมเดือนนี้</div></div>
+            <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
+            <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
           </div>
         </div>
+        {!hasSessionToday && sessions.length > 0 && (
+          <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
+            <span className="text-xl">🏸</span>
+            <div className="flex-1"><div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div><div className="text-xs text-amber-600">กดบันทึกเลย</div></div>
+            <span className="text-amber-400 text-lg">›</span>
+          </button>
+        )}
+        {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+      </div>
 
-        {/* Right column: session list */}
-        <div className="sm:flex-1 sm:min-w-0">
-          {sessions.length === 0 ? (
-            <div className={emptyState.wrapper}>
-              <div className={emptyState.icon}>🏸</div>
-              <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
-              <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
-              <button onClick={onLogSession} className={btn.primaryLg}>
-                + บันทึกครั้งแรก
+      {/* ── Session list (full width on desktop, normal on mobile) ── */}
+      {sessions.length === 0 ? (
+        <div className={emptyState.wrapper}>
+          <div className={emptyState.icon}>🏸</div>
+          <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+          <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+          <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+            </svg>
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="ค้นหาก๊วน หรือสนาม..."
+              className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-            </div>
-          ) : (
-          <div className="flex flex-col gap-2">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-              </svg>
-              <input
-                type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="ค้นหาก๊วน หรือสนาม..."
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-            <button
-              onClick={onLogSession}
-              className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="text-lg leading-none">+</span> บันทึกการตี
-            </button>
-            {/* Mobile: show month-filtered sessions */}
-            <div className="sm:hidden">
-              {viewedSessions.length === 0 && (
-                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
-              )}
-              {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-                const { day, full } = formatDate(session.date);
-                return (
-                  <SessionCard key={session.id} session={session}
-                    courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
-                    dateLabel={`วัน${day} ${full}`}
-                    onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
-                    onUpdateNote={notes => onUpdateNote(session.id, notes)} />
-                );
-              })}
-            </div>
-            {/* Desktop: show all sessions */}
-            <div className="hidden sm:block">
-              {allViewedSessions.length === 0 && (
-                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
-              )}
-              {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-                const { day, full } = formatDate(session.date);
-                return (
-                  <SessionCard key={session.id} session={session}
-                    courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
-                    dateLabel={`วัน${day} ${full}`}
-                    onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
-                    onUpdateNote={notes => onUpdateNote(session.id, notes)} />
-                );
-              })}
-            </div>
+            )}
           </div>
-          )}
-        </div>{/* end right col */}
-      </div>{/* end sm:flex */}
-
-      {/* Heatmap: desktop only, below the two-column layout */}
-      {sessions.length > 0 && (
-        <div className="hidden sm:block mt-6">
-          <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
+          <button onClick={onLogSession}
+            className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
+            <span className="text-lg leading-none">+</span> บันทึกการตี
+          </button>
+          {/* Mobile: month-filtered */}
+          <div className="sm:hidden">
+            {viewedSessions.length === 0 && (
+              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+            )}
+            {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+              const { day, full } = formatDate(session.date);
+              return <SessionCard key={session.id} session={session}
+                courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
+                dateLabel={`วัน${day} ${full}`}
+                onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
+                onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
+            })}
+          </div>
+          {/* Desktop: all sessions */}
+          <div className="hidden sm:block">
+            {allViewedSessions.length === 0 && (
+              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
+            )}
+            {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+              const { day, full } = formatDate(session.date);
+              return <SessionCard key={session.id} session={session}
+                courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
+                dateLabel={`วัน${day} ${full}`}
+                onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
+                onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
+            })}
+          </div>
         </div>
       )}
 
