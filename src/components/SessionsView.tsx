@@ -433,6 +433,11 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [insightIdx, setInsightIdx] = useState(0);
+  React.useEffect(() => {
+    if (insights.length <= 1) return;
+    const t = setInterval(() => setInsightIdx(i => i + 1), 4000);
+    return () => clearInterval(t);
+  }, [insights.length]);
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
