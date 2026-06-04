@@ -352,11 +352,87 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   );
 }
 
+function computeInsights(
+  sessions: Session[],
+  getCourtName: (id: string) => string,
+  getGroupName: (courtId: string, groupId: string) => string
+): Array<{ emoji: string; text: string }> {
+  if (sessions.length < 3) return [];
+  const out: Array<{ emoji: string; text: string }> = [];
+
+  // Most visited group
+  const gc: Record<string, { count: number; courtId: string }> = {};
+  for (const s of sessions) {
+    if (!gc[s.groupId]) gc[s.groupId] = { count: 0, courtId: s.courtId };
+    gc[s.groupId].count++;
+  }
+  const topG = Object.entries(gc).sort((a, b) => b[1].count - a[1].count)[0];
+  if (topG[1].count >= 2)
+    out.push({ emoji: '🏸', text: `ก๊วน ${getGroupName(topG[1].courtId, topG[0])} เป็นที่ที่ไปบ่อยที่สุด (${topG[1].count} ครั้ง)` });
+
+  // Best single session
+  const best = sessions.reduce((b, s) => s.gamesPlayed > b.gamesPlayed ? s : b, sessions[0]);
+  if (best.gamesPlayed >= 3)
+    out.push({ emoji: '⚡', text: `สถิติสูงสุด ${best.gamesPlayed} เกมใน 1 ครั้ง — ${getGroupName(best.courtId, best.groupId)}` });
+
+  // Favourite day of week
+  const dc: Record<number, number> = {};
+  const DL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
+  for (const s of sessions) dc[new Date(s.date + 'T00:00:00').getDay()] = (dc[new Date(s.date + 'T00:00:00').getDay()] || 0) + 1;
+  const topD = Object.entries(dc).sort((a, b) => Number(b[1]) - Number(a[1]))[0];
+  if (Number(topD[1]) >= 2)
+    out.push({ emoji: '📅', text: `วัน${DL[Number(topD[0])]}เป็นวันที่ตีบ่อยที่สุด (${topD[1]} ครั้ง)` });
+
+  // Month comparison
+  const now2 = new Date();
+  const tmStr = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}`;
+  const lmD = new Date(now2.getFullYear(), now2.getMonth() - 1, 1);
+  const lmStr = `${lmD.getFullYear()}-${String(lmD.getMonth() + 1).padStart(2, '0')}`;
+  const tmG = sessions.filter(s => s.date.startsWith(tmStr)).reduce((sum, s) => sum + s.gamesPlayed, 0);
+  const lmG = sessions.filter(s => s.date.startsWith(lmStr)).reduce((sum, s) => sum + s.gamesPlayed, 0);
+  if (lmG > 0 && tmG > 0) {
+    const diff = tmG - lmG;
+    if (diff > 0) out.push({ emoji: '📈', text: `เดือนนี้ตีมากกว่าเดือนที่แล้ว ${diff} เกม` });
+    else if (diff < 0) out.push({ emoji: '📉', text: `เดือนนี้ตีน้อยกว่าเดือนที่แล้ว ${Math.abs(diff)} เกม` });
+  }
+
+  // Best mood group
+  if (sessions.length >= 5) {
+    const gm: Record<string, { sum: number; count: number; courtId: string }> = {};
+    for (const s of sessions) {
+      if (!gm[s.groupId]) gm[s.groupId] = { sum: 0, count: 0, courtId: s.courtId };
+      gm[s.groupId].sum += s.mood; gm[s.groupId].count++;
+    }
+    const bm = Object.entries(gm).filter(([, v]) => v.count >= 2).sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count))[0];
+    if (bm) out.push({ emoji: '😄', text: `อารมณ์ดีที่สุดเมื่อตีกับก๊วน ${getGroupName(bm[1].courtId, bm[0])}` });
+  }
+
+  // All-time best streak
+  const allD = [...new Set(sessions.map(s => s.date))].sort();
+  let maxSt = 1, curSt = 1;
+  for (let i = 1; i < allD.length; i++) {
+    const p = new Date(allD[i - 1] + 'T00:00:00'); p.setDate(p.getDate() + 1);
+    if (p.toISOString().slice(0, 10) === allD[i]) { curSt++; maxSt = Math.max(maxSt, curSt); } else curSt = 1;
+  }
+  if (maxSt >= 3) out.push({ emoji: '🔥', text: `best streak ของคุณคือ ${maxSt} วันติดต่อกัน` });
+
+  // Time preference
+  const timed = sessions.filter(s => !(s.startTime === '00:00' && s.endTime === '00:00'));
+  if (timed.length >= 3) {
+    const avgH = Math.round(timed.map(s => Number(s.startTime.split(':')[0])).reduce((a, b) => a + b, 0) / timed.length);
+    const tl = avgH < 12 ? 'ช่วงเช้า' : avgH < 17 ? 'ช่วงบ่าย' : avgH < 20 ? 'ช่วงเย็น' : 'ช่วงค่ำ';
+    out.push({ emoji: '⏰', text: `ชอบตี${tl} (เริ่มเฉลี่ย ${String(avgH).padStart(2, '0')}:00 น.)` });
+  }
+
+  return out;
+}
+
 export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
   const today = todayString();
   const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [insightIdx, setInsightIdx] = useState(0);
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -428,6 +504,9 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     amber:   { wrap: 'bg-amber-50 border-amber-100',     text: 'text-amber-800',   btn: 'text-amber-700 hover:text-amber-900'     },
     slate:   { wrap: 'bg-slate-100 border-slate-200',    text: 'text-slate-700',   btn: 'text-slate-600 hover:text-slate-900'     },
   };
+
+  const insights = computeInsights(sessions, getCourtName, getGroupName);
+  const activeInsight = insights.length > 0 ? insights[insightIdx % insights.length] : null;
 
   const sessionDurations = thisMonthSessions.map(s => {
     const [sh, sm] = s.startTime.split(':').map(Number);
@@ -516,12 +595,24 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   </button>
                 )}
               </div>
-              {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+              {nudge ? (() => { const ns = NUDGE_STYLES[nudge.style]; return (
                 <div className={`hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
                   <span className={`text-sm font-medium ${ns.text}`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
                   <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
                 </div>
-              ); })()}
+              ); })() : activeInsight ? (
+                <div className="hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)]">
+                  <span className="text-base">{activeInsight.emoji}</span>
+                  <span className="text-sm text-[var(--text-2)] flex-1">{activeInsight.text}</span>
+                  {insights.length > 1 && (
+                    <button onClick={() => setInsightIdx(i => i + 1)}
+                      className="text-xs text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors whitespace-nowrap flex items-center gap-1">
+                      <span>{((insightIdx % insights.length) + 1)}/{insights.length}</span>
+                      <span className="text-base leading-none">›</span>
+                    </button>
+                  )}
+                </div>
+              ) : null}
               <button onClick={onLogSession}
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
@@ -570,7 +661,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
           </div>
         </div>
-        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+        {nudge ? (() => { const ns = NUDGE_STYLES[nudge.style]; return (
           <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left transition-colors ${ns.wrap}`}>
             <span className="text-xl">{nudge.emoji}</span>
             <div className="flex-1">
@@ -579,7 +670,19 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             </div>
             <span className={`text-lg ${ns.btn.split(' ')[0]}`}>›</span>
           </button>
-        ); })()}
+        ); })() : activeInsight ? (
+          <div className="w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 bg-[var(--chip-bg)] border-[var(--card-border)]">
+            <span className="text-xl">{activeInsight.emoji}</span>
+            <span className="text-sm text-[var(--text-2)] flex-1">{activeInsight.text}</span>
+            {insights.length > 1 && (
+              <button onClick={() => setInsightIdx(i => i + 1)}
+                className="text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors flex items-center gap-0.5 text-xs">
+                <span>{((insightIdx % insights.length) + 1)}/{insights.length}</span>
+                <span className="text-lg leading-none">›</span>
+              </button>
+            )}
+          </div>
+        ) : null}
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
