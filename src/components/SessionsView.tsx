@@ -490,7 +490,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     if (hasSessionToday) {
       if (streak >= 5) return { emoji: '🔥', message: `${streak} วันติดต่อกัน!`, sub: 'ฟอร์มร้อนแรงมาก ยอดเยี่ยม!', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
       if (streak >= 3) return { emoji: '🔥', message: `ตีติดกัน ${streak} วันแล้ว!`, sub: 'รักษาฟอร์มนี้ไว้', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
-      return null;
+      return { emoji: '✅', message: 'ตีแล้ววันนี้', btnLabel: '+ บันทึกอีกครั้ง', style: 'slate' };
     }
     if (streak >= 3) return { emoji: '🔥', message: `Streak ${streak} วัน กำลังมา!`, sub: 'ตีวันนี้ด้วยจะได้ครบ', btnLabel: 'บันทึกเลย →', style: 'amber' };
     if (daysSinceLast !== null && daysSinceLast > 14) return { emoji: '😢', message: `ห่างหายไป ${daysSinceLast} วันแล้ว`, sub: 'กลับมาตีได้เลย!', btnLabel: 'บันทึกเลย →', style: 'slate' };
@@ -628,10 +628,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   ); })()}
                 </div>
               )}
-              <button onClick={onLogSession}
-                className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
-                <span className="text-lg leading-none">+</span> บันทึกการตี
-              </button>
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
               )}
@@ -735,10 +731,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 </button>
               )}
             </div>
-            <button onClick={onLogSession}
-              className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
-              <span className="text-lg leading-none">+</span> บันทึกการตี
-            </button>
             {viewedSessions.length === 0 && (
               <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
             )}
