@@ -285,7 +285,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
             <span className="text-xs font-semibold text-[var(--text-3)]">{g.label}</span>
           </div>
           {/* Session rows as individual cards */}
-          <div className={`${card.base} overflow-hidden`}>
+          <div className={card.base}>
             {g.items.map((s, si) => (
               <SessionRow key={s.id} session={s}
                 courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
