@@ -417,6 +417,13 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </div>
           ) : (
             <div className="flex flex-col gap-2">
+              {/* Nudge banner — desktop only */}
+              {!hasSessionToday && (
+                <div className="hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-100">
+                  <span className="text-sm text-amber-800">🏸 วันนี้ยังไม่ได้ตี</span>
+                  <button onClick={onLogSession} className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors whitespace-nowrap">บันทึกเลย →</button>
+                </div>
+              )}
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
