@@ -69,6 +69,13 @@ export default function App() {
   }, [showUserMenu]);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
+  const [justLogged, setJustLogged] = useState(false);
+  const justLoggedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggerJustLogged = () => {
+    if (justLoggedTimerRef.current) clearTimeout(justLoggedTimerRef.current);
+    setJustLogged(true);
+    justLoggedTimerRef.current = setTimeout(() => setJustLogged(false), 5000);
+  };
 
   const closeModal = () => setModal(null);
   const openModal = (m: ModalState) => { setShowUserMenu(false); setModal(m); };
@@ -127,6 +134,7 @@ export default function App() {
           <SessionsView
             sessions={sessions}
             courts={courts}
+            justLogged={justLogged}
             onLogSession={() => openModal({ type: 'logSession' })}
             onDeleteSession={deleteSession}
             onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
@@ -191,7 +199,7 @@ export default function App() {
           initialSession={modal.sessionId ? sessions.find(s => s.id === modal.sessionId) : undefined}
           onSave={data => {
             if (modal.sessionId) updateSession(modal.sessionId, data);
-            else addSession(data);
+            else { addSession(data); triggerJustLogged(); }
             closeModal();
           }}
         />

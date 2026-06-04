@@ -5,6 +5,7 @@ import { btn, card, text, emptyState } from '../styles/tokens';
 interface SessionsViewProps {
   sessions: Session[];
   courts: Court[];
+  justLogged?: boolean;
   onLogSession: () => void;
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
@@ -17,7 +18,7 @@ function RacketSVG({ clipId }: { clipId: string }) {
   return (
     <svg width="260" height="400" viewBox="0 0 260 400" fill="none"
       className="absolute bottom-0 right-0 opacity-[0.13] pointer-events-none select-none"
-      style={{ transform: 'translate(28%, 12%)' }}>
+      style={{ transform: 'translate(8%, 10%)' }}>
       <defs>
         <clipPath id={clipId}>
           <ellipse cx="130" cy="115" rx="88" ry="68" />
@@ -349,7 +350,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   );
 }
 
-export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
   const today = todayString();
   const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -394,6 +395,37 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
   const avgGamesPerDay = thisMonthDays > 0 ? (thisMonthGames / thisMonthDays).toFixed(1) : null;
   const hasSessionToday = sessions.some(s => s.date === today);
   const streak = calcStreak(sessions);
+  const sortedDates = [...new Set(sessions.map(s => s.date))].sort();
+  const lastSessionDate = sortedDates[sortedDates.length - 1];
+  const daysSinceLast = lastSessionDate
+    ? Math.floor((new Date(today + 'T00:00:00').getTime() - new Date(lastSessionDate + 'T00:00:00').getTime()) / 86400000)
+    : null;
+
+  type NudgeStyle = 'emerald' | 'orange' | 'amber' | 'slate';
+  const nudge: { emoji: string; message: string; sub?: string; btnLabel: string; style: NudgeStyle } | null = (() => {
+    if (!sessions.length) return null;
+    if (justLogged) {
+      if (streak >= 5) return { emoji: '🔥', message: `${streak} วันติดต่อกันแล้ว!`, sub: 'ฟอร์มร้อนแรงมาก ไปต่อเลย', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
+      if (streak >= 3) return { emoji: '🎉', message: 'บันทึกแล้ว!', sub: `ตีติดกัน ${streak} วัน สุดยอด!`, btnLabel: 'บันทึกอีกครั้ง', style: 'emerald' };
+      return { emoji: '🎉', message: 'บันทึกแล้ว!', sub: 'ตีดีมากวันนี้ เก่งมาก', btnLabel: 'บันทึกอีกครั้ง', style: 'emerald' };
+    }
+    if (hasSessionToday) {
+      if (streak >= 5) return { emoji: '🔥', message: `${streak} วันติดต่อกัน!`, sub: 'ฟอร์มร้อนแรงมาก ยอดเยี่ยม!', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
+      if (streak >= 3) return { emoji: '🔥', message: `ตีติดกัน ${streak} วันแล้ว!`, sub: 'รักษาฟอร์มนี้ไว้', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
+      return null;
+    }
+    if (streak >= 3) return { emoji: '🔥', message: `Streak ${streak} วัน กำลังมา!`, sub: 'ตีวันนี้ด้วยจะได้ครบ', btnLabel: 'บันทึกเลย →', style: 'amber' };
+    if (daysSinceLast !== null && daysSinceLast > 14) return { emoji: '😢', message: `ห่างหายไป ${daysSinceLast} วันแล้ว`, sub: 'กลับมาตีได้เลย!', btnLabel: 'บันทึกเลย →', style: 'slate' };
+    if (daysSinceLast !== null && daysSinceLast > 7) return { emoji: '😴', message: `หยุดไป ${daysSinceLast} วัน`, sub: 'เริ่มตีใหม่ได้เลย', btnLabel: 'บันทึกเลย →', style: 'slate' };
+    return { emoji: '🏸', message: 'วันนี้ยังไม่ได้ตี', btnLabel: 'บันทึกเลย →', style: 'amber' };
+  })();
+
+  const NUDGE_STYLES: Record<NudgeStyle, { wrap: string; text: string; btn: string }> = {
+    emerald: { wrap: 'bg-emerald-50 border-emerald-100', text: 'text-emerald-800', btn: 'text-emerald-700 hover:text-emerald-900' },
+    orange:  { wrap: 'bg-orange-50 border-orange-100',   text: 'text-orange-800',  btn: 'text-orange-700 hover:text-orange-900'   },
+    amber:   { wrap: 'bg-amber-50 border-amber-100',     text: 'text-amber-800',   btn: 'text-amber-700 hover:text-amber-900'     },
+    slate:   { wrap: 'bg-slate-100 border-slate-200',    text: 'text-slate-700',   btn: 'text-slate-600 hover:text-slate-900'     },
+  };
 
   const sessionDurations = thisMonthSessions.map(s => {
     const [sh, sm] = s.startTime.split(':').map(Number);
@@ -482,12 +514,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                   </button>
                 )}
               </div>
-              {!hasSessionToday && (
-                <div className="hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-100">
-                  <span className="text-sm text-amber-800">🏸 วันนี้ยังไม่ได้ตี</span>
-                  <button onClick={onLogSession} className="text-xs font-semibold text-amber-700 hover:text-amber-900 transition-colors whitespace-nowrap">บันทึกเลย →</button>
+              {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+                <div className={`hidden sm:flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
+                  <span className={`text-sm font-medium ${ns.text}`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
+                  <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
                 </div>
-              )}
+              ); })()}
               <button onClick={onLogSession}
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
@@ -536,13 +568,16 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
           </div>
         </div>
-        {!hasSessionToday && sessions.length > 0 && (
-          <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors">
-            <span className="text-xl">🏸</span>
-            <div className="flex-1"><div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div><div className="text-xs text-amber-600">กดบันทึกเลย</div></div>
-            <span className="text-amber-400 text-lg">›</span>
+        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+          <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 text-left transition-colors ${ns.wrap}`}>
+            <span className="text-xl">{nudge.emoji}</span>
+            <div className="flex-1">
+              <div className={`text-sm font-medium ${ns.text}`}>{nudge.message}</div>
+              {nudge.sub && <div className={`text-xs opacity-75 ${ns.text}`}>{nudge.sub}</div>}
+            </div>
+            <span className={`text-lg ${ns.btn.split(' ')[0]}`}>›</span>
           </button>
-        )}
+        ); })()}
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
