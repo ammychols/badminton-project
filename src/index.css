@@ -4,27 +4,27 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #111827;
-  --p-h: #374151;
-  --app-bg: #f1f5f9;
+  --p: #0d9488;
+  --p-h: #0f766e;
+  --app-bg: #f0fdf9;
   --nav-bg: #ffffff;
-  --nav-border: #e2e8f0;
-  --card-border: #e2e8f0;
+  --nav-border: #ccfbf1;
+  --card-border: #d1fae5;
   --text-1: #111827;
   --text-2: #374151;
   --text-3: #9ca3af;
   --text-4: #6b7280;
-  --input-b: #e5e7eb;
-  --input-f: #6b7280;
-  --chip-bg: #f3f4f6;
-  --chip-t: #4b5563;
-  --bar-a: #111827;
-  --bar-i: #e5e7eb;
-  --dashed: #e5e7eb;
-  --cal-sel: #111827;
-  --hover-bg: #f9fafb;
-  --hero-from: #1a1a2e;
-  --hero-to: #533483;
+  --input-b: #d1fae5;
+  --input-f: #0d9488;
+  --chip-bg: #f0fdf9;
+  --chip-t: #0f766e;
+  --bar-a: #0d9488;
+  --bar-i: #ccfbf1;
+  --dashed: #99f6e4;
+  --cal-sel: #0d9488;
+  --hover-bg: #f0fdf9;
+  --hero-from: #134e4a;
+  --hero-to: #059669;
 }
 
 

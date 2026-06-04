@@ -26,7 +26,7 @@ interface ModalState {
 
 function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string | null }) {
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'linear-gradient(160deg, #134e4a 0%, #0d9488 50%, #059669 100%)' }}>
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold text-white tracking-tight mb-2">BadmintonTracker</h1>
         <p className="text-sm text-slate-400">บันทึกสนาม · ก๊วน · สถิติการตี</p>
