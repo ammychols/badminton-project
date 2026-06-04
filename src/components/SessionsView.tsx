@@ -357,7 +357,7 @@ function computeInsights(
   getCourtName: (id: string) => string,
   getGroupName: (courtId: string, groupId: string) => string
 ): Array<{ emoji: string; text: string }> {
-  if (sessions.length < 3) return [];
+  if (sessions.length < 1) return [];
   const out: Array<{ emoji: string; text: string }> = [];
 
   // Most visited group
