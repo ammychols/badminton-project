@@ -599,23 +599,15 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 <div className="hidden sm:flex gap-2">
                   {/* Insight — left */}
                   {activeInsight && (
-                    <div className="flex-1 flex flex-col gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
-                        <span className="text-sm text-[var(--text-2)] truncate">{activeInsight.text}</span>
-                      </div>
+                    <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0">
+                      <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
+                      <span className="text-sm text-[var(--text-2)] flex-1 min-w-0 truncate">{activeInsight.text}</span>
                       {insights.length > 1 && (
-                        <div className="flex items-center justify-between">
-                          <div className="flex gap-1.5">
-                            {insights.map((_, i) => (
-                              <button key={i} onClick={() => setInsightIdx(i)}
-                                className="rounded-full transition-all"
-                                style={{ width: i === insightIdx % insights.length ? '18px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
-                            ))}
-                          </div>
-                          <button onClick={() => setInsightIdx(i => i + 1)}
-                            className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">ถัดไป ›</button>
-                        </div>
+                        <button onClick={() => setInsightIdx(i => i + 1)}
+                          className="flex items-center gap-1 flex-shrink-0 text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
+                          <span className="tabular-nums">{(insightIdx % insights.length) + 1}/{insights.length}</span>
+                          <span className="text-base leading-none">›</span>
+                        </button>
                       )}
                     </div>
                   )}
