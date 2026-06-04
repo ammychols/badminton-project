@@ -200,7 +200,7 @@ function SessionCard({ session, courtName, groupName, dateLabel, onEdit, onDelet
   const hasTime = !(start === 0 && end === 0);
 
   return (
-    <div className={`${card.base} overflow-hidden`}>
+    <div className={`${card.base} overflow-hidden hover:shadow-lg transition-shadow`}>
       <div className="px-4 py-3.5 flex flex-col gap-2.5">
         {/* Main row */}
         <div className="flex items-center gap-3">
@@ -327,7 +327,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       <div className="hidden sm:flex sm:gap-5 sm:items-start">
         {/* Col 1: Hero card + Heatmap below */}
         <div className="w-[340px] flex-shrink-0">
-          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
             <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
@@ -410,7 +410,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
 
       {/* ── Mobile: stacked ── */}
       <div className="sm:hidden">
-        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
           <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
           <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
           <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
