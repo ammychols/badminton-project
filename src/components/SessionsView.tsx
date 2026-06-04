@@ -323,20 +323,20 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
       </div>
 
-      {/* ── Desktop: 3-column dashboard ── */}
-      <div className="hidden sm:flex sm:gap-5 sm:items-stretch">
-        {/* Col 1: Hero stats + nudge */}
-        <div className="w-64 flex-shrink-0 flex flex-col">
-          <div className="relative rounded-3xl p-6 text-white overflow-hidden flex-1 flex flex-col" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+      {/* ── Desktop: 2-column dashboard ── */}
+      <div className="hidden sm:flex sm:gap-5 sm:items-start">
+        {/* Col 1: Hero card + Heatmap below */}
+        <div className="w-[340px] flex-shrink-0">
+          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
             <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
             <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
             <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
             <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
-            <div className="relative z-10 flex items-start justify-between mb-6">
+            <div className="relative z-10 flex items-end justify-between mb-4">
               <div>
-                <div className="text-xs text-white/60 mb-1">ตีไปทั้งหมด</div>
+                <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
                 <div className="flex items-end gap-1.5 leading-none">
                   <span className="text-5xl font-black">{totalGames}</span>
                   <span className="text-lg text-white/60 mb-1">เกม</span>
@@ -349,29 +349,17 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 </div>
               )}
             </div>
-            <div className="relative z-10 flex-1" />
-            <div className="relative z-10 grid grid-cols-2 gap-y-5 gap-x-3 border-t border-white/10 pt-5">
-              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60 mt-0.5">วันที่ตีเดือนนี้</div></div>
-              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60 mt-0.5">เกมเดือนนี้</div></div>
-              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60 mt-0.5">เกม/วัน</div></div>
-              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60 mt-0.5">เฉลี่ย/ครั้ง</div></div>
+            <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
+              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตีเดือนนี้</div></div>
+              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกมเดือนนี้</div></div>
+              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
+              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
             </div>
           </div>
-          {!hasSessionToday && sessions.length > 0 && (
-            <button onClick={onLogSession} className="w-full bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 mt-3 flex items-center gap-3 text-left hover:bg-amber-100 transition-colors flex-shrink-0">
-              <span className="text-xl">🏸</span>
-              <div className="flex-1"><div className="text-sm font-medium text-amber-800">วันนี้ยังไม่ได้ตี</div><div className="text-xs text-amber-600">กดบันทึกเลย</div></div>
-              <span className="text-amber-400 text-lg">›</span>
-            </button>
+          {sessions.length > 0 && (
+            <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
         </div>
-
-        {/* Col 2: Heatmap */}
-        {sessions.length > 0 && (
-          <div className="w-[340px] flex-shrink-0">
-            <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
-          </div>
-        )}
 
         {/* Col 3: Session feed */}
         <div className="flex-1 min-w-0">
