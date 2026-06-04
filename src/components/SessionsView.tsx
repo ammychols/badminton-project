@@ -392,10 +392,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
                 <span className="text-lg leading-none">+</span> บันทึกการตี
               </button>
-              {allViewedSessions.length === 0 && (
-                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
+              {viewedSessions.length === 0 && (
+                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
               )}
-              {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+              {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
                 const { day, full } = formatDate(session.date);
                 return <SessionCard key={session.id} session={session}
                   courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
