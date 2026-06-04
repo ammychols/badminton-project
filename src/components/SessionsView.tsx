@@ -277,22 +277,24 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
     }
   }
   return (
-    <div className={`${card.base} overflow-hidden`}>
+    <div className="flex flex-col gap-1">
       {groups.map((g, gi) => (
         <div key={g.date}>
-          {/* Date separator */}
-          <div className={`px-4 py-2 flex items-center gap-3${gi > 0 ? ' border-t border-[var(--card-border)]' : ''}`}
-            style={{ backgroundColor: 'var(--app-bg)' }}>
+          {/* Date label */}
+          <div className={`px-1 pb-1.5 ${gi > 0 ? 'pt-4' : 'pt-0'}`}>
             <span className="text-xs font-semibold text-[var(--text-3)]">{g.label}</span>
           </div>
-          {g.items.map((s, si) => (
-            <SessionRow key={s.id} session={s}
-              courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
-              onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
-              onUpdateNote={notes => onUpdateNote(s.id, notes)}
-              isLast={si === g.items.length - 1 && gi === groups.length - 1}
-            />
-          ))}
+          {/* Session rows as individual cards */}
+          <div className={`${card.base} overflow-hidden`}>
+            {g.items.map((s, si) => (
+              <SessionRow key={s.id} session={s}
+                courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
+                onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
+                onUpdateNote={notes => onUpdateNote(s.id, notes)}
+                isLast={si === g.items.length - 1}
+              />
+            ))}
+          </div>
         </div>
       ))}
     </div>
