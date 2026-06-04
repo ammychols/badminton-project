@@ -323,10 +323,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
       </div>
 
-      {/* ── Desktop top row: hero+nudge (left) | heatmap (right) ── */}
-      <div className="hidden sm:flex sm:gap-6 sm:items-start mb-6">
-        {/* Hero + nudge */}
-        <div className="w-72 flex-shrink-0">
+      {/* ── Desktop: 3-column dashboard ── */}
+      <div className="hidden sm:flex sm:gap-5 sm:items-start">
+        {/* Col 1: Hero stats + nudge (fixed ~260px) */}
+        <div className="w-64 flex-shrink-0 sticky top-4">
           <div className="relative rounded-3xl p-5 mb-3 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
@@ -364,15 +364,62 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </button>
           )}
         </div>
-        {/* Heatmap (right of hero) */}
+
+        {/* Col 2: Heatmap / stats (~340px) */}
         {sessions.length > 0 && (
-          <div className="flex-1 min-w-0">
+          <div className="w-80 flex-shrink-0">
             <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           </div>
         )}
+
+        {/* Col 3: Session feed (flex-1) */}
+        <div className="flex-1 min-w-0">
+          {sessions.length === 0 ? (
+            <div className={emptyState.wrapper}>
+              <div className={emptyState.icon}>🏸</div>
+              <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+              <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+              <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+                </svg>
+                <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="ค้นหาก๊วน หรือสนาม..."
+                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                />
+                {search && (
+                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <button onClick={onLogSession}
+                className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
+                <span className="text-lg leading-none">+</span> บันทึกการตี
+              </button>
+              {allViewedSessions.length === 0 && (
+                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
+              )}
+              {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+                const { day, full } = formatDate(session.date);
+                return <SessionCard key={session.id} session={session}
+                  courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
+                  dateLabel={`วัน${day} ${full}`}
+                  onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
+                  onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* ── Mobile layout: hero + nudge + heatmap stacked ── */}
+      {/* ── Mobile: stacked ── */}
       <div className="sm:hidden">
         <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
           <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
@@ -411,40 +458,35 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
           </button>
         )}
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
-      </div>
-
-      {/* ── Session list (full width on desktop, normal on mobile) ── */}
-      {sessions.length === 0 ? (
-        <div className={emptyState.wrapper}>
-          <div className={emptyState.icon}>🏸</div>
-          <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
-          <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
-          <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-            </svg>
-            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="ค้นหาก๊วน หรือสนาม..."
-              className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
-            />
-            {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+        {sessions.length === 0 ? (
+          <div className={emptyState.wrapper}>
+            <div className={emptyState.icon}>🏸</div>
+            <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+            <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+            <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
           </div>
-          <button onClick={onLogSession}
-            className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
-            <span className="text-lg leading-none">+</span> บันทึกการตี
-          </button>
-          {/* Mobile: month-filtered */}
-          <div className="sm:hidden">
+        ) : (
+          <div className="flex flex-col gap-2 mt-4">
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+              </svg>
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="ค้นหาก๊วน หรือสนาม..."
+                className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <button onClick={onLogSession}
+              className="w-full py-3.5 rounded-2xl border-2 border-dashed border-[var(--dashed)] text-[var(--text-3)] text-sm font-medium hover:border-[var(--p)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2">
+              <span className="text-lg leading-none">+</span> บันทึกการตี
+            </button>
             {viewedSessions.length === 0 && (
               <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
             )}
@@ -457,22 +499,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
             })}
           </div>
-          {/* Desktop: all sessions */}
-          <div className="hidden sm:block">
-            {allViewedSessions.length === 0 && (
-              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
-            )}
-            {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-              const { day, full } = formatDate(session.date);
-              return <SessionCard key={session.id} session={session}
-                courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
-                dateLabel={`วัน${day} ${full}`}
-                onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
-                onUpdateNote={notes => onUpdateNote(session.id, notes)} />;
-            })}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
