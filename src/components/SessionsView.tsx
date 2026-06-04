@@ -287,6 +287,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
     if (!q) return true;
     return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
   });
+  // Desktop list: show all sessions (not month-filtered), search still works
+  const allViewedSessions = sessions.filter(s => {
+    if (!q) return true;
+    return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
+  });
 
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
@@ -319,8 +324,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       </div>
 
       <div className="sm:flex sm:gap-6 sm:items-start">
-        {/* Left column: stats + calendar */}
-        <div className="sm:w-80 sm:flex-shrink-0 sm:sticky sm:top-4">
+        {/* Left column: hero + nudge only (sticky, fits viewport) */}
+        <div className="sm:w-72 sm:flex-shrink-0 sm:sticky sm:top-4">
           {/* Hero stats */}
           <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
             {/* Blob shapes */}
@@ -380,8 +385,10 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             </button>
           )}
 
-          {/* Heatmap */}
-          {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+          {/* Heatmap: mobile only (below hero in left col) */}
+          <div className="sm:hidden">
+            {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+          </div>
         </div>
 
         {/* Right column: session list */}
@@ -420,28 +427,49 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
             >
               <span className="text-lg leading-none">+</span> บันทึกการตี
             </button>
-            {viewedSessions.length === 0 && (
-              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
-            )}
-            {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
-              const { day, full } = formatDate(session.date);
-              return (
-                <SessionCard
-                  key={session.id}
-                  session={session}
-                  courtName={getCourtName(session.courtId)}
-                  groupName={getGroupName(session.courtId, session.groupId)}
-                  dateLabel={`วัน${day} ${full}`}
-                  onEdit={() => onEditSession(session)}
-                  onDelete={() => setConfirmDeleteId(session.id)}
-                  onUpdateNote={notes => onUpdateNote(session.id, notes)}
-                />
-              );
-            })}
+            {/* Mobile: show month-filtered sessions */}
+            <div className="sm:hidden">
+              {viewedSessions.length === 0 && (
+                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+              )}
+              {[...viewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+                const { day, full } = formatDate(session.date);
+                return (
+                  <SessionCard key={session.id} session={session}
+                    courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
+                    dateLabel={`วัน${day} ${full}`}
+                    onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
+                    onUpdateNote={notes => onUpdateNote(session.id, notes)} />
+                );
+              })}
+            </div>
+            {/* Desktop: show all sessions */}
+            <div className="hidden sm:block">
+              {allViewedSessions.length === 0 && (
+                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ยังไม่มีบันทึก'}</div>
+              )}
+              {[...allViewedSessions].sort((a, b) => b.date.localeCompare(a.date)).map(session => {
+                const { day, full } = formatDate(session.date);
+                return (
+                  <SessionCard key={session.id} session={session}
+                    courtName={getCourtName(session.courtId)} groupName={getGroupName(session.courtId, session.groupId)}
+                    dateLabel={`วัน${day} ${full}`}
+                    onEdit={() => onEditSession(session)} onDelete={() => setConfirmDeleteId(session.id)}
+                    onUpdateNote={notes => onUpdateNote(session.id, notes)} />
+                );
+              })}
+            </div>
           </div>
           )}
         </div>{/* end right col */}
       </div>{/* end sm:flex */}
+
+      {/* Heatmap: desktop only, below the two-column layout */}
+      {sessions.length > 0 && (
+        <div className="hidden sm:block mt-6">
+          <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
+        </div>
+      )}
 
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
