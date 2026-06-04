@@ -239,7 +239,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           {MOOD_EMOJIS[session.mood]}
         </div>
         {/* Info */}
-        <div className="min-w-0 w-52 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <div className="min-w-0 flex-1 sm:flex-none sm:w-52 sm:flex-shrink-0 cursor-pointer" onClick={onEdit}>
           <div className="text-sm leading-snug truncate">
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
             <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
@@ -277,7 +277,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           </div>
         )}
         {/* Delete */}
-        <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 -mr-1">
+        <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
