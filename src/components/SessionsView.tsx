@@ -227,82 +227,130 @@ function AvatarCard({ totalSessions }: { totalSessions: number }) {
         <div className="text-xs text-[var(--text-3)] mt-0.5">{totalSessions} session{totalSessions !== 1 ? 's' : ''}</div>
       </div>
 
-      {/* Character */}
-      <div className="flex justify-center py-4">
-        <svg width="160" height="200" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Shadow */}
-          <ellipse cx="80" cy="193" rx="32" ry="6" fill="#E8EAF0" />
+      {/* Character — chibi 16P style */}
+      <div className="flex justify-center pt-2 pb-1">
+        <svg width="200" height="240" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-          {/* Shoes */}
-          <rect x="55" y="174" width="20" height="10" rx="5" fill="#5C6BC0" />
-          <rect x="85" y="174" width="20" height="10" rx="5" fill="#5C6BC0" />
+          {/* ── Shadow ── */}
+          <ellipse cx="100" cy="232" rx="38" ry="7" fill="#DDE1EC" />
 
-          {/* Legs */}
-          <rect x="62" y="148" width="12" height="30" rx="6" fill="#FFB74D" />
-          <rect x="86" y="148" width="12" height="30" rx="6" fill="#FFB74D" />
+          {/* ── Shoes ── */}
+          <rect x="64" y="208" width="26" height="13" rx="6.5" fill="#4A5568" />
+          <rect x="64" y="208" width="26" height="7" rx="3.5" fill="#2D3748" />
+          <rect x="110" y="208" width="26" height="13" rx="6.5" fill="#4A5568" />
+          <rect x="110" y="208" width="26" height="7" rx="3.5" fill="#2D3748" />
 
-          {/* Shorts */}
-          <rect x="55" y="144" width="50" height="20" rx="8" fill="#5C6BC0" />
+          {/* ── Socks ── */}
+          <rect x="68" y="196" width="18" height="16" rx="5" fill="white" />
+          <rect x="114" y="196" width="18" height="16" rx="5" fill="white" />
 
-          {/* Body / Shirt */}
-          <rect x="52" y="100" width="56" height="52" rx="14" fill="#EF5350" />
+          {/* ── Legs ── */}
+          <rect x="69" y="170" width="16" height="32" rx="8" fill="#FBBF8A" />
+          <rect x="115" y="170" width="16" height="32" rx="8" fill="#FBBF8A" />
 
-          {/* Shirt stripe */}
-          <rect x="52" y="115" width="56" height="6" fill="#E53935" />
+          {/* ── Skirt / Shorts ── */}
+          <rect x="60" y="160" width="80" height="26" rx="10" fill="#6C63FF" />
+          <rect x="60" y="160" width="80" height="12" rx="10" fill="#7C74FF" />
+          <rect x="97" y="160" width="6" height="26" fill="#6C63FF" />
 
-          {/* Left arm — holding racket */}
-          <rect x="30" y="102" width="26" height="12" rx="6" fill="#FFB74D" transform="rotate(-20 30 102)" />
+          {/* ── Body / Shirt ── */}
+          <rect x="58" y="112" width="84" height="56" rx="18" fill="#FF6B8A" />
+          {/* Collar */}
+          <path d="M88 112 L100 126 L112 112" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
+          {/* Shirt detail lines */}
+          <line x1="72" y1="130" x2="88" y2="130" stroke="#FF8FAA" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="72" y1="138" x2="85" y2="138" stroke="#FF8FAA" strokeWidth="1.5" strokeLinecap="round" />
 
-          {/* Racket handle */}
-          <rect x="14" y="118" width="5" height="28" rx="2.5" fill="#8D6E63" transform="rotate(-30 14 118)" />
-          {/* Racket head */}
-          <ellipse cx="10" cy="112" rx="14" ry="10" fill="none" stroke="#8D6E63" strokeWidth="3" transform="rotate(-30 10 112)" />
-          {/* Racket strings */}
-          <line x1="2" y1="108" x2="18" y2="116" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
-          <line x1="2" y1="112" x2="18" y2="112" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
-          <line x1="6" y1="104" x2="6" y2="120" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
-          <line x1="12" y1="103" x2="12" y2="121" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
+          {/* ── Left arm (raised — holding racket) ── */}
+          <rect x="34" y="108" width="30" height="16" rx="8" fill="#FBBF8A" transform="rotate(-40 34 108)" />
+          {/* Left hand */}
+          <circle cx="30" cy="88" r="9" fill="#FBBF8A" />
 
-          {/* Right arm */}
-          <rect x="104" y="102" width="26" height="12" rx="6" fill="#FFB74D" transform="rotate(15 104 102)" />
+          {/* ── Racket ── */}
+          {/* Handle */}
+          <rect x="14" y="58" width="7" height="36" rx="3.5" fill="#92400E" transform="rotate(-15 14 58)" />
+          {/* Frame */}
+          <ellipse cx="18" cy="44" rx="16" ry="21" fill="none" stroke="#92400E" strokeWidth="3.5" transform="rotate(-15 18 44)" />
+          {/* Strings horizontal */}
+          <line x1="4" y1="36" x2="32" y2="36" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
+          <line x1="3" y1="43" x2="33" y2="43" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
+          <line x1="4" y1="50" x2="32" y2="50" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
+          {/* Strings vertical */}
+          <line x1="10" y1="25" x2="10" y2="63" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
+          <line x1="18" y1="23" x2="18" y2="65" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
+          <line x1="26" y1="25" x2="26" y2="63" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
 
-          {/* Neck */}
-          <rect x="71" y="88" width="18" height="16" rx="6" fill="#FFB74D" />
+          {/* ── Right arm (slightly raised) ── */}
+          <rect x="138" y="116" width="30" height="16" rx="8" fill="#FBBF8A" transform="rotate(20 138 116)" />
+          {/* Right hand */}
+          <circle cx="162" cy="124" r="9" fill="#FBBF8A" />
 
-          {/* Head */}
-          <circle cx="80" cy="68" r="34" fill="#FFB74D" />
+          {/* ── Neck ── */}
+          <rect x="88" y="96" width="24" height="20" rx="8" fill="#FBBF8A" />
 
-          {/* Headband */}
-          <rect x="46" y="58" width="68" height="10" rx="5" fill="#EF5350" />
-          <circle cx="80" cy="58" r="5" fill="#FFF176" />
+          {/* ── Head ── */}
+          <circle cx="100" cy="66" r="50" fill="#FBBF8A" />
 
-          {/* Eyes */}
-          <circle cx="68" cy="70" r="5" fill="white" />
-          <circle cx="92" cy="70" r="5" fill="white" />
-          <circle cx="69.5" cy="71" r="3" fill="#333" />
-          <circle cx="93.5" cy="71" r="3" fill="#333" />
-          {/* Eye shine */}
-          <circle cx="70.5" cy="70" r="1" fill="white" />
-          <circle cx="94.5" cy="70" r="1" fill="white" />
+          {/* ── Hair (back layer) ── */}
+          <path d="M50 66 Q48 20 100 14 Q152 20 150 66" fill="#1A1A2E" />
+          {/* Side hair tufts */}
+          <ellipse cx="52" cy="72" rx="10" ry="16" fill="#1A1A2E" transform="rotate(-10 52 72)" />
+          <ellipse cx="148" cy="72" rx="10" ry="16" fill="#1A1A2E" transform="rotate(10 148 72)" />
 
-          {/* Eyebrows */}
-          <path d="M63 63 Q68 60 73 63" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
-          <path d="M87 63 Q92 60 97 63" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
+          {/* ── Headband ── */}
+          <rect x="50" y="50" width="100" height="14" rx="7" fill="#6C63FF" />
+          {/* Headband bow */}
+          <path d="M100 43 L90 50 L100 57 L110 50 Z" fill="#FF6B8A" />
+          <circle cx="100" cy="50" r="4" fill="#FF9AB5" />
 
-          {/* Nose */}
-          <circle cx="80" cy="76" r="2" fill="#F4A460" />
+          {/* ── Hair (front layer) ── */}
+          <path d="M50 57 Q54 40 68 36" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M150 57 Q146 40 132 36" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M68 36 Q80 30 100 32" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
+          {/* Front bangs */}
+          <path d="M70 50 Q75 38 82 44" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
+          <path d="M80 46 Q88 33 96 42" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
 
-          {/* Mouth — small smile */}
-          <path d="M73 83 Q80 89 87 83" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
+          {/* ── Eyes ── */}
+          {/* Eye whites */}
+          <ellipse cx="82" cy="72" rx="11" ry="12" fill="white" />
+          <ellipse cx="118" cy="72" rx="11" ry="12" fill="white" />
+          {/* Iris */}
+          <circle cx="82" cy="74" r="8" fill="#4A90D9" />
+          <circle cx="118" cy="74" r="8" fill="#4A90D9" />
+          {/* Pupil */}
+          <circle cx="83" cy="75" r="5" fill="#1A1A2E" />
+          <circle cx="119" cy="75" r="5" fill="#1A1A2E" />
+          {/* Eye shine large */}
+          <circle cx="85" cy="72" r="2.5" fill="white" />
+          <circle cx="121" cy="72" r="2.5" fill="white" />
+          {/* Eye shine small */}
+          <circle cx="80" cy="77" r="1.2" fill="white" />
+          <circle cx="116" cy="77" r="1.2" fill="white" />
+          {/* Eyelashes top */}
+          <path d="M71 64 Q82 60 93 64" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <path d="M107 64 Q118 60 129 64" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
 
-          {/* Cheeks */}
-          <circle cx="63" cy="80" r="7" fill="#FF8A65" opacity="0.35" />
-          <circle cx="97" cy="80" r="7" fill="#FF8A65" opacity="0.35" />
+          {/* ── Eyebrows ── */}
+          <path d="M72 60 Q82 55 92 59" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path d="M108 59 Q118 55 128 60" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
 
-          {/* Hair */}
-          <path d="M46 62 Q48 38 80 34 Q112 38 114 62" fill="#3E2723" />
-          <path d="M46 62 Q42 50 48 42 Q50 36 58 34" fill="#3E2723" />
-          <path d="M114 62 Q118 50 112 42 Q110 36 102 34" fill="#3E2723" />
+          {/* ── Nose ── */}
+          <path d="M97 83 Q100 87 103 83" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+          {/* ── Mouth ── */}
+          <path d="M88 93 Q100 103 112 93" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          {/* Teeth hint */}
+          <path d="M91 93 Q100 100 109 93" fill="white" />
+
+          {/* ── Cheeks ── */}
+          <ellipse cx="70" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.55" />
+          <ellipse cx="130" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.55" />
+
+          {/* ── Sparkles ── */}
+          <text x="155" y="30" fontSize="14" fill="#FFD700">✦</text>
+          <text x="168" y="50" fontSize="9" fill="#FFD700">✦</text>
+          <text x="148" y="18" fontSize="8" fill="#FF9AB5">✦</text>
         </svg>
       </div>
 
