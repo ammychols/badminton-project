@@ -783,10 +783,9 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           {sessions.length > 0 && (
             <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
-          <AvatarCard totalSessions={sessions.length} />
         </div>
 
-        {/* Col 3: Session feed */}
+        {/* Col 2: Session feed */}
         <div className="flex-1 min-w-0">
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
@@ -852,6 +851,11 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
             </div>
           )}
+        </div>
+
+        {/* Col 3: Avatar card */}
+        <div className="w-[240px] flex-shrink-0">
+          <AvatarCard totalSessions={sessions.length} />
         </div>
       </div>
 
