@@ -83,4 +83,5 @@ export interface Session {
   mood: 1 | 2 | 3 | 4 | 5 | 6;
   intensity?: Intensity;
   notes?: string;
+  image?: string;
 }

@@ -265,6 +265,13 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         </button>
       </div>
 
+      {/* Photo */}
+      {session.image && (
+        <div className="mt-3 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
+          <img src={session.image} alt="session" className="w-full max-h-52 object-cover" />
+        </div>
+      )}
+
       {/* Note — full text, the hero of the card */}
       <div className="mt-3">
         {editingNote ? (
