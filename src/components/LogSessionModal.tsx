@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { Court, Session, DayOfWeek, Intensity, ALL_INTENSITIES, INTENSITY_LABELS, INTENSITY_EMOJIS } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
-import { uploadGroupImage } from '../utils/uploadImage';
 
 interface LogSessionModalProps {
   courts: Court[];
@@ -173,9 +172,6 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | 6>(initialSession?.mood ?? 3);
   const [intensity, setIntensity] = useState<Intensity | undefined>(initialSession?.intensity);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
-  const [image, setImage] = useState<string | undefined>(initialSession?.image);
-  const [loadingImage, setLoadingImage] = useState(false);
-  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
 
@@ -203,31 +199,16 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
     setGroupId(newCourt?.groups.filter(g => g.days.includes(dow))[0]?.id ?? '');
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setLoadingImage(true);
-    const reader = new FileReader();
-    reader.onload = async ev => {
-      const dataUrl = ev.target?.result as string;
-      const compressed = await uploadGroupImage('', '', dataUrl);
-      setImage(compressed);
-      setLoadingImage(false);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
   const handleSave = () => {
     if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
     onClose();
-    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, notes: notes.trim() || undefined, image });
+    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, notes: notes.trim() || undefined });
   };
 
   const saveButton = (
-    <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday || loadingImage}
+    <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday}
       className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
-      {loadingImage ? 'กำลังโหลดรูป...' : 'บันทึก'}
+      บันทึก
     </button>
   );
 
@@ -322,29 +303,6 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
-      {/* Photo */}
-      <div className="mb-4">
-        <label className={text.label}>รูปภาพ</label>
-        <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-        {image ? (
-          <div className="relative rounded-2xl overflow-hidden">
-            <img src={image} alt="session" className="w-full max-h-56 object-cover rounded-2xl" />
-            <button
-              type="button"
-              onClick={() => setImage(undefined)}
-              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-sm hover:bg-black/70 transition-colors"
-            >✕</button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => imageInputRef.current?.click()}
-            className="w-full py-3 rounded-2xl border border-dashed border-[var(--dashed)] hover:border-[var(--p)] text-sm text-[var(--text-3)] hover:text-[var(--p)] transition-colors flex items-center justify-center gap-2"
-          >
-            <span className="text-base">📷</span> เพิ่มรูปภาพ
-          </button>
-        )}
-      </div>
 
     </BottomSheet>
   );

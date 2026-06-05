@@ -142,6 +142,10 @@ export default function App() {
               const s = sessions.find(s => s.id === id);
               if (s) updateSession(id, { ...s, notes });
             }}
+            onUpdatePhoto={(id, image) => {
+              const s = sessions.find(s => s.id === id);
+              if (s) updateSession(id, { ...s, image });
+            }}
           />
         )}
       </main>

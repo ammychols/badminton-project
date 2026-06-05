@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Court, Session, INTENSITY_LABELS } from '../types';
+import { uploadGroupImage } from '../utils/uploadImage';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
 interface SessionsViewProps {
@@ -10,6 +11,7 @@ interface SessionsViewProps {
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
+  onUpdatePhoto: (id: string, image: string | undefined) => void;
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
@@ -216,16 +218,30 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote }: {
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto }: {
   session: Session; courtName: string; groupName: string;
-  onEdit: () => void; onDelete: () => void; onUpdateNote: (notes: string | undefined) => void;
+  onEdit: () => void; onDelete: () => void;
+  onUpdateNote: (notes: string | undefined) => void;
+  onUpdatePhoto: (image: string | undefined) => void;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const commitNote = () => {
     setEditingNote(false);
     const trimmed = noteText.trim() || undefined;
     if (trimmed !== session.notes) onUpdateNote(trimmed);
+  };
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      const compressed = await uploadGroupImage('', '', ev.target?.result as string);
+      onUpdatePhoto(compressed);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
   const [sh, sm] = session.startTime.split(':').map(Number);
   const [eh, em] = session.endTime.split(':').map(Number);
@@ -292,10 +308,28 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
         </div>
         {/* Photo — right column, spans header+note */}
-        {session.image && (
-          <div className="w-24 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+        {session.image ? (
+          <div className="relative w-24 flex-shrink-0 m-2 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
             <img src={session.image} alt="session" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
+              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
+            >✕</button>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => photoInputRef.current?.click()}
+            className="w-10 flex-shrink-0 flex items-center justify-center text-[var(--text-4)] opacity-0 group-hover:opacity-100 transition-opacity hover:text-[var(--p)]"
+            title="เพิ่มรูปภาพ"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
         )}
       </div>
 
@@ -315,13 +349,14 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   );
 }
 
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
   onEditSession: (s: Session) => void;
   setConfirmDeleteId: (id: string) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
+  onUpdatePhoto: (id: string, image: string | undefined) => void;
 }) {
   const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
   // Group by date
@@ -349,6 +384,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
                 onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
+                onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
               />
             ))}
           </div>
@@ -476,7 +512,7 @@ function computeInsights(
   return out;
 }
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -693,7 +729,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} />
               )}
             </div>
           )}
@@ -814,7 +850,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             )}
             {viewedSessions.length > 0 && (
               <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} />
+                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} />
             )}
           </div>
         )}
