@@ -240,8 +240,10 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
   return (
     <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)]">
-      <div className="p-4">
-        {/* Header: mood + group/court + thumbnail + delete */}
+      {/* Top section: content left + photo right */}
+      <div className="flex">
+        <div className="flex-1 min-w-0 p-4 pb-0">
+        {/* Header: mood + group/court + delete */}
         <div className="flex items-start gap-3">
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
@@ -259,11 +261,6 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               </div>
             )}
           </div>
-          {session.image && (
-            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={onEdit}>
-              <img src={session.image} alt="session" className="w-full h-full object-cover" />
-            </div>
-          )}
           <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -293,20 +290,27 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           )}
         </div>
 
-        {/* Meta footer */}
-        {(hasTime || session.gamesPlayed > 0) && (
-          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer" onClick={onEdit}>
-            {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
-            {hasTime && durLabel && metaDivider}
-            {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
-            {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
-            {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
-            {minPerGame && metaDivider}
-            {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
+        </div>
+        {/* Photo — right column, spans header+note */}
+        {session.image && (
+          <div className="w-24 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+            <img src={session.image} alt="session" className="w-full h-full object-cover" />
           </div>
         )}
       </div>
 
+      {/* Meta footer — full width below */}
+      {(hasTime || session.gamesPlayed > 0) && (
+        <div className="mx-4 mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer pb-4" onClick={onEdit}>
+          {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
+          {hasTime && durLabel && metaDivider}
+          {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
+          {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
+          {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
+          {minPerGame && metaDivider}
+          {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
+        </div>
+      )}
     </div>
   );
 }
