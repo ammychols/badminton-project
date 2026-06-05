@@ -273,12 +273,23 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {/* Duration + games */}
         {(durLabel || session.gamesPlayed > 0) && (
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-            <div className="tabular-nums flex items-baseline justify-end gap-1 leading-tight">
-              {durLabel && <span className="text-sm font-bold text-[var(--text-1)]">{durLabel}</span>}
-              {durLabel && session.gamesPlayed > 0 && <span className="text-xs text-[var(--text-3)]">·</span>}
-              {session.gamesPlayed > 0 && <span className="text-sm font-semibold text-[var(--text-1)]">{session.gamesPlayed} <span className="text-xs font-normal text-[var(--text-3)]">เกม</span></span>}
+            <div className="flex items-center justify-end gap-2 leading-tight">
+              {durLabel && (
+                <div className="text-right">
+                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{durLabel}</div>
+                  <div className="text-[10px] text-[var(--text-3)]">เวลา</div>
+                </div>
+              )}
+              {durLabel && session.gamesPlayed > 0 && (
+                <div className="w-px h-6 bg-[var(--card-border)]" />
+              )}
+              {session.gamesPlayed > 0 && (
+                <div className="text-right">
+                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{session.gamesPlayed}</div>
+                  <div className="text-[10px] text-[var(--text-3)]">{minPerGame ? `เกม · ${minPerGame}น./เกม` : 'เกม'}</div>
+                </div>
+              )}
             </div>
-            {minPerGame && <div className="text-xs text-[var(--text-3)] tabular-nums text-right mt-0.5">{minPerGame} น./เกม</div>}
           </div>
         )}
         {/* Delete */}
