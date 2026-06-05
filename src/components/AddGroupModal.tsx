@@ -48,6 +48,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
   const [levels, setLevels] = useState<GroupLevel[]>(initialValues?.levels ?? []);
   const [image, setImage] = useState<string | undefined>(initialValues?.image);
   const [uploading, setUploading] = useState(false);
+  const [decodingImage, setDecodingImage] = useState(false);
 
   const toggleLevel = (lv: GroupLevel) =>
     setLevels(prev => prev.includes(lv) ? prev.filter(l => l !== lv) : [...prev, lv]);
@@ -55,6 +56,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setDecodingImage(true);
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
@@ -66,26 +68,33 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
         canvas.height = Math.round(img.height * scale);
         canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
         setImage(canvas.toDataURL('image/jpeg', 0.75));
+        setDecodingImage(false);
       };
+      img.onerror = () => setDecodingImage(false);
       img.src = reader.result as string;
     };
+    reader.onerror = () => setDecodingImage(false);
     reader.readAsDataURL(file);
   };
 
   const toggleDay = (day: DayOfWeek) =>
     setDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
 
+  const isBusy = uploading || decodingImage;
+
   const handleSave = () => {
-    if (!name.trim() || days.length === 0 || uploading) return;
+    if (!name.trim() || days.length === 0 || isBusy) return;
     if (image?.startsWith('data:')) setUploading(true);
     onClose();
     onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, image });
   };
 
+  const saveLabel = decodingImage ? 'กำลังโหลดรูป...' : uploading ? 'กำลังอัปโหลด...' : initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน';
+
   const saveButton = (
-    <button onClick={handleSave} disabled={!name.trim() || days.length === 0 || uploading}
+    <button onClick={handleSave} disabled={!name.trim() || days.length === 0 || isBusy}
       className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
-      {uploading ? 'กำลังอัปโหลด...' : initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
+      {saveLabel}
     </button>
   );
 
@@ -106,6 +115,10 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
           <div className="relative">
             <img src={image} alt="group" className="w-full h-36 object-cover rounded-xl" />
             <button type="button" onClick={() => setImage(undefined)} className="absolute top-2 right-2 bg-black/50 text-white w-7 h-7 rounded-full text-lg leading-none flex items-center justify-center hover:bg-black/70">×</button>
+          </div>
+        ) : decodingImage ? (
+          <div className="flex items-center justify-center w-full h-24 border-2 border-dashed border-[var(--dashed)] rounded-xl">
+            <span className="text-xs text-[var(--text-3)]">กำลังโหลดรูป...</span>
           </div>
         ) : (
           <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-[var(--dashed)] rounded-xl cursor-pointer hover:bg-[var(--hover-bg)] transition-colors">

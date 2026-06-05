@@ -6,9 +6,8 @@ export async function uploadGroupImage(uid: string, groupId: string, dataUrl: st
     const storageRef = ref(storage, `users/${uid}/groups/${groupId}.jpg`);
     await uploadString(storageRef, dataUrl, 'data_url');
     return getDownloadURL(storageRef);
-  } catch {
-    // Storage rules not deployed or quota exceeded — fall back to compressed base64.
-    // Re-compress to 400px / 0.6 quality to stay well under Firestore's 1MB limit.
+  } catch (err) {
+    console.warn('[Storage] upload failed, falling back to base64:', err);
     return compressToBase64(dataUrl, 400, 0.6);
   }
 }

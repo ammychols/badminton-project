@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { collection, doc, onSnapshot, setDoc, deleteDoc, deleteField, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Court, Group, Review } from '../types';
@@ -19,6 +19,9 @@ function toFs(group: Partial<Group>): Record<string, unknown> {
 
 export function useCourts(uid: string) {
   const [courts, setCourts] = useState<Court[]>([]);
+  // Always-current ref so async functions read fresh state after awaits.
+  const courtsRef = useRef<Court[]>([]);
+  courtsRef.current = courts;
 
   useEffect(() => {
     if (!uid) return;
@@ -28,7 +31,8 @@ export function useCourts(uid: string) {
   }, [uid]);
 
   const ref = (courtId: string) => doc(db, 'users', uid, 'courts', courtId);
-  const get = (courtId: string) => courts.find(c => c.id === courtId);
+  // Always reads from the latest snapshot via ref, safe to call after awaits.
+  const get = (courtId: string) => courtsRef.current.find(c => c.id === courtId);
 
   const addCourt = (data: Omit<Court, 'id' | 'createdAt' | 'groups'>) => {
     const id = crypto.randomUUID();
@@ -53,19 +57,17 @@ export function useCourts(uid: string) {
   };
 
   const addGroup = async (courtId: string, group: Omit<Group, 'id' | 'courtId' | 'reviews'>) => {
-    const court = get(courtId);
-    if (!court) return;
     const groupId = crypto.randomUUID();
     const image = await resolveImage(uid, groupId, group.image);
+    // Read court AFTER the Storage await so we get the freshest groups list.
+    const court = get(courtId);
+    if (!court) return;
     const newGroup = toFs({ ...group, image, id: groupId, courtId, reviews: [] });
     await setDoc(ref(courtId), { groups: [...court.groups.map(toFs), newGroup] }, { merge: true });
     return newGroup as unknown as Group;
   };
 
   const updateGroup = async (courtId: string, groupId: string, data: Partial<Group>) => {
-    const court = get(courtId);
-    if (!court) return;
-
     const removingImage = 'image' in data && !data.image;
     const changingImage = 'image' in data && !!data.image;
     let newImageUrl: string | undefined;
@@ -75,6 +77,10 @@ export function useCourts(uid: string) {
     } else if (changingImage) {
       newImageUrl = await resolveImage(uid, groupId, data.image);
     }
+
+    // Read court AFTER the Storage await so we get the freshest groups list.
+    const court = get(courtId);
+    if (!court) return;
 
     // Separate image from the rest of the patch
     const { image: _img, ...rest } = data;
@@ -103,10 +109,7 @@ export function useCourts(uid: string) {
   const addReview = (courtId: string, groupId: string, review: Omit<Review, 'id' | 'groupId'>) => {
     const court = get(courtId);
     if (!court) return;
-    if (!review.notes) {
-      setDoc(ref(courtId), { groups: court.groups.map(g => toFs({ ...g, ...(g.id === groupId ? { reviews: [] } : {}) })) }, { merge: true });
-      return;
-    }
+    if (!review.notes) return;
     const newReview = { ...review, id: crypto.randomUUID(), groupId };
     setDoc(ref(courtId), {
       groups: court.groups.map(g => toFs({ ...g, ...(g.id === groupId ? { reviews: [newReview] } : {}) })),
