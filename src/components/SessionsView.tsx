@@ -294,9 +294,9 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           {hasTime && durLabel && metaDivider}
           {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
           {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
-          {session.gamesPlayed > 0 && <span className="font-semibold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} <span className="font-normal text-[var(--text-3)]">เกม</span></span>}
+          {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} <span className="font-normal text-[var(--text-3)]">เกม</span></span>}
           {minPerGame && metaDivider}
-          {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} น./เกม</span>}
+          {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
         </div>
       )}
     </div>
