@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Court, Session, DayOfWeek } from '../types';
+import { Court, Session, DayOfWeek, Intensity, ALL_INTENSITIES, INTENSITY_LABELS, INTENSITY_EMOJIS } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
 
@@ -170,6 +170,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | 6>(initialSession?.mood ?? 3);
+  const [intensity, setIntensity] = useState<Intensity | undefined>(initialSession?.intensity);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
@@ -201,7 +202,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const handleSave = () => {
     if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
     onClose();
-    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, notes: notes.trim() || undefined });
+    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, notes: notes.trim() || undefined });
   };
 
   const saveButton = (
@@ -281,6 +282,22 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
             <button key={m} type="button" onClick={() => setMood(m)}
               className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[var(--p)] scale-105' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Intensity */}
+      <div className="mb-4">
+        <label className={text.label}>ความหนัก</label>
+        <div className="flex gap-2">
+          {ALL_INTENSITIES.map(lv => (
+            <button key={lv} type="button" onClick={() => setIntensity(prev => prev === lv ? undefined : lv)}
+              className={`flex-1 py-2.5 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
+                intensity === lv ? 'bg-[var(--p)] text-white scale-105' : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
+              }`}>
+              <span className="text-xs">{INTENSITY_EMOJIS[lv]}</span>
+              {INTENSITY_LABELS[lv]}
             </button>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Court, Session } from '../types';
+import { Court, Session, INTENSITY_LABELS } from '../types';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
 interface SessionsViewProps {
@@ -184,6 +184,12 @@ function thisMonthString() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+const INTENSITY_CHIP: Record<string, string> = {
+  light: 'bg-emerald-50 text-emerald-600',
+  medium: 'bg-amber-50 text-amber-600',
+  heavy: 'bg-red-50 text-red-500',
+};
+
 const MOOD_BUBBLE: Record<number, string> = {
   1: 'bg-red-50',
   2: 'bg-slate-100',
@@ -245,8 +251,13 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
             <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
           </div>
-          <div className="text-xs text-[var(--text-3)] mt-0.5 truncate">
-            {hasTime ? `${session.startTime} – ${session.endTime}` : '—'}
+          <div className="text-xs text-[var(--text-3)] mt-0.5 flex items-center gap-1.5">
+            <span className="truncate">{hasTime ? `${session.startTime} – ${session.endTime}` : '—'}</span>
+            {session.intensity && (
+              <span className={`flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${INTENSITY_CHIP[session.intensity]}`}>
+                {INTENSITY_LABELS[session.intensity]}
+              </span>
+            )}
           </div>
         </div>
         {/* Note — desktop only inline */}
