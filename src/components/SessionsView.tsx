@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Court, Session } from '../types';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
@@ -438,6 +438,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [insightIdx, setInsightIdx] = useState(0);
+  const insightTouchX = useRef<number | null>(null);
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -464,12 +465,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     if (!q) return true;
     return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
   });
-  // Desktop list: show all sessions (not month-filtered), search still works
-  const allViewedSessions = sessions.filter(s => {
-    if (!q) return true;
-    return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
-  });
-
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
   const thisMonthSessions = sessions.filter(s => s.date.startsWith(thisMonth));
@@ -510,8 +505,15 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     slate:   { wrap: 'bg-slate-200 border-slate-300',     text: 'text-slate-700',   btn: 'text-slate-600 hover:text-slate-900'     },
   };
 
-  const insights = computeInsights(sessions, getCourtName, getGroupName);
+  const insights = useMemo(
+    () => computeInsights(sessions, getCourtName, getGroupName),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sessions, courts]
+  );
   const activeInsight = insights.length > 0 ? insights[insightIdx % insights.length] : null;
+  React.useEffect(() => {
+    setInsightIdx(0);
+  }, [insights.length]);
   React.useEffect(() => {
     if (insights.length <= 1) return;
     const t = setInterval(() => setInsightIdx(i => i + 1), 4000);
@@ -681,7 +683,18 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
         </div>
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {activeInsight && (
-          <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}>
+          <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
+            style={{ touchAction: 'pan-y' }}
+            onTouchStart={e => { insightTouchX.current = e.touches[0].clientX; }}
+            onTouchEnd={e => {
+              if (insightTouchX.current === null) return;
+              const dx = e.changedTouches[0].clientX - insightTouchX.current;
+              insightTouchX.current = null;
+              if (Math.abs(dx) < 40) return;
+              if (dx < 0) setInsightIdx(i => i + 1);
+              else setInsightIdx(i => (i - 1 + insights.length) % insights.length);
+            }}
+          >
             <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
               <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
               <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
