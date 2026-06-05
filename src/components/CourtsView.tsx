@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
 import { CourtsMap } from './CourtsMap';
 import { btn, emptyState, text } from '../styles/tokens';
@@ -49,6 +49,17 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
   });
 
   const selectedCourt = filteredCourts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
+
+  // Reset day filter when a group is added so the new group stays visible
+  const prevGroupCount = useRef<number | null>(null);
+  const groupCount = selectedCourt?.groups.length ?? 0;
+  useEffect(() => {
+    if (prevGroupCount.current !== null && groupCount > prevGroupCount.current) {
+      setSelectedDay('all');
+    }
+    prevGroupCount.current = groupCount;
+  }, [groupCount]);
+
   const visibleGroups = selectedCourt
     ? (selectedDay === 'all' ? selectedCourt.groups : selectedCourt.groups.filter(g => g.days.includes(selectedDay as DayOfWeek)))
     : [];
