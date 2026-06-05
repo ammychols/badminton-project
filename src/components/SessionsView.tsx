@@ -241,7 +241,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   return (
     <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md p-4 transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)]">
       {/* Header: mood + group/court + delete */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-stretch gap-3">
         <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
           {MOOD_EMOJIS[session.mood]}
         </div>
@@ -259,7 +259,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           )}
         </div>
         {session.image && (
-          <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={onEdit}>
+          <div className="w-24 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer self-stretch" onClick={onEdit}>
             <img src={session.image} alt="session" className="w-full h-full object-cover" />
           </div>
         )}
