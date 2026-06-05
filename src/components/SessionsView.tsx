@@ -258,19 +258,17 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             </div>
           )}
         </div>
+        {session.image && (
+          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={onEdit}>
+            <img src={session.image} alt="session" className="w-full h-full object-cover" />
+          </div>
+        )}
         <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </button>
       </div>
-
-      {/* Photo */}
-      {session.image && (
-        <div className="mt-3 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
-          <img src={session.image} alt="session" className="w-full max-h-24 object-cover" />
-        </div>
-      )}
 
       {/* Note — full text, the hero of the card */}
       <div className="mt-3">
