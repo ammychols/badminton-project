@@ -274,7 +274,12 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {(durLabel || session.gamesPlayed > 0) && (
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
             {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
-            {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5 tabular-nums">{session.gamesPlayed} เกม{minPerGame ? ` · ${minPerGame}น./เกม` : ''}</div>}
+            {session.gamesPlayed > 0 && (
+              <div className="mt-0.5 tabular-nums flex flex-col items-end gap-0">
+                <span className="text-xs text-[var(--text-2)] font-medium">{session.gamesPlayed} เกม</span>
+                {minPerGame && <span className="text-xs text-[var(--text-3)]">{minPerGame} น./เกม</span>}
+              </div>
+            )}
           </div>
         )}
         {/* Delete */}
@@ -428,6 +433,22 @@ function computeInsights(
     const avgH = Math.round(timed.map(s => Number(s.startTime.split(':')[0])).reduce((a, b) => a + b, 0) / timed.length);
     const tl = avgH < 12 ? 'ช่วงเช้า' : avgH < 17 ? 'ช่วงบ่าย' : avgH < 20 ? 'ช่วงเย็น' : 'ช่วงค่ำ';
     out.push({ emoji: '⏰', text: `ชอบตี${tl} (เริ่มเฉลี่ย ${String(avgH).padStart(2, '0')}:00 น.)` });
+  }
+
+  // Longest wait (max min/game) — sessions with both time and games recorded
+  const withMpg = sessions
+    .filter(s => s.gamesPlayed > 0 && !(s.startTime === '00:00' && s.endTime === '00:00'))
+    .map(s => {
+      const [sh, sm] = s.startTime.split(':').map(Number);
+      const [eh, em] = s.endTime.split(':').map(Number);
+      let dur = (eh * 60 + em) - (sh * 60 + sm);
+      if (dur <= 0) dur += 24 * 60;
+      return { mpg: Math.round(dur / s.gamesPlayed), courtId: s.courtId, groupId: s.groupId };
+    });
+  if (withMpg.length >= 3) {
+    const top = withMpg.reduce((a, b) => b.mpg > a.mpg ? b : a);
+    if (top.mpg >= 30)
+      out.push({ emoji: '⏳', text: `รอนานสุดเคยถึง ${top.mpg} นาที/เกม — ${getGroupName(top.courtId, top.groupId)}` });
   }
 
   return out;
