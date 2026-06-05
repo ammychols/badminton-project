@@ -257,7 +257,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   return (
     <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
       {/* Left: all content */}
-      <div className="flex-1 min-w-0 flex flex-col p-4">
+      <div className="flex-1 min-w-0 flex flex-col p-5">
         {/* Header */}
         <div className="flex items-start gap-3">
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
@@ -330,7 +330,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Right: photo — full card height with margin */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
-        <div className="relative aspect-[16/7] sm:aspect-auto sm:w-36 flex-shrink-0 sm:m-2 rounded-none sm:rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
+        <div className="relative aspect-[16/7] sm:aspect-auto sm:w-48 flex-shrink-0 sm:m-2 rounded-none sm:rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
           <button
             type="button"
