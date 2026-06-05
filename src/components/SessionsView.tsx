@@ -283,7 +283,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               {session.gamesPlayed > 0 && (
                 <div className="text-right">
                   <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{session.gamesPlayed} <span className="text-xs font-normal text-[var(--text-3)]">เกม</span></div>
-                  {minPerGame && <div className="text-[10px] text-[var(--text-3)]">{minPerGame} น./เกม</div>}
+                  {minPerGame && <div className="text-xs text-[var(--text-3)]">{minPerGame} น./เกม</div>}
                 </div>
               )}
             </div>
