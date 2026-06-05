@@ -1,0 +1,13 @@
+[
+  {
+    "origin": ["https://ammychols.github.io"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "x-goog-resumable",
+      "x-goog-meta-firebaseStorageDownloadTokens"
+    ]
+  }
+]
