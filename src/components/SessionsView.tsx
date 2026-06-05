@@ -275,18 +275,15 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
             <div className="flex items-center justify-end gap-2 leading-tight">
               {durLabel && (
-                <div className="text-right">
-                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{durLabel}</div>
-                  <div className="text-[10px] text-[var(--text-3)]">เวลา</div>
-                </div>
+                <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{durLabel}</div>
               )}
               {durLabel && session.gamesPlayed > 0 && (
                 <div className="w-px h-6 bg-[var(--card-border)]" />
               )}
               {session.gamesPlayed > 0 && (
                 <div className="text-right">
-                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{session.gamesPlayed}</div>
-                  <div className="text-[10px] text-[var(--text-3)]">{minPerGame ? `เกม · ${minPerGame}น./เกม` : 'เกม'}</div>
+                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{session.gamesPlayed} <span className="text-xs font-normal text-[var(--text-3)]">เกม</span></div>
+                  {minPerGame && <div className="text-[10px] text-[var(--text-3)]">{minPerGame} น./เกม</div>}
                 </div>
               )}
             </div>
