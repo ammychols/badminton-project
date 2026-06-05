@@ -268,7 +268,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Photo */}
       {session.image && (
         <div className="mt-3 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
-          <img src={session.image} alt="session" className="w-full max-h-36 object-cover" />
+          <img src={session.image} alt="session" className="w-full max-h-24 object-cover" />
         </div>
       )}
 
