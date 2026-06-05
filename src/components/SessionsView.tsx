@@ -12,6 +12,8 @@ interface SessionsViewProps {
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
+  gender: 'male' | 'female' | null;
+  onSetGender: (g: 'male' | 'female' | null) => void;
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
@@ -218,143 +220,295 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
-function AvatarCard({ totalSessions }: { totalSessions: number }) {
+/* ── Racket SVG helper used inside both avatars ── */
+function RacketInHand() {
+  /* Ellipse cx=16 cy=43 rx=14 ry=19 unrotated — strings clipped manually */
+  return (
+    <g>
+      {/* Handle */}
+      <line x1="23" y1="64" x2="31" y2="89" stroke="#8B4513" strokeWidth="7" strokeLinecap="round" />
+      {/* Rotated frame + strings */}
+      <g transform="rotate(-15 16 43)">
+        {/* String grid — endpoints pre-computed to stay inside ellipse */}
+        <line x1="9"  y1="27" x2="23" y2="27" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="3"  y1="35" x2="29" y2="35" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="2"  y1="43" x2="30" y2="43" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="3"  y1="51" x2="29" y2="51" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="9"  y1="59" x2="23" y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="8"  y1="27" x2="8"  y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="16" y1="24" x2="16" y2="62" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        <line x1="24" y1="27" x2="24" y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
+        {/* Frame drawn on top of strings */}
+        <ellipse cx="16" cy="43" rx="14" ry="19" stroke="#8B4513" strokeWidth="2.5" fill="#FEF3C7" fillOpacity="0.22" />
+      </g>
+    </g>
+  );
+}
+
+function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
+  const h = Math.round(width * 1.2);
+  return (
+    <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Shadow */}
+      <ellipse cx="100" cy="233" rx="36" ry="7" fill="#DDE1EC" />
+
+      {/* Shoes */}
+      <rect x="73" y="212" width="23" height="14" rx="7" fill="#3D4451" />
+      <rect x="104" y="212" width="23" height="14" rx="7" fill="#3D4451" />
+      <rect x="73" y="212" width="23" height="7" rx="3.5" fill="#252C3B" />
+      <rect x="104" y="212" width="23" height="7" rx="3.5" fill="#252C3B" />
+
+      {/* Socks */}
+      <rect x="77" y="200" width="16" height="15" rx="5" fill="white" />
+      <rect x="107" y="200" width="16" height="15" rx="5" fill="white" />
+
+      {/* Legs */}
+      <rect x="79" y="172" width="14" height="33" rx="7" fill="#FBBF8A" />
+      <rect x="107" y="172" width="14" height="33" rx="7" fill="#FBBF8A" />
+
+      {/* Casual skirt — light lilac */}
+      <rect x="63" y="160" width="74" height="20" rx="10" fill="#DDD6FE" />
+      <rect x="63" y="160" width="74" height="11" rx="7"  fill="#E9D5FF" />
+
+      {/* Casual T-shirt — soft pink */}
+      <rect x="66" y="118" width="68" height="52" rx="20" fill="#FDA4AF" />
+      {/* Simple scoop neck */}
+      <ellipse cx="100" cy="122" rx="14" ry="8" fill="#FBB6C2" />
+
+      {/* Racket (drawn before arm so arm overlaps handle top) */}
+      <RacketInHand />
+
+      {/* Left arm — raised, holding racket. Thick bezier stroke = connected limb */}
+      <path d="M 74 130 C 56 116 40 104 30 88" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      <circle cx="30" cy="88" r="11" fill="#FBBF8A" />
+
+      {/* Right arm — relaxed at side */}
+      <path d="M 126 130 C 144 142 154 156 158 167" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      <circle cx="158" cy="169" r="11" fill="#FBBF8A" />
+
+      {/* Shirt hem overlaps skirt waistband */}
+      <rect x="63" y="157" width="74" height="14" rx="7" fill="#FDA4AF" />
+
+      {/* Neck */}
+      <rect x="89" y="106" width="22" height="20" rx="9" fill="#FBBF8A" />
+
+      {/* Head */}
+      <circle cx="100" cy="68" r="48" fill="#FBBF8A" />
+
+      {/* Hair back */}
+      <path d="M 52 68 Q 50 20 100 14 Q 150 20 148 68" fill="#1A1A2E" />
+      <ellipse cx="53" cy="74" rx="9" ry="18" fill="#1A1A2E" transform="rotate(-5 53 74)" />
+      <ellipse cx="147" cy="74" rx="9" ry="18" fill="#1A1A2E" transform="rotate(5 147 74)" />
+
+      {/* Cute hair bow clip — not sporty, just accessory */}
+      <rect x="52" y="52" width="96" height="11" rx="5.5" fill="#C4B5FD" />
+      <path d="M 100 45 L 90 52 L 100 59 L 110 52 Z" fill="#FDA4AF" />
+      <circle cx="100" cy="52" r="4" fill="#FBCFE8" />
+
+      {/* Hair front / bangs */}
+      <path d="M 52 58 Q 56 40 70 36" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
+      <path d="M 148 58 Q 144 40 130 36" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
+      <path d="M 70 36 Q 84 28 100 30 Q 116 28 130 36" stroke="#1A1A2E" strokeWidth="10" strokeLinecap="round" fill="none" />
+      <path d="M 68 50 Q 74 36 82 44" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 78 44 Q 88 30 97 42" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+
+      {/* Eye whites */}
+      <ellipse cx="82" cy="74" rx="11" ry="12" fill="white" />
+      <ellipse cx="118" cy="74" rx="11" ry="12" fill="white" />
+      {/* Iris */}
+      <circle cx="82" cy="76" r="8" fill="#4A90D9" />
+      <circle cx="118" cy="76" r="8" fill="#4A90D9" />
+      {/* Pupils */}
+      <circle cx="83" cy="77" r="5" fill="#1A1A2E" />
+      <circle cx="119" cy="77" r="5" fill="#1A1A2E" />
+      {/* Shines */}
+      <circle cx="85" cy="74" r="2.5" fill="white" />
+      <circle cx="121" cy="74" r="2.5" fill="white" />
+      <circle cx="80" cy="79" r="1.2" fill="white" />
+      <circle cx="116" cy="79" r="1.2" fill="white" />
+      {/* Eyelashes */}
+      <path d="M 71 66 Q 82 62 93 66" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M 107 66 Q 118 62 129 66" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+      {/* Eyebrows */}
+      <path d="M 72 61 Q 82 57 92 60" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <path d="M 108 60 Q 118 57 128 61" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
+
+      {/* Nose */}
+      <path d="M 97 85 Q 100 89 103 85" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+      {/* Mouth */}
+      <path d="M 91 94 Q 100 102 109 94" fill="white" />
+      <path d="M 88 94 Q 100 105 112 94" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+      {/* Cheeks */}
+      <ellipse cx="70" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.5" />
+      <ellipse cx="130" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.5" />
+
+      {/* Sparkles */}
+      <text x="155" y="28" fontSize="14" fill="#FFD700">✦</text>
+      <text x="168" y="48" fontSize="9"  fill="#FFD700">✦</text>
+      <text x="148" y="16" fontSize="8"  fill="#FDA4AF">✦</text>
+    </svg>
+  );
+}
+
+function MaleAvatarSVG({ width = 200 }: { width?: number }) {
+  const h = Math.round(width * 1.2);
+  return (
+    <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Shadow */}
+      <ellipse cx="100" cy="233" rx="36" ry="7" fill="#DDE1EC" />
+
+      {/* Shoes */}
+      <rect x="73" y="212" width="23" height="14" rx="7" fill="#3D4451" />
+      <rect x="104" y="212" width="23" height="14" rx="7" fill="#3D4451" />
+      <rect x="73" y="212" width="23" height="7" rx="3.5" fill="#252C3B" />
+      <rect x="104" y="212" width="23" height="7" rx="3.5" fill="#252C3B" />
+
+      {/* Socks */}
+      <rect x="77" y="200" width="16" height="15" rx="5" fill="white" />
+      <rect x="107" y="200" width="16" height="15" rx="5" fill="white" />
+
+      {/* Legs */}
+      <rect x="79" y="172" width="14" height="33" rx="7" fill="#FBBF8A" />
+      <rect x="107" y="172" width="14" height="33" rx="7" fill="#FBBF8A" />
+
+      {/* Casual shorts — dark gray */}
+      <rect x="63" y="160" width="74" height="20" rx="10" fill="#4B5563" />
+      <rect x="63" y="160" width="74" height="11" rx="7"  fill="#6B7280" />
+      {/* Center seam */}
+      <line x1="100" y1="161" x2="100" y2="180" stroke="#374151" strokeWidth="1.5" />
+
+      {/* Casual T-shirt — sky blue */}
+      <rect x="66" y="118" width="68" height="52" rx="20" fill="#7DD3FC" />
+      {/* Crew neck */}
+      <ellipse cx="100" cy="122" rx="13" ry="7.5" fill="#60C4F4" />
+
+      {/* Racket (drawn before arm) */}
+      <RacketInHand />
+
+      {/* Left arm — raised, holding racket */}
+      <path d="M 74 130 C 56 116 40 104 30 88" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      <circle cx="30" cy="88" r="11" fill="#FBBF8A" />
+
+      {/* Right arm — relaxed at side */}
+      <path d="M 126 130 C 144 142 154 156 158 167" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      <circle cx="158" cy="169" r="11" fill="#FBBF8A" />
+
+      {/* Shirt hem */}
+      <rect x="63" y="157" width="74" height="14" rx="7" fill="#7DD3FC" />
+
+      {/* Neck */}
+      <rect x="89" y="106" width="22" height="20" rx="9" fill="#FBBF8A" />
+
+      {/* Head */}
+      <circle cx="100" cy="68" r="48" fill="#FBBF8A" />
+
+      {/* Hair back — shorter/rounder for male */}
+      <path d="M 56 70 Q 54 24 100 18 Q 146 24 144 70" fill="#1A1A2E" />
+      <ellipse cx="57" cy="72" rx="8" ry="13" fill="#1A1A2E" transform="rotate(-5 57 72)" />
+      <ellipse cx="143" cy="72" rx="8" ry="13" fill="#1A1A2E" transform="rotate(5 143 72)" />
+
+      {/* No headband — just natural hair */}
+
+      {/* Hair front — short, spiky male style */}
+      <path d="M 56 60 Q 60 44 72 40" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M 144 60 Q 140 44 128 40" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M 72 40 Q 86 32 100 34 Q 114 32 128 40" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
+      {/* Short spiky bangs */}
+      <path d="M 70 52 Q 78 38 88 46" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M 90 44 Q 98 34 108 44" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
+
+      {/* Eye whites — slightly less tall for masculine look */}
+      <ellipse cx="82" cy="75" rx="11" ry="11" fill="white" />
+      <ellipse cx="118" cy="75" rx="11" ry="11" fill="white" />
+      {/* Iris — warm brown */}
+      <circle cx="82" cy="76" r="8" fill="#5B3925" />
+      <circle cx="118" cy="76" r="8" fill="#5B3925" />
+      {/* Pupils */}
+      <circle cx="83" cy="77" r="5" fill="#1A1A2E" />
+      <circle cx="119" cy="77" r="5" fill="#1A1A2E" />
+      {/* Shines */}
+      <circle cx="85" cy="74" r="2.5" fill="white" />
+      <circle cx="121" cy="74" r="2.5" fill="white" />
+      <circle cx="80" cy="79" r="1.2" fill="white" />
+      <circle cx="116" cy="79" r="1.2" fill="white" />
+
+      {/* Eyebrows — straighter, slightly thicker for male */}
+      <path d="M 72 62 Q 82 58 92 62" stroke="#1A1A2E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <path d="M 108 62 Q 118 58 128 62" stroke="#1A1A2E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+
+      {/* Nose */}
+      <path d="M 97 86 Q 100 90 103 86" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+      {/* Mouth */}
+      <path d="M 90 94 Q 100 102 110 94" fill="white" />
+      <path d="M 87 94 Q 100 106 113 94" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+      {/* Sparkles */}
+      <text x="155" y="28" fontSize="14" fill="#FFD700">✦</text>
+      <text x="168" y="48" fontSize="9"  fill="#FFD700">✦</text>
+      <text x="148" y="16" fontSize="8"  fill="#BAE6FD">✦</text>
+    </svg>
+  );
+}
+
+function AvatarCard({ totalSessions, gender, onSetGender }: {
+  totalSessions: number;
+  gender: 'male' | 'female' | null;
+  onSetGender: (g: 'male' | 'female' | null) => void;
+}) {
+  if (gender === null) {
+    return (
+      <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
+        <div className="px-5 pt-5 pb-6">
+          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">Avatar</div>
+          <div className="text-sm font-semibold text-[var(--text-1)] mb-0.5">เลือก Avatar ของคุณ</div>
+          <div className="text-xs text-[var(--text-3)] mb-5">กดเลือกตัวละครประจำตัว</div>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => onSetGender('male')}
+              className="flex flex-col items-center gap-2 pt-3 pb-3 rounded-2xl border-2 border-[var(--card-border)] hover:border-[var(--p)] hover:bg-[var(--chip-bg)] transition-all active:scale-95"
+            >
+              <MaleAvatarSVG width={84} />
+              <span className="text-sm font-semibold text-[var(--text-1)]">ชาย</span>
+            </button>
+            <button
+              onClick={() => onSetGender('female')}
+              className="flex flex-col items-center gap-2 pt-3 pb-3 rounded-2xl border-2 border-[var(--card-border)] hover:border-[var(--p)] hover:bg-[var(--chip-bg)] transition-all active:scale-95"
+            >
+              <FemaleAvatarSVG width={84} />
+              <span className="text-sm font-semibold text-[var(--text-1)]">หญิง</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
       <div className="px-5 pt-5 pb-2">
         <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">Avatar</div>
-        <div className="text-sm font-semibold text-[var(--text-1)]">มือใหม่หัดตี</div>
-        <div className="text-xs text-[var(--text-3)] mt-0.5">{totalSessions} session{totalSessions !== 1 ? 's' : ''}</div>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-sm font-semibold text-[var(--text-1)]">มือใหม่หัดตี</div>
+            <div className="text-xs text-[var(--text-3)] mt-0.5">{totalSessions} session{totalSessions !== 1 ? 's' : ''}</div>
+          </div>
+          <button
+            onClick={() => onSetGender(null)}
+            className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors py-0.5 px-1.5 rounded-lg hover:bg-[var(--chip-bg)]"
+          >
+            เปลี่ยน
+          </button>
+        </div>
       </div>
 
-      {/* Character — chibi 16P style */}
-      <div className="flex justify-center pt-2 pb-1">
-        <svg width="200" height="240" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-          {/* ── Shadow ── */}
-          <ellipse cx="100" cy="232" rx="38" ry="7" fill="#DDE1EC" />
-
-          {/* ── Shoes ── */}
-          <rect x="64" y="208" width="26" height="13" rx="6.5" fill="#4A5568" />
-          <rect x="64" y="208" width="26" height="7" rx="3.5" fill="#2D3748" />
-          <rect x="110" y="208" width="26" height="13" rx="6.5" fill="#4A5568" />
-          <rect x="110" y="208" width="26" height="7" rx="3.5" fill="#2D3748" />
-
-          {/* ── Socks ── */}
-          <rect x="68" y="196" width="18" height="16" rx="5" fill="white" />
-          <rect x="114" y="196" width="18" height="16" rx="5" fill="white" />
-
-          {/* ── Legs ── */}
-          <rect x="69" y="170" width="16" height="32" rx="8" fill="#FBBF8A" />
-          <rect x="115" y="170" width="16" height="32" rx="8" fill="#FBBF8A" />
-
-          {/* ── Skirt / Shorts ── */}
-          <rect x="60" y="160" width="80" height="26" rx="10" fill="#6C63FF" />
-          <rect x="60" y="160" width="80" height="12" rx="10" fill="#7C74FF" />
-          <rect x="97" y="160" width="6" height="26" fill="#6C63FF" />
-
-          {/* ── Body / Shirt ── */}
-          <rect x="58" y="112" width="84" height="56" rx="18" fill="#FF6B8A" />
-          {/* Collar */}
-          <path d="M88 112 L100 126 L112 112" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
-          {/* Shirt detail lines */}
-          <line x1="72" y1="130" x2="88" y2="130" stroke="#FF8FAA" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="72" y1="138" x2="85" y2="138" stroke="#FF8FAA" strokeWidth="1.5" strokeLinecap="round" />
-
-          {/* ── Left arm (raised — holding racket) ── */}
-          <rect x="34" y="108" width="30" height="16" rx="8" fill="#FBBF8A" transform="rotate(-40 34 108)" />
-          {/* Left hand */}
-          <circle cx="30" cy="88" r="9" fill="#FBBF8A" />
-
-          {/* ── Racket ── */}
-          {/* Handle */}
-          <rect x="14" y="58" width="7" height="36" rx="3.5" fill="#92400E" transform="rotate(-15 14 58)" />
-          {/* Frame */}
-          <ellipse cx="18" cy="44" rx="16" ry="21" fill="none" stroke="#92400E" strokeWidth="3.5" transform="rotate(-15 18 44)" />
-          {/* Strings horizontal */}
-          <line x1="4" y1="36" x2="32" y2="36" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-          <line x1="3" y1="43" x2="33" y2="43" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-          <line x1="4" y1="50" x2="32" y2="50" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-          {/* Strings vertical */}
-          <line x1="10" y1="25" x2="10" y2="63" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-          <line x1="18" y1="23" x2="18" y2="65" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-          <line x1="26" y1="25" x2="26" y2="63" stroke="#92400E" strokeWidth="1" strokeOpacity="0.6" transform="rotate(-15 18 44)" />
-
-          {/* ── Right arm (slightly raised) ── */}
-          <rect x="138" y="116" width="30" height="16" rx="8" fill="#FBBF8A" transform="rotate(20 138 116)" />
-          {/* Right hand */}
-          <circle cx="162" cy="124" r="9" fill="#FBBF8A" />
-
-          {/* ── Neck ── */}
-          <rect x="88" y="96" width="24" height="20" rx="8" fill="#FBBF8A" />
-
-          {/* ── Head ── */}
-          <circle cx="100" cy="66" r="50" fill="#FBBF8A" />
-
-          {/* ── Hair (back layer) ── */}
-          <path d="M50 66 Q48 20 100 14 Q152 20 150 66" fill="#1A1A2E" />
-          {/* Side hair tufts */}
-          <ellipse cx="52" cy="72" rx="10" ry="16" fill="#1A1A2E" transform="rotate(-10 52 72)" />
-          <ellipse cx="148" cy="72" rx="10" ry="16" fill="#1A1A2E" transform="rotate(10 148 72)" />
-
-          {/* ── Headband ── */}
-          <rect x="50" y="50" width="100" height="14" rx="7" fill="#6C63FF" />
-          {/* Headband bow */}
-          <path d="M100 43 L90 50 L100 57 L110 50 Z" fill="#FF6B8A" />
-          <circle cx="100" cy="50" r="4" fill="#FF9AB5" />
-
-          {/* ── Hair (front layer) ── */}
-          <path d="M50 57 Q54 40 68 36" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
-          <path d="M150 57 Q146 40 132 36" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
-          <path d="M68 36 Q80 30 100 32" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
-          {/* Front bangs */}
-          <path d="M70 50 Q75 38 82 44" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
-          <path d="M80 46 Q88 33 96 42" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
-
-          {/* ── Eyes ── */}
-          {/* Eye whites */}
-          <ellipse cx="82" cy="72" rx="11" ry="12" fill="white" />
-          <ellipse cx="118" cy="72" rx="11" ry="12" fill="white" />
-          {/* Iris */}
-          <circle cx="82" cy="74" r="8" fill="#4A90D9" />
-          <circle cx="118" cy="74" r="8" fill="#4A90D9" />
-          {/* Pupil */}
-          <circle cx="83" cy="75" r="5" fill="#1A1A2E" />
-          <circle cx="119" cy="75" r="5" fill="#1A1A2E" />
-          {/* Eye shine large */}
-          <circle cx="85" cy="72" r="2.5" fill="white" />
-          <circle cx="121" cy="72" r="2.5" fill="white" />
-          {/* Eye shine small */}
-          <circle cx="80" cy="77" r="1.2" fill="white" />
-          <circle cx="116" cy="77" r="1.2" fill="white" />
-          {/* Eyelashes top */}
-          <path d="M71 64 Q82 60 93 64" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-          <path d="M107 64 Q118 60 129 64" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-
-          {/* ── Eyebrows ── */}
-          <path d="M72 60 Q82 55 92 59" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
-          <path d="M108 59 Q118 55 128 60" stroke="#1A1A2E" strokeWidth="3" strokeLinecap="round" fill="none" />
-
-          {/* ── Nose ── */}
-          <path d="M97 83 Q100 87 103 83" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-          {/* ── Mouth ── */}
-          <path d="M88 93 Q100 103 112 93" stroke="#1A1A2E" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-          {/* Teeth hint */}
-          <path d="M91 93 Q100 100 109 93" fill="white" />
-
-          {/* ── Cheeks ── */}
-          <ellipse cx="70" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.55" />
-          <ellipse cx="130" cy="86" rx="11" ry="7" fill="#FFB3C1" opacity="0.55" />
-
-          {/* ── Sparkles ── */}
-          <text x="155" y="30" fontSize="14" fill="#FFD700">✦</text>
-          <text x="168" y="50" fontSize="9" fill="#FFD700">✦</text>
-          <text x="148" y="18" fontSize="8" fill="#FF9AB5">✦</text>
-        </svg>
+      <div className="flex justify-center pt-1 pb-1">
+        {gender === 'female' ? <FemaleAvatarSVG /> : <MaleAvatarSVG />}
       </div>
 
-      {/* Progress */}
       <div className="px-5 pb-5">
         <div className="flex justify-between text-xs text-[var(--text-3)] mb-1.5">
           <span>ไปอีก {Math.max(0, 5 - totalSessions)} sessions จะ evolve!</span>
@@ -678,7 +832,7 @@ function computeInsights(
   return out;
 }
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, gender, onSetGender }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -903,7 +1057,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
 
         {/* Col 3: Avatar card */}
         <div className="w-[240px] flex-shrink-0">
-          <AvatarCard totalSessions={sessions.length} />
+          <AvatarCard totalSessions={sessions.length} gender={gender} onSetGender={onSetGender} />
         </div>
       </div>
 
