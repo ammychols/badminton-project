@@ -166,14 +166,14 @@ export default function App() {
         }} />
       )}
       {modal?.type === 'addGroup' && modal.courtId && activeCourt && (
-        <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { closeModal(); addGroup(modal.courtId!, data); }} />
+        <AddGroupModal courtName={activeCourt.name} defaultDay={modal.defaultDay} onClose={closeModal} onSave={data => { closeModal(); addGroup(modal.courtId!, data).catch(console.error); }} />
       )}
       {modal?.type === 'editGroup' && modal.courtId && modal.groupId && activeCourt && activeGroup && (
         <AddGroupModal
           courtName={activeCourt.name}
           initialValues={{ name: activeGroup.name, days: activeGroup.days, startTime: activeGroup.startTime, endTime: activeGroup.endTime, levels: activeGroup.levels, notes: activeGroup.notes, image: activeGroup.image }}
           onClose={closeModal}
-          onSave={data => { closeModal(); updateGroup(modal.courtId!, modal.groupId!, data); }}
+          onSave={data => { closeModal(); updateGroup(modal.courtId!, modal.groupId!, data).catch(console.error); }}
         />
       )}
       {modal?.type === 'courtInfo' && modal.courtId && activeCourt && (

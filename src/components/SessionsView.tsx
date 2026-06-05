@@ -456,7 +456,6 @@ function computeInsights(
 
 export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote }: SessionsViewProps) {
   const today = todayString();
-  const thisMonth = thisMonthString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [insightIdx, setInsightIdx] = useState(0);
@@ -487,9 +486,10 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     if (!q) return true;
     return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
   });
+  const isNextDisabled = viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth);
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
-  const thisMonthSessions = sessions.filter(s => s.date.startsWith(thisMonth));
+  const thisMonthSessions = sessions.filter(s => s.date.startsWith(viewYM));
   const thisMonthDays = new Set(thisMonthSessions.map(s => s.date)).size;
   const thisMonthGames = thisMonthSessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
   const avgGamesPerDay = thisMonthDays > 0 ? (thisMonthGames / thisMonthDays).toFixed(1) : null;
@@ -590,11 +590,18 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 </div>
               )}
             </div>
-            <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
-              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตีเดือนนี้</div></div>
-              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกมเดือนนี้</div></div>
-              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
-              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+            <div className="relative z-10 border-t border-white/10 pt-3">
+              <div className="flex items-center justify-between mb-3">
+                <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none">‹</button>
+                <span className="text-xs text-white/70 font-medium">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
+                <button onClick={nextMonth} disabled={isNextDisabled} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none disabled:opacity-30 disabled:cursor-default">›</button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตี</div></div>
+                <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกม</div></div>
+                <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
+                <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+              </div>
             </div>
           </div>
           {sessions.length > 0 && (
@@ -696,11 +703,18 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               </div>
             )}
           </div>
-          <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
-            <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตีเดือนนี้</div></div>
-            <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกมเดือนนี้</div></div>
-            <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
-            <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+          <div className="relative z-10 border-t border-white/10 pt-3">
+            <div className="flex items-center justify-between mb-3">
+              <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none">‹</button>
+              <span className="text-xs text-white/70 font-medium">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
+              <button onClick={nextMonth} disabled={isNextDisabled} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none disabled:opacity-30 disabled:cursor-default">›</button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตี</div></div>
+              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกม</div></div>
+              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
+              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+            </div>
           </div>
         </div>
         {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
