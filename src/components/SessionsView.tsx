@@ -332,7 +332,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Right: photo — full card height with margin */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
-        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-48 flex-shrink-0 sm:m-2 rounded-none sm:rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
+        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
           <button
             type="button"
