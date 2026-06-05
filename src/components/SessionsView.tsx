@@ -305,7 +305,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
       {/* Photo — full card height, right side */}
       {session.image && (
-        <div className="w-28 flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <div className="w-44 flex-shrink-0 cursor-pointer" onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
         </div>
       )}
