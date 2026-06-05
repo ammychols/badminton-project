@@ -229,6 +229,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const durMin = (() => { if (start === 0 && end === 0) return 0; let d = end - start; if (d <= 0) d += 24 * 60; return (d > 0 && d < 24 * 60) ? d : 0; })();
   const durLabel = durMin > 0 ? (Math.floor(durMin / 60) > 0 ? `${Math.floor(durMin / 60)}ชม.` : '') + (durMin % 60 > 0 ? `${durMin % 60}น.` : '') : null;
   const hasTime = !(start === 0 && end === 0);
+  const minPerGame = (durMin > 0 && session.gamesPlayed > 0) ? Math.round(durMin / session.gamesPlayed) : null;
 
   return (
     <div className={`group${isLast ? '' : ' border-b border-[var(--card-border)]'}`}>
@@ -263,8 +264,8 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
               className="w-full text-left px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)] transition-colors">
               {session.notes
-                ? <p className="text-xs text-[var(--text-4)] leading-snug truncate">{session.notes}</p>
-                : <p className="text-xs text-[var(--dashed)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
+                ? <p className="text-sm text-[var(--text-2)] leading-snug truncate">{session.notes}</p>
+                : <p className="text-xs text-[var(--text-3)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
               }
             </button>
           )}
@@ -273,7 +274,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {(durLabel || session.gamesPlayed > 0) && (
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
             {durLabel && <div className="text-sm font-bold text-[var(--text-1)] tabular-nums leading-tight">{durLabel}</div>}
-            {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5">{session.gamesPlayed} เกม</div>}
+            {session.gamesPlayed > 0 && <div className="text-xs text-[var(--text-3)] mt-0.5 tabular-nums">{session.gamesPlayed} เกม{minPerGame ? ` · ${minPerGame}น./เกม` : ''}</div>}
           </div>
         )}
         {/* Delete */}
