@@ -448,7 +448,7 @@ function computeInsights(
   if (withMpg.length >= 3) {
     const top = withMpg.reduce((a, b) => b.mpg > a.mpg ? b : a);
     if (top.mpg >= 30)
-      out.push({ emoji: '⏳', text: `รอนานสุดเคยถึง ${top.mpg} นาที/เกม — ${getGroupName(top.courtId, top.groupId)}` });
+      out.push({ emoji: '⏳', text: `รอนานสุด ${top.mpg} นาที/เกม — ${getGroupName(top.courtId, top.groupId)}` });
   }
 
   return out;
