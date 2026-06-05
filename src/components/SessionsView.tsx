@@ -246,7 +246,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           {MOOD_EMOJIS[session.mood]}
         </div>
         {/* Info */}
-        <div className="min-w-0 flex-1 sm:flex-none sm:w-52 sm:flex-shrink-0 cursor-pointer" onClick={onEdit}>
+        <div className="min-w-0 flex-1 sm:flex-none sm:w-64 sm:flex-shrink-0 cursor-pointer" onClick={onEdit}>
           <div className="text-sm leading-snug truncate">
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
             <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
@@ -274,7 +274,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
               className="w-full text-left px-2 py-1 rounded-lg hover:bg-[var(--chip-bg)] transition-colors">
               {session.notes
-                ? <p className="text-sm text-[var(--text-2)] leading-snug truncate">{session.notes}</p>
+                ? <p className="text-sm text-[var(--text-2)] leading-snug truncate border-l-2 border-[var(--card-border)] pl-2.5">{session.notes}</p>
                 : <p className="text-xs text-[var(--text-3)] opacity-0 group-hover:opacity-100 transition-opacity">+ โน้ต</p>
               }
             </button>
