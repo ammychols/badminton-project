@@ -246,15 +246,17 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           {MOOD_EMOJIS[session.mood]}
         </div>
         <div className="min-w-0 flex-1 cursor-pointer" onClick={onEdit}>
-          <div className="text-sm leading-snug flex items-center flex-wrap gap-1.5">
+          <div className="text-sm leading-snug">
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
-            {session.intensity && (
+            <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
+          </div>
+          {session.intensity && (
+            <div className="mt-0.5">
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium leading-tight ${INTENSITY_CHIP[session.intensity]}`}>
                 {INTENSITY_LABELS[session.intensity]}
               </span>
-            )}
-            <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
-          </div>
+            </div>
+          )}
         </div>
         <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
