@@ -239,9 +239,8 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const metaDivider = <span className="text-[var(--text-4)]">·</span>;
 
   return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex">
-      {/* Content */}
-      <div className="flex-1 min-w-0 p-4">
+    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)]">
+      <div className="p-4">
         {/* Header: mood + group/court + delete */}
         <div className="flex items-start gap-3">
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
@@ -289,7 +288,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           )}
         </div>
 
-        {/* Meta footer: time · duration · games · min/game */}
+        {/* Meta footer */}
         {(hasTime || session.gamesPlayed > 0) && (
           <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer" onClick={onEdit}>
             {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
@@ -303,11 +302,10 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         )}
       </div>
 
-      {/* Photo — full card height, right side */}
+      {/* Photo — below content, fixed aspect ratio */}
       {session.image && (
-        <div className="w-44 flex-shrink-0 cursor-pointer relative" onClick={onEdit}>
+        <div className="cursor-pointer" style={{ aspectRatio: '16/7' }} onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
-          <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none" />
         </div>
       )}
     </div>
