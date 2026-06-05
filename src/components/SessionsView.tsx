@@ -277,7 +277,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               </div>
             )}
           </div>
-          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
             {!session.image && (
               <button type="button" onClick={() => photoInputRef.current?.click()}
                 className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1">
