@@ -469,6 +469,28 @@ function computeInsights(
       out.push({ emoji: '⏳', text: `รอนานสุด ${top.mpg} นาที/เกม — ${getGroupName(top.courtId, top.groupId)}` });
   }
 
+  // Heaviest group — which group most often delivers heavy games
+  const INTENSITY_SCORE: Record<string, number> = { light: 1, medium: 2, heavy: 3 };
+  const gi: Record<string, { sum: number; count: number; heavy: number; courtId: string }> = {};
+  for (const s of sessions) {
+    if (!s.intensity) continue;
+    if (!gi[s.groupId]) gi[s.groupId] = { sum: 0, count: 0, heavy: 0, courtId: s.courtId };
+    gi[s.groupId].sum += INTENSITY_SCORE[s.intensity];
+    gi[s.groupId].count++;
+    if (s.intensity === 'heavy') gi[s.groupId].heavy++;
+  }
+  const ranked = Object.entries(gi)
+    .filter(([, v]) => v.count >= 2)
+    .sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count));
+  if (ranked.length > 0) {
+    const top = ranked[0];
+    const bottom = ranked[ranked.length - 1];
+    if (top[1].sum / top[1].count >= 2.5)
+      out.push({ emoji: '🔥', text: `ไปก๊วน ${getGroupName(top[1].courtId, top[0])} มักเจอเกมหนัก เตรียมตัวให้พร้อม!` });
+    else if (bottom[1].sum / bottom[1].count <= 1.5)
+      out.push({ emoji: '🌿', text: `ก๊วน ${getGroupName(bottom[1].courtId, bottom[0])} เล่นสบายๆ ชิลล์ๆ` });
+  }
+
   return out;
 }
 
