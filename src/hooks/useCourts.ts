@@ -65,11 +65,17 @@ export function useCourts(uid: string) {
   const updateGroup = async (courtId: string, groupId: string, data: Partial<Group>) => {
     const court = get(courtId);
     if (!court) return;
+    const removingImage = 'image' in data && data.image === undefined;
     const image = await resolveImage(uid, groupId, data.image);
-    if (data.image === undefined && 'image' in data) await deleteGroupImage(uid, groupId);
+    if (removingImage) await deleteGroupImage(uid, groupId);
     const patch = toFs({ ...data, image });
     await setDoc(ref(courtId), {
-      groups: court.groups.map(g => g.id === groupId ? { ...toFs(g), ...patch } : toFs(g)),
+      groups: court.groups.map(g => {
+        if (g.id !== groupId) return toFs(g);
+        const base = toFs(g) as Record<string, unknown>;
+        if (removingImage) delete base.image;
+        return { ...base, ...patch };
+      }),
     }, { merge: true });
   };
 
