@@ -259,7 +259,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           )}
         </div>
         {session.image && (
-          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={onEdit}>
+          <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={onEdit}>
             <img src={session.image} alt="session" className="w-full h-full object-cover" />
           </div>
         )}
