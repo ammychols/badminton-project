@@ -273,9 +273,10 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {/* Duration + games */}
         {(durLabel || session.gamesPlayed > 0) && (
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-            <div className="tabular-nums flex items-baseline justify-end gap-1.5 leading-tight">
+            <div className="tabular-nums flex items-baseline justify-end gap-1 leading-tight">
               {durLabel && <span className="text-sm font-bold text-[var(--text-1)]">{durLabel}</span>}
-              {session.gamesPlayed > 0 && <span className="text-xs text-[var(--text-2)] font-medium">{session.gamesPlayed} เกม</span>}
+              {durLabel && session.gamesPlayed > 0 && <span className="text-xs text-[var(--text-3)]">·</span>}
+              {session.gamesPlayed > 0 && <span className="text-sm font-semibold text-[var(--text-1)]">{session.gamesPlayed} <span className="text-xs font-normal text-[var(--text-3)]">เกม</span></span>}
             </div>
             {minPerGame && <div className="text-xs text-[var(--text-3)] tabular-nums text-right mt-0.5">{minPerGame} น./เกม</div>}
           </div>
