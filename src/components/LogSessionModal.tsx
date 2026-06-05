@@ -322,12 +322,6 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
-      {/* Note */}
-      <div className="mb-4">
-        <label className={text.label}>โน้ต</label>
-        <NoteField value={notes} onChange={setNotes} />
-      </div>
-
       {/* Photo */}
       <div className="mb-4">
         <label className={text.label}>รูปภาพ</label>
