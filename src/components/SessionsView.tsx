@@ -218,6 +218,108 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
+function AvatarCard({ totalSessions }: { totalSessions: number }) {
+  return (
+    <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
+      <div className="px-5 pt-5 pb-2">
+        <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">Avatar</div>
+        <div className="text-sm font-semibold text-[var(--text-1)]">มือใหม่หัดตี</div>
+        <div className="text-xs text-[var(--text-3)] mt-0.5">{totalSessions} session{totalSessions !== 1 ? 's' : ''}</div>
+      </div>
+
+      {/* Character */}
+      <div className="flex justify-center py-4">
+        <svg width="160" height="200" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Shadow */}
+          <ellipse cx="80" cy="193" rx="32" ry="6" fill="#E8EAF0" />
+
+          {/* Shoes */}
+          <rect x="55" y="174" width="20" height="10" rx="5" fill="#5C6BC0" />
+          <rect x="85" y="174" width="20" height="10" rx="5" fill="#5C6BC0" />
+
+          {/* Legs */}
+          <rect x="62" y="148" width="12" height="30" rx="6" fill="#FFB74D" />
+          <rect x="86" y="148" width="12" height="30" rx="6" fill="#FFB74D" />
+
+          {/* Shorts */}
+          <rect x="55" y="144" width="50" height="20" rx="8" fill="#5C6BC0" />
+
+          {/* Body / Shirt */}
+          <rect x="52" y="100" width="56" height="52" rx="14" fill="#EF5350" />
+
+          {/* Shirt stripe */}
+          <rect x="52" y="115" width="56" height="6" fill="#E53935" />
+
+          {/* Left arm — holding racket */}
+          <rect x="30" y="102" width="26" height="12" rx="6" fill="#FFB74D" transform="rotate(-20 30 102)" />
+
+          {/* Racket handle */}
+          <rect x="14" y="118" width="5" height="28" rx="2.5" fill="#8D6E63" transform="rotate(-30 14 118)" />
+          {/* Racket head */}
+          <ellipse cx="10" cy="112" rx="14" ry="10" fill="none" stroke="#8D6E63" strokeWidth="3" transform="rotate(-30 10 112)" />
+          {/* Racket strings */}
+          <line x1="2" y1="108" x2="18" y2="116" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
+          <line x1="2" y1="112" x2="18" y2="112" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
+          <line x1="6" y1="104" x2="6" y2="120" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
+          <line x1="12" y1="103" x2="12" y2="121" stroke="#8D6E63" strokeWidth="1" transform="rotate(-30 10 112)" />
+
+          {/* Right arm */}
+          <rect x="104" y="102" width="26" height="12" rx="6" fill="#FFB74D" transform="rotate(15 104 102)" />
+
+          {/* Neck */}
+          <rect x="71" y="88" width="18" height="16" rx="6" fill="#FFB74D" />
+
+          {/* Head */}
+          <circle cx="80" cy="68" r="34" fill="#FFB74D" />
+
+          {/* Headband */}
+          <rect x="46" y="58" width="68" height="10" rx="5" fill="#EF5350" />
+          <circle cx="80" cy="58" r="5" fill="#FFF176" />
+
+          {/* Eyes */}
+          <circle cx="68" cy="70" r="5" fill="white" />
+          <circle cx="92" cy="70" r="5" fill="white" />
+          <circle cx="69.5" cy="71" r="3" fill="#333" />
+          <circle cx="93.5" cy="71" r="3" fill="#333" />
+          {/* Eye shine */}
+          <circle cx="70.5" cy="70" r="1" fill="white" />
+          <circle cx="94.5" cy="70" r="1" fill="white" />
+
+          {/* Eyebrows */}
+          <path d="M63 63 Q68 60 73 63" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <path d="M87 63 Q92 60 97 63" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+          {/* Nose */}
+          <circle cx="80" cy="76" r="2" fill="#F4A460" />
+
+          {/* Mouth — small smile */}
+          <path d="M73 83 Q80 89 87 83" stroke="#333" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+          {/* Cheeks */}
+          <circle cx="63" cy="80" r="7" fill="#FF8A65" opacity="0.35" />
+          <circle cx="97" cy="80" r="7" fill="#FF8A65" opacity="0.35" />
+
+          {/* Hair */}
+          <path d="M46 62 Q48 38 80 34 Q112 38 114 62" fill="#3E2723" />
+          <path d="M46 62 Q42 50 48 42 Q50 36 58 34" fill="#3E2723" />
+          <path d="M114 62 Q118 50 112 42 Q110 36 102 34" fill="#3E2723" />
+        </svg>
+      </div>
+
+      {/* Progress */}
+      <div className="px-5 pb-5">
+        <div className="flex justify-between text-xs text-[var(--text-3)] mb-1.5">
+          <span>ไปอีก {Math.max(0, 5 - totalSessions)} sessions จะ evolve!</span>
+          <span>{Math.min(totalSessions, 5)}/5</span>
+        </div>
+        <div className="w-full h-2 rounded-full bg-[var(--chip-bg)]">
+          <div className="h-2 rounded-full bg-[var(--p)] transition-all" style={{ width: `${Math.min((totalSessions / 5) * 100, 100)}%` }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
@@ -681,6 +783,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           {sessions.length > 0 && (
             <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
+          <AvatarCard totalSessions={sessions.length} />
         </div>
 
         {/* Col 3: Session feed */}
