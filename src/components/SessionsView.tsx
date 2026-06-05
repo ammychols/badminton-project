@@ -226,6 +226,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
+  const [lightbox, setLightbox] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const commitNote = () => {
     setEditingNote(false);
@@ -332,7 +333,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Right: photo — full card height with margin */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
-        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={onEdit}>
+        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
           <button
             type="button"
@@ -341,6 +342,25 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           >✕</button>
         </div>
       ) : null}
+
+      {/* Lightbox */}
+      {lightbox && session.image && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setLightbox(false)}
+        >
+          <img
+            src={session.image}
+            alt="session"
+            className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setLightbox(false)}
+            className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-lg hover:bg-white/30 transition-colors"
+          >✕</button>
+        </div>
+      )}
     </div>
   );
 }
