@@ -330,13 +330,18 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Right: photo — full card height with margin */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
-        <div className="relative aspect-[16/7] sm:aspect-auto sm:w-48 flex-shrink-0 sm:m-2 rounded-none sm:rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
-          <img src={session.image} alt="session" className="w-full h-full object-cover" />
-          <button
-            type="button"
-            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
-          >✕</button>
+        <div className="flex flex-col aspect-[16/7] sm:aspect-auto sm:w-48 flex-shrink-0 sm:m-2">
+          {/* X button row — aligns with trash in header */}
+          <div className="flex justify-end flex-shrink-0" style={{ height: '36px' }}>
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
+              className="w-7 h-7 m-1 rounded-full bg-[var(--chip-bg)] text-[var(--text-3)] flex items-center justify-center text-xs hover:bg-red-50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+            >✕</button>
+          </div>
+          <div className="flex-1 rounded-xl overflow-hidden cursor-pointer min-h-0" onClick={onEdit}>
+            <img src={session.image} alt="session" className="w-full h-full object-cover" />
+          </div>
         </div>
       ) : null}
     </div>
