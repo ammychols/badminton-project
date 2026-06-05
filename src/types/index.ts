@@ -67,6 +67,11 @@ export interface TodayGroup {
   averageScore: number;
 }
 
+export type Intensity = 'light' | 'medium' | 'heavy';
+export const INTENSITY_LABELS: Record<Intensity, string> = { light: 'เบา', medium: 'ปานกลาง', heavy: 'หนัก' };
+export const INTENSITY_EMOJIS: Record<Intensity, string> = { light: '🟢', medium: '🟡', heavy: '🔴' };
+export const ALL_INTENSITIES: Intensity[] = ['light', 'medium', 'heavy'];
+
 export interface Session {
   id: string;
   courtId: string;
@@ -76,5 +81,6 @@ export interface Session {
   endTime: string; // HH:MM
   gamesPlayed: number;
   mood: 1 | 2 | 3 | 4 | 5 | 6;
+  intensity?: Intensity;
   notes?: string;
 }
