@@ -304,7 +304,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
       {/* Photo — below content, fixed aspect ratio */}
       {session.image && (
-        <div className="cursor-pointer" style={{ aspectRatio: '16/7' }} onClick={onEdit}>
+        <div className="cursor-pointer" style={{ aspectRatio: '16/5' }} onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
         </div>
       )}
