@@ -47,6 +47,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
   const [endTime, setEndTime] = useState(initialValues?.endTime ?? defaultEnd);
   const [levels, setLevels] = useState<GroupLevel[]>(initialValues?.levels ?? []);
   const [image, setImage] = useState<string | undefined>(initialValues?.image);
+  const [uploading, setUploading] = useState(false);
 
   const toggleLevel = (lv: GroupLevel) =>
     setLevels(prev => prev.includes(lv) ? prev.filter(l => l !== lv) : [...prev, lv]);
@@ -75,15 +76,16 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
     setDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
 
   const handleSave = () => {
-    if (!name.trim() || days.length === 0) return;
+    if (!name.trim() || days.length === 0 || uploading) return;
+    if (image?.startsWith('data:')) setUploading(true);
     onClose();
     onSave({ name: name.trim(), days, startTime, endTime, levels: levels.length ? levels : undefined, image });
   };
 
   const saveButton = (
-    <button onClick={handleSave} disabled={!name.trim() || days.length === 0}
+    <button onClick={handleSave} disabled={!name.trim() || days.length === 0 || uploading}
       className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
-      {initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
+      {uploading ? 'กำลังอัปโหลด...' : initialValues ? 'บันทึกการแก้ไข' : 'บันทึกก๊วน'}
     </button>
   );
 

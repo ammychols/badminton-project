@@ -2,34 +2,19 @@ import { useState, useEffect } from 'react';
 import { collection, doc, onSnapshot, setDoc, deleteDoc, deleteField, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Court, Group, Review } from '../types';
+import { uploadGroupImage, deleteGroupImage } from '../utils/uploadImage';
 
-// Images are stored in localStorage (not Firestore) to stay under Firestore's 1MB document limit.
-const imgKey = (id: string) => `grp_img_${id}`;
-
-function saveImg(id: string, img: string | undefined) {
-  img ? localStorage.setItem(imgKey(id), img) : localStorage.removeItem(imgKey(id));
-}
-function loadImg(id: string): string | undefined {
-  return localStorage.getItem(imgKey(id)) ?? undefined;
-}
-
-// Merge localStorage images into groups fetched from Firestore.
-// If a group has an image in Firestore (legacy), migrate it to localStorage.
-function withImgs(groups: Group[]): Group[] {
-  return groups.map(g => {
-    const local = loadImg(g.id);
-    if (local) return { ...g, image: local };
-    if (g.image) {
-      saveImg(g.id, g.image); // migrate existing Firestore image → localStorage
-      return g;
-    }
-    return g;
-  });
+// If the image is a base64 data URL, upload to Firebase Storage and return the https:// URL.
+// Otherwise return the value as-is (already a Storage URL or undefined).
+async function resolveImage(uid: string, groupId: string, image: string | undefined): Promise<string | undefined> {
+  if (!image) return undefined;
+  if (image.startsWith('data:')) return uploadGroupImage(uid, groupId, image);
+  return image;
 }
 
-// Strip image fields before writing to Firestore so documents stay small.
-function toFirestore(groups: Group[]): Omit<Group, 'image'>[] {
-  return groups.map(({ image: _img, ...rest }) => rest);
+// Serialize a group for Firestore — strip undefined fields.
+function toFs(group: Partial<Group>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(group).filter(([, v]) => v !== undefined));
 }
 
 export function useCourts(uid: string) {
@@ -38,10 +23,7 @@ export function useCourts(uid: string) {
   useEffect(() => {
     if (!uid) return;
     return onSnapshot(collection(db, 'users', uid, 'courts'), snap => {
-      setCourts(snap.docs.map(d => {
-        const court = d.data() as Court;
-        return { ...court, groups: withImgs(court.groups) };
-      }));
+      setCourts(snap.docs.map(d => d.data() as Court));
     });
   }, [uid]);
 
@@ -66,50 +48,48 @@ export function useCourts(uid: string) {
 
   const deleteCourt = (id: string) => {
     const court = get(id);
-    court?.groups.forEach(g => saveImg(g.id, undefined));
+    court?.groups.forEach(g => deleteGroupImage(uid, g.id));
     deleteDoc(ref(id));
   };
 
-  const addGroup = (courtId: string, group: Omit<Group, 'id' | 'courtId' | 'reviews'>) => {
+  const addGroup = async (courtId: string, group: Omit<Group, 'id' | 'courtId' | 'reviews'>) => {
     const court = get(courtId);
     if (!court) return;
-    const raw = { ...group, id: crypto.randomUUID(), courtId, reviews: [] };
-    const newGroup = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined)) as unknown as Group;
-    saveImg(newGroup.id, newGroup.image);
-    setDoc(ref(courtId), { groups: [...toFirestore(court.groups), ...toFirestore([newGroup])] }, { merge: true });
-    return newGroup;
+    const groupId = crypto.randomUUID();
+    const image = await resolveImage(uid, groupId, group.image);
+    const newGroup = toFs({ ...group, image, id: groupId, courtId, reviews: [] });
+    await setDoc(ref(courtId), { groups: [...court.groups.map(toFs), newGroup] }, { merge: true });
+    return newGroup as unknown as Group;
   };
 
-  const updateGroup = (courtId: string, groupId: string, data: Partial<Group>) => {
+  const updateGroup = async (courtId: string, groupId: string, data: Partial<Group>) => {
     const court = get(courtId);
     if (!court) return;
-    if ('image' in data) saveImg(groupId, data.image);
-    const { image: _img, ...cleanNoImg } = Object.fromEntries(
-      Object.entries(data).filter(([, v]) => v !== undefined)
-    ) as Partial<Group>;
-    setDoc(ref(courtId), {
-      groups: toFirestore(court.groups).map(g => g.id === groupId ? { ...g, ...cleanNoImg } : g),
+    const image = await resolveImage(uid, groupId, data.image);
+    if (data.image === undefined && 'image' in data) await deleteGroupImage(uid, groupId);
+    const patch = toFs({ ...data, image });
+    await setDoc(ref(courtId), {
+      groups: court.groups.map(g => g.id === groupId ? { ...toFs(g), ...patch } : toFs(g)),
     }, { merge: true });
   };
 
   const deleteGroup = (courtId: string, groupId: string) => {
     const court = get(courtId);
     if (!court) return;
-    saveImg(groupId, undefined);
-    setDoc(ref(courtId), { groups: toFirestore(court.groups).filter(g => g.id !== groupId) }, { merge: true });
+    deleteGroupImage(uid, groupId);
+    setDoc(ref(courtId), { groups: court.groups.filter(g => g.id !== groupId).map(toFs) }, { merge: true });
   };
 
   const addReview = (courtId: string, groupId: string, review: Omit<Review, 'id' | 'groupId'>) => {
     const court = get(courtId);
     if (!court) return;
     if (!review.notes) {
-      setDoc(ref(courtId), { groups: toFirestore(court.groups).map(g => g.id === groupId ? { ...g, reviews: [] } : g) }, { merge: true });
+      setDoc(ref(courtId), { groups: court.groups.map(g => toFs({ ...g, ...(g.id === groupId ? { reviews: [] } : {}) })) }, { merge: true });
       return;
     }
-    const raw = { ...review, id: crypto.randomUUID(), groupId };
-    const newReview = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined));
+    const newReview = { ...review, id: crypto.randomUUID(), groupId };
     setDoc(ref(courtId), {
-      groups: toFirestore(court.groups).map(g => g.id === groupId ? { ...g, reviews: [newReview] } : g),
+      groups: court.groups.map(g => toFs({ ...g, ...(g.id === groupId ? { reviews: [newReview] } : {}) })),
     }, { merge: true });
   };
 
