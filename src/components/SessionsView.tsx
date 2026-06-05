@@ -338,7 +338,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
           >✕</button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
