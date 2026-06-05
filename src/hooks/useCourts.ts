@@ -65,18 +65,32 @@ export function useCourts(uid: string) {
   const updateGroup = async (courtId: string, groupId: string, data: Partial<Group>) => {
     const court = get(courtId);
     if (!court) return;
-    const removingImage = 'image' in data && data.image === undefined;
-    const image = await resolveImage(uid, groupId, data.image);
-    if (removingImage) await deleteGroupImage(uid, groupId);
-    const patch = toFs({ ...data, image });
-    await setDoc(ref(courtId), {
-      groups: court.groups.map(g => {
-        if (g.id !== groupId) return toFs(g);
-        const base = toFs(g) as Record<string, unknown>;
-        if (removingImage) delete base.image;
-        return { ...base, ...patch };
-      }),
-    }, { merge: true });
+
+    const removingImage = 'image' in data && !data.image;
+    const changingImage = 'image' in data && !!data.image;
+    let newImageUrl: string | undefined;
+
+    if (removingImage) {
+      await deleteGroupImage(uid, groupId);
+    } else if (changingImage) {
+      newImageUrl = await resolveImage(uid, groupId, data.image);
+    }
+
+    // Separate image from the rest of the patch
+    const { image: _img, ...rest } = data;
+    const patch = toFs(rest);
+
+    const groups = court.groups.map(g => {
+      const base = toFs(g) as Record<string, unknown>;
+      if (g.id !== groupId) return base;
+      Object.assign(base, patch);
+      if (removingImage) delete base.image;
+      else if (changingImage && newImageUrl) base.image = newImageUrl;
+      // else: 'image' not in data → keep existing image unchanged
+      return base;
+    });
+
+    await setDoc(ref(courtId), { groups }, { merge: true });
   };
 
   const deleteGroup = (courtId: string, groupId: string) => {
