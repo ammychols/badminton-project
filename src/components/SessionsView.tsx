@@ -251,14 +251,13 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
             <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
           </div>
-          <div className="text-xs text-[var(--text-3)] mt-0.5 flex items-center gap-1.5">
-            <span className="truncate">{hasTime ? `${session.startTime} – ${session.endTime}` : '—'}</span>
-            {session.intensity && (
-              <span className={`flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${INTENSITY_CHIP[session.intensity]}`}>
+          {session.intensity && (
+            <div className="mt-1">
+              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium ${INTENSITY_CHIP[session.intensity]}`}>
                 {INTENSITY_LABELS[session.intensity]}
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
         {/* Note — desktop only inline */}
         <div className="hidden sm:block flex-1 min-w-0">
@@ -284,9 +283,12 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {/* Duration + games */}
         {(durLabel || session.gamesPlayed > 0) && (
           <div className="flex-shrink-0 text-right cursor-pointer" onClick={onEdit}>
-            <div className="flex items-center justify-end gap-2 leading-tight">
+            <div className="flex items-start justify-end gap-2 leading-tight">
               {durLabel && (
-                <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{durLabel}</div>
+                <div className="text-right">
+                  <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{durLabel}</div>
+                  {hasTime && <div className="text-xs text-[var(--text-3)] tabular-nums mt-0.5">{session.startTime} – {session.endTime}</div>}
+                </div>
               )}
               {durLabel && session.gamesPlayed > 0 && (
                 <div className="w-px h-6 bg-[var(--card-border)]" />
@@ -294,7 +296,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               {session.gamesPlayed > 0 && (
                 <div className="text-right">
                   <div className="text-sm font-bold tabular-nums text-[var(--text-1)]">{session.gamesPlayed} <span className="text-xs font-normal text-[var(--text-3)]">เกม</span></div>
-                  {minPerGame && <div className="text-xs text-[var(--text-3)]">{minPerGame} น./เกม</div>}
+                  {minPerGame && <div className="text-xs text-[var(--text-3)] mt-0.5">{minPerGame} น./เกม</div>}
                 </div>
               )}
             </div>
