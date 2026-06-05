@@ -255,7 +255,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const metaDivider = <span className="text-[var(--text-4)]">·</span>;
 
   return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex">
+    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
       {/* Left: all content */}
       <div className="flex-1 min-w-0 flex flex-col p-4">
         {/* Header */}
@@ -330,7 +330,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
       {/* Right: photo — full card height with margin */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
-        <div className="relative w-36 flex-shrink-0 m-2 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
+        <div className="relative aspect-[16/7] sm:aspect-auto sm:w-36 flex-shrink-0 sm:m-2 rounded-none sm:rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
           <button
             type="button"
