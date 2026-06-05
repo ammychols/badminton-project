@@ -252,7 +252,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           </div>
           {session.intensity && (
             <div className="mt-0.5">
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium leading-tight ${INTENSITY_CHIP[session.intensity]}`}>
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium leading-tight ${INTENSITY_CHIP[session.intensity]}`}>
                 {INTENSITY_LABELS[session.intensity]}
               </span>
             </div>
