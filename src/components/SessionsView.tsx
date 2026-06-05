@@ -255,11 +255,10 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const metaDivider = <span className="text-[var(--text-4)]">·</span>;
 
   return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)]">
-      {/* Top section: content left + photo right */}
-      <div className="flex">
-        <div className="flex-1 min-w-0 p-4 pb-0">
-        {/* Header: mood + group/court + delete */}
+    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex">
+      {/* Left: all content */}
+      <div className="flex-1 min-w-0 flex flex-col p-4">
+        {/* Header */}
         <div className="flex items-start gap-3">
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
@@ -284,8 +283,8 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           </button>
         </div>
 
-        {/* Note — full text, the hero of the card */}
-        <div className="mt-3">
+        {/* Note */}
+        <div className="mt-3 flex-1">
           {editingNote ? (
             <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
               onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
@@ -296,8 +295,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               style={{ backgroundColor: 'var(--app-bg)' }}
             />
           ) : (
-            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
-              className="w-full text-left">
+            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }} className="w-full text-left">
               {session.notes
                 ? <p className="text-[15px] text-[var(--text-1)] leading-relaxed whitespace-pre-wrap border-l-2 border-[color-mix(in_srgb,var(--p)_40%,transparent)] pl-3">{session.notes}</p>
                 : <p className="text-sm text-[var(--text-3)] opacity-60 group-hover:opacity-100 transition-opacity">+ เพิ่มโน้ต...</p>
@@ -306,44 +304,43 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           )}
         </div>
 
-        </div>
-        {/* Photo — right column, spans header+note */}
-        <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-        {session.image ? (
-          <div className="relative w-24 flex-shrink-0 m-2 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
-            <img src={session.image} alt="session" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-              className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
-            >✕</button>
+        {/* Meta footer */}
+        {(hasTime || session.gamesPlayed > 0) && (
+          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer" onClick={onEdit}>
+            {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
+            {hasTime && durLabel && metaDivider}
+            {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
+            {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
+            {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
+            {minPerGame && metaDivider}
+            {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => photoInputRef.current?.click()}
-            className="w-10 flex-shrink-0 flex items-center justify-center text-[var(--text-4)] opacity-0 group-hover:opacity-100 transition-opacity hover:text-[var(--p)]"
-            title="เพิ่มรูปภาพ"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
         )}
       </div>
 
-      {/* Meta footer — full width below */}
-      {(hasTime || session.gamesPlayed > 0) && (
-        <div className="mx-4 mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer pb-4" onClick={onEdit}>
-          {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
-          {hasTime && durLabel && metaDivider}
-          {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
-          {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
-          {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
-          {minPerGame && metaDivider}
-          {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
+      {/* Right: photo — full card height with margin */}
+      <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+      {session.image ? (
+        <div className="relative w-36 flex-shrink-0 m-2 rounded-xl overflow-hidden cursor-pointer" onClick={onEdit}>
+          <img src={session.image} alt="session" className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
+            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
+          >✕</button>
         </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => photoInputRef.current?.click()}
+          className="w-10 flex-shrink-0 flex items-center justify-center text-[var(--text-4)] opacity-0 group-hover:opacity-100 transition-opacity hover:text-[var(--p)]"
+          title="เพิ่มรูปภาพ"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
       )}
     </div>
   );
