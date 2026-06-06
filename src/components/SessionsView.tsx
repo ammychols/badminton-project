@@ -255,8 +255,8 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       <ellipse cx="100" cy="234" rx="42" ry="7" fill="#D1D5E8" />
 
       {/* Ponytail — drawn BEFORE head so head circle crops its base naturally */}
-      {/* Bundle visible beyond right edge of head (right edge at ~x=141 at y=88) */}
-      <path d="M 134 84 C 152 76 166 90 162 108 C 158 122 146 126 136 118 C 144 110 150 96 146 88 Z" fill={hair} />
+      {/* Bundle visible beyond right edge of head (right edge at ~x=129 at y=105) */}
+      <path d="M 130 100 C 148 92 162 108 158 126 C 154 140 142 144 132 136 C 140 126 146 110 142 102 Z" fill={hair} />
 
       {/* Shoes */}
       <rect x="74" y="212" width="22" height="14" rx="7" fill="#252C3B" />
@@ -278,8 +278,8 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Left arm — raised */}
       <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
-      {/* Right arm — relaxed */}
-      <path d="M 124 130 C 142 142 152 156 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      {/* Right arm — relaxed, starts from shoulder area */}
+      <path d="M 128 122 C 146 132 154 148 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="156" cy="167" r="10" fill="#FBBF8A" />
       {/* Shirt hem */}
       <rect x="64" y="156" width="72" height="14" rx="7" fill="#FDA4AF" />
@@ -294,16 +294,22 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Bottom fringe dips to y=66 in center, eyebrows at y=71 → 5px clean gap */}
       <path d="M 58 60 A 44 44 0 0 1 142 60 C 128 62 114 66 100 66 C 86 66 72 62 58 60 Z" fill={hair} />
 
-      {/* Hair tie — drawn after head, at right edge of head where ponytail meets */}
-      <ellipse cx="143" cy="87" rx="7" ry="5" fill="#FDA4AF" />
-      <ellipse cx="143" cy="87" rx="5" ry="3.5" fill="#FB7185" />
+      {/* Ears — drawn before head so head naturally overlaps the inner part */}
+      <ellipse cx="56" cy="83" rx="9" ry="11" fill="#FBBF8A" />
+      <ellipse cx="144" cy="83" rx="9" ry="11" fill="#FBBF8A" />
+      <ellipse cx="56" cy="83" rx="5" ry="7" fill="#F0A870" opacity="0.5" />
+      <ellipse cx="144" cy="83" rx="5" ry="7" fill="#F0A870" opacity="0.5" />
+
+      {/* Hair tie — drawn after head, at nape level where ponytail meets */}
+      <ellipse cx="138" cy="104" rx="7" ry="5" fill="#FDA4AF" />
+      <ellipse cx="138" cy="104" rx="5" ry="3.5" fill="#FB7185" />
 
       {/* Eyebrows */}
       <path d="M 73 71 Q 82 67 91 70" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
       <path d="M 109 70 Q 118 67 127 71" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      {/* Eyelashes */}
-      <path d="M 72 76 Q 82 71 92 75" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      <path d="M 108 75 Q 118 71 128 76" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      {/* Eyelashes — softer color so they don't merge with eyebrows */}
+      <path d="M 73 76 Q 82 72 92 76" stroke="#2D1A0E" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      <path d="M 108 76 Q 118 72 127 76" stroke="#2D1A0E" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
       {/* Eyes */}
       <ellipse cx="82" cy="81" rx="10" ry="11" fill="white" />
       <ellipse cx="118" cy="81" rx="10" ry="11" fill="white" />
@@ -358,8 +364,8 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Left arm — raised */}
       <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
-      {/* Right arm — relaxed */}
-      <path d="M 124 130 C 142 142 152 156 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
+      {/* Right arm — relaxed, starts from shoulder area */}
+      <path d="M 128 122 C 146 132 154 148 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="156" cy="167" r="10" fill="#FBBF8A" />
       {/* Shirt hem */}
       <rect x="64" y="156" width="72" height="14" rx="7" fill="#7DD3FC" />
