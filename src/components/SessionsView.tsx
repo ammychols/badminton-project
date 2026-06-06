@@ -247,20 +247,16 @@ function RacketInHand() {
 
 function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
   const h = Math.round(width * 1.2);
-  // Chihiro style: brown hair, medium-length, right-side ponytail
+  // Chihiro style: hair pulled back, small ponytail visible on right side
   // head cx=100 cy=72 r=44 | hairline y=60 | brows y=71 | eyes cy=81
-  const hair = '#5C3A1E';
+  const hair = '#5C3015';
   return (
     <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="100" cy="234" rx="42" ry="7" fill="#D1D5E8" />
 
-      {/* ── Back hair (shoulder-length) — drawn FIRST ── */}
-      <path d="M 66 60 C 54 86 46 116 46 142 C 46 156 50 164 56 168 L 72 164 C 68 160 66 152 66 140 C 66 118 72 90 80 66 Z" fill={hair} />
-      <path d="M 134 60 C 146 86 154 116 154 142 C 154 156 150 164 144 168 L 128 164 C 132 160 134 152 134 140 C 134 118 128 90 120 66 Z" fill={hair} />
-      {/* Right ponytail */}
-      <path d="M 140 80 C 152 74 164 82 162 96 C 160 108 150 114 140 110 C 146 104 150 94 144 88 Z" fill={hair} />
-      <circle cx="140" cy="82" r="5.5" fill="#FDA4AF" />
-      <circle cx="140" cy="82" r="3.5" fill="#FB7185" />
+      {/* Ponytail — drawn BEFORE head so head circle crops its base naturally */}
+      {/* Bundle visible beyond right edge of head (right edge at ~x=141 at y=88) */}
+      <path d="M 134 84 C 152 76 166 90 162 108 C 158 122 146 126 136 118 C 144 110 150 96 146 88 Z" fill={hair} />
 
       {/* Shoes */}
       <rect x="74" y="212" width="22" height="14" rx="7" fill="#252C3B" />
@@ -278,9 +274,7 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       <rect x="64" y="161" width="72" height="11" rx="7" fill="#EDE9FE" />
       {/* Shirt */}
       <rect x="68" y="118" width="64" height="52" rx="18" fill="#FDA4AF" />
-
       <RacketInHand />
-
       {/* Left arm — raised */}
       <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
@@ -291,16 +285,21 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       <rect x="64" y="156" width="72" height="14" rx="7" fill="#FDA4AF" />
       {/* Neck */}
       <rect x="90" y="108" width="20" height="18" rx="9" fill="#FBBF8A" />
+
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair cap — dome ending at hairline y=60, well above eyes y=81 */}
-      <path d="M 66 60 C 62 38 66 16 100 12 C 134 16 138 38 134 60 C 122 54 110 52 100 52 C 90 52 78 54 66 60 Z" fill={hair} />
+      {/* Hair cap — dome, ends at hairline y=60 */}
+      <path d="M 64 60 C 60 36 64 14 100 10 C 136 14 140 36 136 60 C 124 54 112 52 100 52 C 88 52 76 54 64 60 Z" fill={hair} />
 
-      {/* Bangs — 3 strands, tips all at y≤60, eyebrows at y=71 */}
-      <path d="M 68 60 C 72 46 82 40 88 52" stroke={hair} strokeWidth="6" strokeLinecap="round" fill="none" />
-      <path d="M 86 48 C 94 34 108 36 114 50" stroke={hair} strokeWidth="6" strokeLinecap="round" fill="none" />
-      <path d="M 116 52 C 122 42 132 48 132 60" stroke={hair} strokeWidth="6" strokeLinecap="round" fill="none" />
+      {/* Bangs — gentle fringe sweeping across forehead (y=60→66, above brows at y=71) */}
+      <path d="M 66 62 C 72 66 80 66 86 62" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
+      <path d="M 84 60 C 94 66 106 66 116 60" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
+      <path d="M 118 62 C 124 66 130 64 132 60" stroke={hair} strokeWidth="5.5" strokeLinecap="round" fill="none" />
+
+      {/* Hair tie — drawn after head, at right edge of head where ponytail meets */}
+      <ellipse cx="143" cy="87" rx="7" ry="5" fill="#FDA4AF" />
+      <ellipse cx="143" cy="87" rx="5" ry="3.5" fill="#FB7185" />
 
       {/* Eyebrows */}
       <path d="M 73 71 Q 82 67 91 70" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
@@ -333,9 +332,9 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
 
 function MaleAvatarSVG({ width = 200 }: { width?: number }) {
   const h = Math.round(width * 1.2);
-  // Ghibli boy style: warm brown messy/spiky short hair
+  // Ghibli boy: clean short cut, slightly fluffy top — NO individual spike strokes
   // head cx=100 cy=72 r=44 | hairline y=62 | brows y=72 | eyes cy=80
-  const hair = '#5C3A1E';
+  const hair = '#6B4020';
   return (
     <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="100" cy="234" rx="42" ry="7" fill="#D1D5E8" />
@@ -358,9 +357,7 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Shirt */}
       <rect x="68" y="118" width="64" height="52" rx="18" fill="#7DD3FC" />
       <ellipse cx="100" cy="122" rx="12" ry="7" fill="#60C4F4" />
-
       <RacketInHand />
-
       {/* Left arm — raised */}
       <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
       <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
@@ -371,27 +368,24 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       <rect x="64" y="156" width="72" height="14" rx="7" fill="#7DD3FC" />
       {/* Neck */}
       <rect x="90" y="108" width="20" height="18" rx="9" fill="#FBBF8A" />
+
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair base — short all-over coverage, hairline at y=62 */}
-      <path d="M 64 62 C 60 40 64 16 100 12 C 136 16 140 40 136 62 C 126 56 112 54 100 54 C 88 54 74 56 64 62 Z" fill={hair} />
-      {/* Thin sideburns to ear level only */}
-      <path d="M 64 62 C 60 72 60 84 62 92 L 70 90 C 68 82 68 70 68 62 Z" fill={hair} />
-      <path d="M 136 62 C 140 72 140 84 138 92 L 130 90 C 132 82 132 70 132 62 Z" fill={hair} />
+      {/* Hair cap — single clean shape with slightly irregular top for natural texture */}
+      {/* The top outline has a gentle center rise suggesting fluffy/natural hair */}
+      <path d="M 62 64 C 58 46 60 24 68 14 C 76 6 88 4 94 8 C 97 2 103 2 106 8 C 114 4 124 6 132 14 C 140 24 142 46 138 64 C 126 58 112 56 100 56 C 88 56 74 58 62 64 Z" fill={hair} />
 
-      {/* Spiky top strands — messy Ghibli look */}
-      <path d="M 74 34 C 70 18 80 8 86 18" stroke={hair} strokeWidth="9" strokeLinecap="round" fill="none" />
-      <path d="M 88 24 C 86 6 98 2 102 16" stroke={hair} strokeWidth="9" strokeLinecap="round" fill="none" />
-      <path d="M 104 22 C 108 4 122 8 118 22" stroke={hair} strokeWidth="8" strokeLinecap="round" fill="none" />
-      <path d="M 120 32 C 128 16 138 18 134 32" stroke={hair} strokeWidth="7" strokeLinecap="round" fill="none" />
+      {/* Small sideburns — ear level only, no long extensions */}
+      <path d="M 62 64 C 58 74 58 88 60 96 L 68 94 C 68 86 68 74 66 64 Z" fill={hair} />
+      <path d="M 138 64 C 142 74 142 88 140 96 L 132 94 C 132 86 132 74 134 64 Z" fill={hair} />
 
-      {/* Front bangs — short, end well above brows (y=72) */}
-      <path d="M 66 62 C 70 48 80 42 86 54" stroke={hair} strokeWidth="7" strokeLinecap="round" fill="none" />
-      <path d="M 84 50 C 92 36 108 38 112 52" stroke={hair} strokeWidth="6" strokeLinecap="round" fill="none" />
-      <path d="M 114 52 C 120 40 132 46 130 60" stroke={hair} strokeWidth="6" strokeLinecap="round" fill="none" />
+      {/* Bangs — 3 gentle arcs dipping into forehead, end at y≤68 (brows at y=72) */}
+      <path d="M 64 64 C 70 70 80 70 86 64" stroke={hair} strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 88 62 C 96 68 106 68 116 62" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
+      <path d="M 120 64 C 124 70 130 68 132 62" stroke={hair} strokeWidth="5.5" strokeLinecap="round" fill="none" />
 
-      {/* Eyebrows — straight, thick for masculine look */}
+      {/* Eyebrows — straight, slightly thick */}
       <path d="M 72 72 Q 82 68 92 71" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
       <path d="M 108 71 Q 118 68 128 72" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
       {/* Eyes */}
