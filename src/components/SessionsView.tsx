@@ -289,13 +289,9 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair cap — dome, ends at hairline y=60 */}
-      <path d="M 64 60 C 60 36 64 14 100 10 C 136 14 140 36 136 60 C 124 54 112 52 100 52 C 88 52 76 54 64 60 Z" fill={hair} />
-
-      {/* Bangs — gentle fringe sweeping across forehead (y=60→66, above brows at y=71) */}
-      <path d="M 66 62 C 72 66 80 66 86 62" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
-      <path d="M 84 60 C 94 66 106 66 116 60" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
-      <path d="M 118 62 C 124 66 130 64 132 60" stroke={hair} strokeWidth="5.5" strokeLinecap="round" fill="none" />
+      {/* Hair cap — dome with fringe built into bottom edge (no separate bang strokes) */}
+      {/* Bottom edge dips to y=66 in center → creates natural fringe above brows (y=71) */}
+      <path d="M 64 60 C 60 36 64 14 100 10 C 136 14 140 36 136 60 C 128 62 114 66 100 66 C 86 66 72 62 64 60 Z" fill={hair} />
 
       {/* Hair tie — drawn after head, at right edge of head where ponytail meets */}
       <ellipse cx="143" cy="87" rx="7" ry="5" fill="#FDA4AF" />
@@ -372,18 +368,14 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair cap — single clean shape with slightly irregular top for natural texture */}
-      {/* The top outline has a gentle center rise suggesting fluffy/natural hair */}
-      <path d="M 62 64 C 58 46 60 24 68 14 C 76 6 88 4 94 8 C 97 2 103 2 106 8 C 114 4 124 6 132 14 C 140 24 142 46 138 64 C 126 58 112 56 100 56 C 88 56 74 58 62 64 Z" fill={hair} />
+      {/* Hair cap — irregular top for Ghibli texture + fringe built into bottom edge */}
+      {/* Top: center bump at y≈2 suggests fluffy/natural hair */}
+      {/* Bottom: dips to y=68 in center → clean fringe above brows (y=72), no separate strokes */}
+      <path d="M 62 62 C 58 44 60 22 68 14 C 76 6 88 4 94 8 C 97 2 103 2 106 8 C 114 4 124 6 132 14 C 140 22 142 44 138 62 C 130 64 116 68 100 68 C 84 68 70 64 62 62 Z" fill={hair} />
 
-      {/* Small sideburns — ear level only, no long extensions */}
-      <path d="M 62 64 C 58 74 58 88 60 96 L 68 94 C 68 86 68 74 66 64 Z" fill={hair} />
-      <path d="M 138 64 C 142 74 142 88 140 96 L 132 94 C 132 86 132 74 134 64 Z" fill={hair} />
-
-      {/* Bangs — 3 gentle arcs dipping into forehead, end at y≤68 (brows at y=72) */}
-      <path d="M 64 64 C 70 70 80 70 86 64" stroke={hair} strokeWidth="7" strokeLinecap="round" fill="none" />
-      <path d="M 88 62 C 96 68 106 68 116 62" stroke={hair} strokeWidth="6.5" strokeLinecap="round" fill="none" />
-      <path d="M 120 64 C 124 70 130 68 132 62" stroke={hair} strokeWidth="5.5" strokeLinecap="round" fill="none" />
+      {/* Sideburns — ear level only */}
+      <path d="M 62 62 C 58 72 58 86 60 92 L 68 90 C 68 84 68 72 66 62 Z" fill={hair} />
+      <path d="M 138 62 C 142 72 142 86 140 92 L 132 90 C 132 84 132 72 134 62 Z" fill={hair} />
 
       {/* Eyebrows — straight, slightly thick */}
       <path d="M 72 72 Q 82 68 92 71" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
