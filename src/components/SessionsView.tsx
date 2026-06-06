@@ -289,9 +289,10 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair cap — dome with fringe built into bottom edge (no separate bang strokes) */}
-      {/* Bottom edge dips to y=66 in center → creates natural fringe above brows (y=71) */}
-      <path d="M 64 60 C 60 36 64 14 100 10 C 136 14 140 36 136 60 C 128 62 114 66 100 66 C 86 66 72 62 64 60 Z" fill={hair} />
+      {/* Hair cap — outer edge uses SVG arc to EXACTLY trace the head circle (r=44, center 100,72) */}
+      {/* A 44 44 0 0 1: small arc, CW in SVG = goes over the top through y=28 */}
+      {/* Bottom fringe dips to y=66 in center, eyebrows at y=71 → 5px clean gap */}
+      <path d="M 58 60 A 44 44 0 0 1 142 60 C 128 62 114 66 100 66 C 86 66 72 62 58 60 Z" fill={hair} />
 
       {/* Hair tie — drawn after head, at right edge of head where ponytail meets */}
       <ellipse cx="143" cy="87" rx="7" ry="5" fill="#FDA4AF" />
@@ -368,14 +369,13 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
 
-      {/* Hair cap — irregular top for Ghibli texture + fringe built into bottom edge */}
-      {/* Top: center bump at y≈2 suggests fluffy/natural hair */}
-      {/* Bottom: dips to y=68 in center → clean fringe above brows (y=72), no separate strokes */}
-      <path d="M 62 62 C 58 44 60 22 68 14 C 76 6 88 4 94 8 C 97 2 103 2 106 8 C 114 4 124 6 132 14 C 140 22 142 44 138 62 C 130 64 116 68 100 68 C 84 68 70 64 62 62 Z" fill={hair} />
+      {/* Hair cap — sides start at head circle edge (x≈57 at y=62), bumpy top for Ghibli texture */}
+      {/* Bottom fringe dips to y=68 center, eyebrows at y=72 → 4px gap */}
+      <path d="M 57 62 C 52 44 55 20 64 14 C 72 6 84 4 92 8 C 97 2 103 2 108 8 C 116 4 128 6 136 14 C 145 20 148 44 143 62 C 130 64 116 68 100 68 C 84 68 70 64 57 62 Z" fill={hair} />
 
-      {/* Sideburns — ear level only */}
-      <path d="M 62 62 C 58 72 58 86 60 92 L 68 90 C 68 84 68 72 66 62 Z" fill={hair} />
-      <path d="M 138 62 C 142 72 142 86 140 92 L 132 90 C 132 84 132 72 134 62 Z" fill={hair} />
+      {/* Sideburns — start at head circle edge, ear level only */}
+      <path d="M 57 62 C 53 72 52 84 54 90 L 62 88 C 60 80 60 70 62 62 Z" fill={hair} />
+      <path d="M 143 62 C 147 72 148 84 146 90 L 138 88 C 140 80 140 70 138 62 Z" fill={hair} />
 
       {/* Eyebrows — straight, slightly thick */}
       <path d="M 72 72 Q 82 68 92 71" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
@@ -1132,7 +1132,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
               <div className="flex items-start justify-between px-5 pt-5 pb-3">
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-[var(--text-1)]">{group.name}</p>
+                  <p className="text-base font-bold text-[var(--text-1)]"><span className="text-xs font-semibold text-[var(--p)] bg-[color-mix(in_srgb,var(--p)_12%,transparent)] px-1.5 py-0.5 rounded-md mr-1.5">ก๊วน</span>{group.name}</p>
                   <p className="text-sm text-[var(--text-3)] mt-0.5">{court.name}</p>
                   {court.address && <p className="text-xs text-[var(--text-4)] mt-0.5">{court.address}</p>}
                 </div>
