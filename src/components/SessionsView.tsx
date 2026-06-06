@@ -282,12 +282,18 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             )}
           </div>
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-            <button onClick={onEdit} className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
+            <button onClick={onEdit} title="แก้ไข" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
               </svg>
             </button>
-            <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-50">
+            <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+            <button onClick={onDelete} title="ลบ" className="text-[var(--text-3)] hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-50">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -331,16 +337,32 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         )}
       </div>
 
-      {/* Right: photo — full card height with margin */}
+      {/* Right: photo */}
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
       {session.image ? (
         <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
-          <button
-            type="button"
-            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-            className="absolute top-4 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
-          >✕</button>
+          {/* Hover overlay with actions */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              title="เปลี่ยนรูป"
+              onClick={e => { e.stopPropagation(); photoInputRef.current?.click(); }}
+              className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              title="ลบรูป"
+              onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
+              className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-red-500/80 transition-colors"
+            >✕</button>
+          </div>
         </div>
       ) : null}
 
