@@ -70,7 +70,6 @@ export default function App() {
   }, [showUserMenu]);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
-  const { gender, setGender } = useProfile(user?.uid ?? '');
   const [justLogged, setJustLogged] = useState(false);
   const justLoggedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const triggerJustLogged = () => {
@@ -148,8 +147,7 @@ export default function App() {
               const s = sessions.find(s => s.id === id);
               if (s) updateSession(id, { ...s, image });
             }}
-            gender={gender}
-            onSetGender={setGender}
+
           />
         )}
       </main>

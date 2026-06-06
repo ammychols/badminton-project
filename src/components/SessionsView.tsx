@@ -12,8 +12,6 @@ interface SessionsViewProps {
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
-  gender: 'male' | 'female' | null;
-  onSetGender: (g: 'male' | 'female' | null) => void;
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
@@ -218,246 +216,6 @@ function calcStreak(sessions: { date: string }[]): number {
     else break;
   }
   return streak;
-}
-
-/* ── Racket SVG helper used inside both avatars ── */
-function RacketInHand() {
-  /* Ellipse cx=16 cy=43 rx=14 ry=19 unrotated — strings clipped manually */
-  return (
-    <g>
-      {/* Handle */}
-      <line x1="23" y1="64" x2="31" y2="89" stroke="#8B4513" strokeWidth="7" strokeLinecap="round" />
-      {/* Rotated frame + strings */}
-      <g transform="rotate(-15 16 43)">
-        {/* String grid — endpoints pre-computed to stay inside ellipse */}
-        <line x1="9"  y1="27" x2="23" y2="27" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="3"  y1="35" x2="29" y2="35" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="2"  y1="43" x2="30" y2="43" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="3"  y1="51" x2="29" y2="51" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="9"  y1="59" x2="23" y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="8"  y1="27" x2="8"  y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="16" y1="24" x2="16" y2="62" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        <line x1="24" y1="27" x2="24" y2="59" stroke="#8B4513" strokeWidth="0.9" strokeOpacity="0.55" />
-        {/* Frame drawn on top of strings */}
-        <ellipse cx="16" cy="43" rx="14" ry="19" stroke="#8B4513" strokeWidth="2.5" fill="#FEF3C7" fillOpacity="0.22" />
-      </g>
-    </g>
-  );
-}
-
-function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
-  const h = Math.round(width * 1.2);
-  // Chihiro style: hair pulled back, small ponytail visible on right side
-  // head cx=100 cy=72 r=44 | hairline y=60 | brows y=71 | eyes cy=81
-  const hair = '#5C3015';
-  return (
-    <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="100" cy="234" rx="42" ry="7" fill="#D1D5E8" />
-
-      {/* Ponytail — drawn BEFORE head so head circle crops its base naturally */}
-      {/* Bundle visible beyond right edge of head (right edge at ~x=129 at y=105) */}
-      <path d="M 130 100 C 148 92 162 108 158 126 C 154 140 142 144 132 136 C 140 126 146 110 142 102 Z" fill={hair} />
-
-      {/* Shoes */}
-      <rect x="74" y="212" width="22" height="14" rx="7" fill="#252C3B" />
-      <rect x="104" y="212" width="22" height="14" rx="7" fill="#252C3B" />
-      <rect x="74" y="212" width="22" height="7" rx="3.5" fill="#3A4255" />
-      <rect x="104" y="212" width="22" height="7" rx="3.5" fill="#3A4255" />
-      {/* Socks */}
-      <rect x="78" y="200" width="14" height="15" rx="5" fill="white" />
-      <rect x="108" y="200" width="14" height="15" rx="5" fill="white" />
-      {/* Legs */}
-      <rect x="80" y="172" width="12" height="32" rx="6" fill="#FBBF8A" />
-      <rect x="108" y="172" width="12" height="32" rx="6" fill="#FBBF8A" />
-      {/* Skirt */}
-      <rect x="64" y="161" width="72" height="20" rx="10" fill="#DDD6FE" />
-      <rect x="64" y="161" width="72" height="11" rx="7" fill="#EDE9FE" />
-      {/* Shirt */}
-      <rect x="68" y="118" width="64" height="52" rx="18" fill="#FDA4AF" />
-      <RacketInHand />
-      {/* Left arm — raised */}
-      <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
-      <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
-      {/* Right arm — relaxed, starts from shoulder area */}
-      <path d="M 128 122 C 146 132 154 148 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
-      <circle cx="156" cy="167" r="10" fill="#FBBF8A" />
-      {/* Shirt hem */}
-      <rect x="64" y="156" width="72" height="14" rx="7" fill="#FDA4AF" />
-      {/* Neck */}
-      <rect x="90" y="108" width="20" height="18" rx="9" fill="#FBBF8A" />
-
-      {/* Head */}
-      <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
-
-      {/* Hair cap — outer edge uses SVG arc to EXACTLY trace the head circle (r=44, center 100,72) */}
-      {/* A 44 44 0 0 1: small arc, CW in SVG = goes over the top through y=28 */}
-      {/* Bottom fringe dips to y=66 in center, eyebrows at y=71 → 5px clean gap */}
-      <path d="M 58 60 A 44 44 0 0 1 142 60 C 128 62 114 66 100 66 C 86 66 72 62 58 60 Z" fill={hair} />
-
-      {/* Ears — drawn before head so head naturally overlaps the inner part */}
-      <ellipse cx="56" cy="83" rx="9" ry="11" fill="#FBBF8A" />
-      <ellipse cx="144" cy="83" rx="9" ry="11" fill="#FBBF8A" />
-      <ellipse cx="56" cy="83" rx="5" ry="7" fill="#F0A870" opacity="0.5" />
-      <ellipse cx="144" cy="83" rx="5" ry="7" fill="#F0A870" opacity="0.5" />
-
-      {/* Hair tie — drawn after head, at nape level where ponytail meets */}
-      <ellipse cx="138" cy="104" rx="7" ry="5" fill="#FDA4AF" />
-      <ellipse cx="138" cy="104" rx="5" ry="3.5" fill="#FB7185" />
-
-      {/* Eyebrows */}
-      <path d="M 73 71 Q 82 67 91 70" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      <path d="M 109 70 Q 118 67 127 71" stroke={hair} strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      {/* Eyelashes — softer color so they don't merge with eyebrows */}
-      <path d="M 73 76 Q 82 72 92 76" stroke="#2D1A0E" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
-      <path d="M 108 76 Q 118 72 127 76" stroke="#2D1A0E" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
-      {/* Eyes */}
-      <ellipse cx="82" cy="81" rx="10" ry="11" fill="white" />
-      <ellipse cx="118" cy="81" rx="10" ry="11" fill="white" />
-      <circle cx="82" cy="83" r="7" fill="#4A90D9" />
-      <circle cx="118" cy="83" r="7" fill="#4A90D9" />
-      <circle cx="83" cy="84" r="4.5" fill="#1A1A2E" />
-      <circle cx="119" cy="84" r="4.5" fill="#1A1A2E" />
-      <circle cx="85" cy="79" r="2" fill="white" />
-      <circle cx="121" cy="79" r="2" fill="white" />
-      {/* Nose */}
-      <path d="M 97 92 Q 100 96 103 92" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
-      {/* Mouth */}
-      <path d="M 90 101 Q 100 111 110 101" stroke="#D4604A" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      {/* Cheeks */}
-      <ellipse cx="70" cy="89" rx="10" ry="6" fill="#FFB3C1" opacity="0.5" />
-      <ellipse cx="130" cy="89" rx="10" ry="6" fill="#FFB3C1" opacity="0.5" />
-
-      <text x="152" y="26" fontSize="14" fill="#FFD700">✦</text>
-      <text x="165" y="46" fontSize="9" fill="#FFD700">✦</text>
-    </svg>
-  );
-}
-
-function MaleAvatarSVG({ width = 200 }: { width?: number }) {
-  const h = Math.round(width * 1.2);
-  // Ghibli boy: clean short cut, slightly fluffy top — NO individual spike strokes
-  // head cx=100 cy=72 r=44 | hairline y=62 | brows y=72 | eyes cy=80
-  const hair = '#6B4020';
-  return (
-    <svg width={width} height={h} viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="100" cy="234" rx="42" ry="7" fill="#D1D5E8" />
-
-      {/* Shoes */}
-      <rect x="74" y="212" width="22" height="14" rx="7" fill="#252C3B" />
-      <rect x="104" y="212" width="22" height="14" rx="7" fill="#252C3B" />
-      <rect x="74" y="212" width="22" height="7" rx="3.5" fill="#3A4255" />
-      <rect x="104" y="212" width="22" height="7" rx="3.5" fill="#3A4255" />
-      {/* Socks */}
-      <rect x="78" y="200" width="14" height="15" rx="5" fill="white" />
-      <rect x="108" y="200" width="14" height="15" rx="5" fill="white" />
-      {/* Legs */}
-      <rect x="80" y="172" width="12" height="32" rx="6" fill="#FBBF8A" />
-      <rect x="108" y="172" width="12" height="32" rx="6" fill="#FBBF8A" />
-      {/* Shorts */}
-      <rect x="64" y="161" width="72" height="20" rx="10" fill="#4B5563" />
-      <rect x="64" y="161" width="72" height="11" rx="7" fill="#6B7280" />
-      <line x1="100" y1="162" x2="100" y2="180" stroke="#374151" strokeWidth="1.5" />
-      {/* Shirt */}
-      <rect x="68" y="118" width="64" height="52" rx="18" fill="#7DD3FC" />
-      <ellipse cx="100" cy="122" rx="12" ry="7" fill="#60C4F4" />
-      <RacketInHand />
-      {/* Left arm — raised */}
-      <path d="M 76 130 C 58 116 42 102 32 86" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
-      <circle cx="32" cy="86" r="10" fill="#FBBF8A" />
-      {/* Right arm — relaxed, starts from shoulder area */}
-      <path d="M 128 122 C 146 132 154 148 156 166" stroke="#FBBF8A" strokeWidth="20" strokeLinecap="round" fill="none" />
-      <circle cx="156" cy="167" r="10" fill="#FBBF8A" />
-      {/* Shirt hem */}
-      <rect x="64" y="156" width="72" height="14" rx="7" fill="#7DD3FC" />
-      {/* Neck */}
-      <rect x="90" y="108" width="20" height="18" rx="9" fill="#FBBF8A" />
-
-      {/* Head */}
-      <circle cx="100" cy="72" r="44" fill="#FBBF8A" />
-
-      {/* Hair cap — sides start at head circle edge (x≈57 at y=62), bumpy top for Ghibli texture */}
-      {/* Bottom fringe dips to y=68 center, eyebrows at y=72 → 4px gap */}
-      <path d="M 57 62 C 52 44 55 20 64 14 C 72 6 84 4 92 8 C 97 2 103 2 108 8 C 116 4 128 6 136 14 C 145 20 148 44 143 62 C 130 64 116 68 100 68 C 84 68 70 64 57 62 Z" fill={hair} />
-
-      {/* Sideburns — start at head circle edge, ear level only */}
-      <path d="M 57 62 C 53 72 52 84 54 90 L 62 88 C 60 80 60 70 62 62 Z" fill={hair} />
-      <path d="M 143 62 C 147 72 148 84 146 90 L 138 88 C 140 80 140 70 138 62 Z" fill={hair} />
-
-      {/* Eyebrows — straight, slightly thick */}
-      <path d="M 72 72 Q 82 68 92 71" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      <path d="M 108 71 Q 118 68 128 72" stroke={hair} strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      {/* Eyes */}
-      <ellipse cx="82" cy="80" rx="10" ry="10" fill="white" />
-      <ellipse cx="118" cy="80" rx="10" ry="10" fill="white" />
-      <circle cx="82" cy="81" r="7" fill="#4A7CC0" />
-      <circle cx="118" cy="81" r="7" fill="#4A7CC0" />
-      <circle cx="83" cy="82" r="4.5" fill="#1A1A2E" />
-      <circle cx="119" cy="82" r="4.5" fill="#1A1A2E" />
-      <circle cx="85" cy="77" r="2" fill="white" />
-      <circle cx="121" cy="77" r="2" fill="white" />
-      {/* Nose */}
-      <path d="M 97 91 Q 100 95 103 91" stroke="#E8956A" strokeWidth="2" strokeLinecap="round" fill="none" />
-      {/* Mouth */}
-      <path d="M 89 100 Q 100 110 111 100" stroke="#D4604A" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-
-      <text x="152" y="26" fontSize="14" fill="#FFD700">✦</text>
-      <text x="165" y="46" fontSize="9" fill="#FFD700">✦</text>
-      <text x="148" y="14" fontSize="8" fill="#BAE6FD">✦</text>
-    </svg>
-  );
-}
-
-function AvatarCard({ gender, onSetGender }: {
-  gender: 'male' | 'female' | null;
-  onSetGender: (g: 'male' | 'female' | null) => void;
-}) {
-  if (gender === null) {
-    return (
-      <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
-        <div className="px-5 pt-5 pb-6">
-          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">🏸 ตัวแทนของคุณ</div>
-          <div className="text-sm font-semibold text-[var(--text-1)] mb-0.5">เลือกตัวละครของคุณ</div>
-          <div className="text-xs text-[var(--text-3)] mb-5">กดเลือกตัวละครประจำตัว</div>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => onSetGender('male')}
-              className="flex flex-col items-center gap-2 pt-3 pb-3 rounded-2xl border-2 border-[var(--card-border)] hover:border-[var(--p)] hover:bg-[var(--chip-bg)] transition-all active:scale-95"
-            >
-              <MaleAvatarSVG width={84} />
-              <span className="text-sm font-semibold text-[var(--text-1)]">ชาย</span>
-            </button>
-            <button
-              onClick={() => onSetGender('female')}
-              className="flex flex-col items-center gap-2 pt-3 pb-3 rounded-2xl border-2 border-[var(--card-border)] hover:border-[var(--p)] hover:bg-[var(--chip-bg)] transition-all active:scale-95"
-            >
-              <FemaleAvatarSVG width={84} />
-              <span className="text-sm font-semibold text-[var(--text-1)]">หญิง</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
-      <div className="px-5 pt-5 pb-0">
-        <div className="flex items-center justify-between">
-          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">🏸 ตัวแทนของคุณ</div>
-          <button
-            onClick={() => onSetGender(null)}
-            className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors py-0.5 px-1.5 rounded-lg hover:bg-[var(--chip-bg)]"
-          >
-            เปลี่ยน
-          </button>
-        </div>
-      </div>
-
-      <div className="flex justify-center pt-2 pb-3">
-        {gender === 'female' ? <FemaleAvatarSVG /> : <MaleAvatarSVG />}
-      </div>
-    </div>
-  );
 }
 
 function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo }: {
@@ -772,7 +530,7 @@ function computeInsights(
   return out;
 }
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, gender, onSetGender }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
@@ -1000,10 +758,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           )}
         </div>
 
-        {/* Col 3: Avatar card */}
-        <div className="w-[240px] flex-shrink-0">
-          <AvatarCard gender={gender} onSetGender={onSetGender} />
-        </div>
+
       </div>
 
       {/* ── Mobile: stacked ── */}
@@ -1090,7 +845,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
           </button>
         ); })()}
-        <AvatarCard gender={gender} onSetGender={onSetGender} />
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
             <div className={emptyState.icon}>🏸</div>
