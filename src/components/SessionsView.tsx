@@ -464,8 +464,8 @@ function AvatarCard({ gender, onSetGender }: {
     return (
       <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
         <div className="px-5 pt-5 pb-6">
-          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">Avatar</div>
-          <div className="text-sm font-semibold text-[var(--text-1)] mb-0.5">เลือก Avatar ของคุณ</div>
+          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">🏸 ตัวแทนของคุณ</div>
+          <div className="text-sm font-semibold text-[var(--text-1)] mb-0.5">เลือกตัวละครของคุณ</div>
           <div className="text-xs text-[var(--text-3)] mb-5">กดเลือกตัวละครประจำตัว</div>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -492,7 +492,7 @@ function AvatarCard({ gender, onSetGender }: {
     <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
       <div className="px-5 pt-5 pb-0">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">Avatar</div>
+          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">🏸 ตัวแทนของคุณ</div>
           <button
             onClick={() => onSetGender(null)}
             className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors py-0.5 px-1.5 rounded-lg hover:bg-[var(--chip-bg)]"
