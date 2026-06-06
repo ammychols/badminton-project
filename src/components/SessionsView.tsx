@@ -218,6 +218,95 @@ function calcStreak(sessions: { date: string }[]): number {
   return streak;
 }
 
+const MOOD_COLOR: Record<number, string> = {
+  1: '#EF4444', 2: '#F97316', 3: '#EAB308',
+  4: '#84CC16', 5: '#22C55E', 6: '#10B981',
+};
+
+function MoodTrack({ sessions }: { sessions: Session[] }) {
+  const COLS = 4, ROWS = 5, CELL = 46, PAD = 18;
+  const TOTAL = COLS * ROWS; // 20 slots
+  const W = COLS * CELL + PAD * 2;
+  const H = ROWS * CELL + PAD * 2;
+
+  // Sort oldest→newest, take last TOTAL
+  const sorted = [...sessions].sort((a, b) => a.date < b.date ? -1 : 1);
+  const recent = sorted.slice(-TOTAL);
+
+  // Grid position: i=0 bottom-left, serpentine upward
+  const pos = (i: number) => {
+    const row = Math.floor(i / COLS);
+    const col = row % 2 === 0 ? i % COLS : COLS - 1 - (i % COLS);
+    return {
+      x: PAD + col * CELL + CELL / 2,
+      y: H - PAD - row * CELL - CELL / 2,
+    };
+  };
+
+  // Build smooth path through all TOTAL slots
+  const allPts = Array.from({ length: TOTAL }, (_, i) => pos(i));
+  const pathD = allPts.map((p, i) => i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`).join(' ');
+
+  const latestIdx = recent.length - 1;
+
+  return (
+    <div className="rounded-2xl border border-[var(--card-border)] bg-white shadow-sm overflow-hidden mb-4">
+      <div className="px-4 pt-4 pb-1">
+        <div className="text-sm font-semibold text-[var(--text-1)]">เส้นทาง Mood</div>
+        <div className="text-xs text-[var(--text-3)] mt-0.5">{recent.length} session ล่าสุด</div>
+      </div>
+      <div className="flex justify-center pb-3 pt-1">
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none">
+          {/* Background track */}
+          <path d={pathD} stroke="var(--card-border)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Colored filled track up to current position */}
+          {recent.length > 1 && (() => {
+            const filledPts = allPts.slice(0, recent.length);
+            const d = filledPts.map((p, i) => i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`).join(' ');
+            return <path d={d} stroke="#E2E8F0" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />;
+          })()}
+          {/* Empty slot dots */}
+          {allPts.slice(recent.length).map((p, i) => (
+            <circle key={`e-${i}`} cx={p.x} cy={p.y} r="8" fill="#F1F5F9" stroke="#E2E8F0" strokeWidth="1.5" />
+          ))}
+          {/* Session nodes */}
+          {recent.map((s, i) => {
+            const { x, y } = allPts[i];
+            const isLatest = i === latestIdx;
+            const color = MOOD_COLOR[s.mood ?? 0] ?? '#CBD5E1';
+            return (
+              <g key={s.id}>
+                {isLatest && <circle cx={x} cy={y} r="18" fill={color} opacity="0.2" />}
+                <circle cx={x} cy={y} r={isLatest ? 14 : 10} fill={color} />
+                {isLatest
+                  ? <text x={x} y={y + 5} textAnchor="middle" fontSize="13">🏸</text>
+                  : s.mood
+                    ? <text x={x} y={y + 4} textAnchor="middle" fontSize="9" fill="white" fontWeight="700">{s.mood}</text>
+                    : null
+                }
+              </g>
+            );
+          })}
+          {/* Start flag at slot 0 if no sessions yet */}
+          {recent.length === 0 && (
+            <text x={allPts[0].x} y={allPts[0].y + 5} textAnchor="middle" fontSize="14">🚩</text>
+          )}
+        </svg>
+      </div>
+      {/* Mood legend */}
+      <div className="flex items-center justify-center gap-1.5 pb-3 px-4">
+        {[1,2,3,4,5,6].map(m => (
+          <div key={m} className="flex flex-col items-center gap-0.5">
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: MOOD_COLOR[m] }} />
+            <span className="text-[9px] text-[var(--text-3)]">{m}</span>
+          </div>
+        ))}
+        <span className="text-[10px] text-[var(--text-4)] ml-1">mood</span>
+      </div>
+    </div>
+  );
+}
+
 function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
@@ -758,7 +847,10 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
           )}
         </div>
 
-
+        {/* Col 3: Mood track */}
+        <div className="w-[220px] flex-shrink-0">
+          <MoodTrack sessions={sessions} />
+        </div>
       </div>
 
       {/* ── Mobile: stacked ── */}
@@ -845,6 +937,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
           </button>
         ); })()}
+        <MoodTrack sessions={sessions} />
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
             <div className={emptyState.icon}>🏸</div>
