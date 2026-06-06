@@ -252,6 +252,14 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Shadow */}
       <ellipse cx="100" cy="233" rx="36" ry="7" fill="#DDE1EC" />
 
+      {/* Long hair curtains — drawn FIRST so legs/body render on top */}
+      <path d="M 52 80 C 42 102 36 132 36 162 C 36 182 40 196 46 206 L 72 206 C 66 196 62 182 62 162 C 62 132 66 102 70 80 Z" fill="#1A1A2E" />
+      <path d="M 46 100 C 42 124 38 152 38 174" stroke="#2D2D48" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      <path d="M 58 96 C 54 120 52 150 52 170" stroke="#2D2D48" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      <path d="M 148 80 C 158 102 164 132 164 162 C 164 182 160 196 154 206 L 128 206 C 134 196 138 182 138 162 C 138 132 134 102 130 80 Z" fill="#1A1A2E" />
+      <path d="M 154 100 C 158 124 162 152 162 174" stroke="#2D2D48" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      <path d="M 142 96 C 146 120 148 150 148 170" stroke="#2D2D48" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+
       {/* Shoes */}
       <rect x="73" y="212" width="23" height="14" rx="7" fill="#3D4451" />
       <rect x="104" y="212" width="23" height="14" rx="7" fill="#3D4451" />
@@ -295,22 +303,19 @@ function FemaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="68" r="48" fill="#FBBF8A" />
 
-      {/* Hair back */}
-      <path d="M 52 68 Q 50 20 100 14 Q 150 20 148 68" fill="#1A1A2E" />
-      <ellipse cx="53" cy="74" rx="9" ry="18" fill="#1A1A2E" transform="rotate(-5 53 74)" />
-      <ellipse cx="147" cy="74" rx="9" ry="18" fill="#1A1A2E" transform="rotate(5 147 74)" />
+      {/* Hair cap — dome from y=14 (top) to y=80 (sides), connects to curtains */}
+      <path d="M 52 80 C 48 52 50 20 100 14 C 150 20 152 52 148 80 Z" fill="#1A1A2E" />
 
-      {/* Cute hair bow clip — not sporty, just accessory */}
+      {/* Hair bow accessory */}
       <rect x="52" y="52" width="96" height="11" rx="5.5" fill="#C4B5FD" />
       <path d="M 100 45 L 90 52 L 100 59 L 110 52 Z" fill="#FDA4AF" />
       <circle cx="100" cy="52" r="4" fill="#FBCFE8" />
 
-      {/* Hair front / bangs */}
-      <path d="M 52 58 Q 56 40 70 36" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
-      <path d="M 148 58 Q 144 40 130 36" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
-      <path d="M 70 36 Q 84 28 100 30 Q 116 28 130 36" stroke="#1A1A2E" strokeWidth="10" strokeLinecap="round" fill="none" />
-      <path d="M 68 50 Q 74 36 82 44" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
-      <path d="M 78 44 Q 88 30 97 42" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      {/* Front bangs — 4 sweeping strands across forehead */}
+      <path d="M 54 66 C 58 52 66 44 76 54" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M 68 50 C 74 36 86 32 94 46" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 88 40 C 98 28 114 32 118 46" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 114 50 C 122 40 132 44 134 58" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
 
       {/* Eye whites */}
       <ellipse cx="82" cy="74" rx="11" ry="12" fill="white" />
@@ -405,20 +410,17 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
       {/* Head */}
       <circle cx="100" cy="68" r="48" fill="#FBBF8A" />
 
-      {/* Hair back — shorter/rounder for male */}
-      <path d="M 56 70 Q 54 24 100 18 Q 146 24 144 70" fill="#1A1A2E" />
-      <ellipse cx="57" cy="72" rx="8" ry="13" fill="#1A1A2E" transform="rotate(-5 57 72)" />
-      <ellipse cx="143" cy="72" rx="8" ry="13" fill="#1A1A2E" transform="rotate(5 143 72)" />
+      {/* Hair cap with natural M-hairline */}
+      <path d="M 56 82 C 52 56 54 22 100 16 C 146 22 148 56 144 82 C 136 76 124 72 112 70 C 106 69 100 69 100 69 C 94 69 88 69 80 71 C 68 73 62 76 56 82 Z" fill="#1A1A2E" />
+      {/* Left side hair — ear coverage */}
+      <path d="M 56 82 C 50 94 48 108 50 120 L 62 118 C 60 106 62 92 68 82 Z" fill="#1A1A2E" />
+      {/* Right side hair — ear coverage */}
+      <path d="M 144 82 C 150 94 152 108 150 120 L 138 118 C 140 106 138 92 132 82 Z" fill="#1A1A2E" />
 
-      {/* No headband — just natural hair */}
-
-      {/* Hair front — short, spiky male style */}
-      <path d="M 56 60 Q 60 44 72 40" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <path d="M 144 60 Q 140 44 128 40" stroke="#1A1A2E" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <path d="M 72 40 Q 86 32 100 34 Q 114 32 128 40" stroke="#1A1A2E" strokeWidth="9" strokeLinecap="round" fill="none" />
-      {/* Short spiky bangs */}
-      <path d="M 70 52 Q 78 38 88 46" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
-      <path d="M 90 44 Q 98 34 108 44" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
+      {/* Front bangs — 3 short strands */}
+      <path d="M 60 76 C 64 62 74 56 82 64" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 76 60 C 82 46 96 44 102 58" stroke="#1A1A2E" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path d="M 100 56 C 108 44 122 48 126 62" stroke="#1A1A2E" strokeWidth="6" strokeLinecap="round" fill="none" />
 
       {/* Eye whites — slightly less tall for masculine look */}
       <ellipse cx="82" cy="75" rx="11" ry="11" fill="white" />
@@ -507,11 +509,12 @@ function AvatarCard({ gender, onSetGender }: {
   );
 }
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto }: {
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
   onUpdateNote: (notes: string | undefined) => void;
   onUpdatePhoto: (image: string | undefined) => void;
+  onViewInfo: () => void;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
@@ -553,9 +556,10 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
           </div>
-          <div className="min-w-0 flex-1 cursor-pointer" onClick={onEdit}>
+          {/* Group + court names → tap to view info */}
+          <button className="min-w-0 flex-1 text-left" onClick={onViewInfo}>
             <div className="text-sm leading-snug">
-              <span className="font-semibold text-[var(--text-1)]">{groupName}</span>
+              <span className="font-semibold text-[var(--text-1)] hover:underline">{groupName}</span>
               <span className="text-[var(--text-3)] font-normal"> · {courtName}</span>
             </div>
             {session.intensity && (
@@ -565,8 +569,8 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
                 </span>
               </div>
             )}
-          </div>
-          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          </button>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
             {!session.image && (
               <button type="button" onClick={() => photoInputRef.current?.click()}
                 className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1">
@@ -576,6 +580,12 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
                 </svg>
               </button>
             )}
+            {/* Pencil — edit session */}
+            <button onClick={onEdit} className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
+              </svg>
+            </button>
             <button onClick={onDelete} className="text-[var(--text-3)] hover:text-red-400 transition-colors p-1">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -607,7 +617,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
         {/* Meta footer */}
         {(hasTime || session.gamesPlayed > 0) && (
-          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs cursor-pointer" onClick={onEdit}>
+          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
             {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
             {hasTime && durLabel && metaDivider}
             {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
@@ -654,7 +664,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   );
 }
 
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onViewInfo }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
@@ -662,6 +672,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   setConfirmDeleteId: (id: string) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onViewInfo: (s: Session) => void;
 }) {
   const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
   // Group by date
@@ -690,6 +701,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
                 onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
+                onViewInfo={() => onViewInfo(s)}
               />
             ))}
           </div>
@@ -820,6 +832,7 @@ function computeInsights(
 export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, gender, onSetGender }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
   const [search, setSearch] = useState('');
   const [insightIdx, setInsightIdx] = useState(0);
   const insightTouchX = useRef<number | null>(null);
@@ -922,8 +935,17 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   return (
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Header */}
-      <div className="flex items-center mb-5">
+      <div className="flex items-center justify-between mb-5">
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
+        <button
+          onClick={onLogSession}
+          className="flex items-center gap-1.5 bg-[var(--p)] text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90 active:scale-95 transition-all"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          บันทึก
+        </button>
       </div>
 
       {/* ── Desktop: 2-column dashboard ── */}
@@ -1024,7 +1046,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
                     <div className={`flex-1 flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border ${ns.wrap}`}>
                       <span className={`text-sm font-medium ${ns.text} min-w-0 truncate`}>{nudge.emoji} {nudge.message}{nudge.sub && <span className="font-normal opacity-80"> — {nudge.sub}</span>}</span>
-                      <button onClick={onLogSession} className={`text-xs font-semibold transition-colors whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</button>
+                      <button onClick={onLogSession} className="text-xs font-semibold whitespace-nowrap bg-[var(--p)] text-white px-3 py-1.5 rounded-full hover:opacity-90 active:scale-95 transition-all flex-shrink-0">{nudge.btnLabel}</button>
                     </div>
                   ); })()}
                 </div>
@@ -1034,7 +1056,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
               )}
             </div>
           )}
@@ -1127,7 +1149,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               <div className={`text-sm font-medium ${ns.text}`}>{nudge.message}</div>
               {nudge.sub && <div className={`text-xs opacity-75 ${ns.text}`}>{nudge.sub}</div>}
             </div>
-            <span className={`text-xs font-semibold whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</span>
+            <span className="text-xs font-semibold whitespace-nowrap bg-[var(--p)] text-white px-3 py-1.5 rounded-full flex-shrink-0">{nudge.btnLabel}</span>
           </button>
         ); })()}
         <AvatarCard gender={gender} onSetGender={onSetGender} />
@@ -1161,11 +1183,63 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             )}
             {viewedSessions.length > 0 && (
               <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} />
+                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
             )}
           </div>
         )}
       </div>
+
+      {/* Group / Court info sheet */}
+      {viewInfoSession && (() => {
+        const court = courts.find(c => c.id === viewInfoSession.courtId);
+        const group = court?.groups.find(g => g.id === viewInfoSession.groupId);
+        if (!court || !group) return null;
+        const dayMap: Record<string, string> = { MON: 'จ', TUE: 'อ', WED: 'พ', THU: 'พฤ', FRI: 'ศ', SAT: 'ส', SUN: 'อา' };
+        return (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setViewInfoSession(null)}>
+            <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-start justify-between px-5 pt-5 pb-3">
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-[var(--text-1)]">{group.name}</p>
+                  <p className="text-sm text-[var(--text-3)] mt-0.5">{court.name}</p>
+                  {court.address && <p className="text-xs text-[var(--text-4)] mt-0.5">{court.address}</p>}
+                </div>
+                <button onClick={() => setViewInfoSession(null)} className="w-8 h-8 rounded-full bg-[var(--chip-bg)] flex items-center justify-center text-[var(--text-3)] text-sm ml-3 flex-shrink-0">✕</button>
+              </div>
+              <div className="px-5 pb-6 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">📅</div>
+                  <div>
+                    <div className="text-xs text-[var(--text-3)] mb-0.5">วัน · เวลา</div>
+                    <div className="text-sm font-medium text-[var(--text-1)]">
+                      {group.days.map(d => dayMap[d] ?? d).join(' ')}
+                      {group.startTime && group.endTime ? ` · ${group.startTime}–${group.endTime}` : ''}
+                    </div>
+                  </div>
+                </div>
+                {group.levels && group.levels.length > 0 && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">🏸</div>
+                    <div>
+                      <div className="text-xs text-[var(--text-3)] mb-0.5">ระดับ</div>
+                      <div className="text-sm font-medium text-[var(--text-1)]">{group.levels.join(' · ')}</div>
+                    </div>
+                  </div>
+                )}
+                {group.notes && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">📝</div>
+                    <div>
+                      <div className="text-xs text-[var(--text-3)] mb-0.5">โน้ต</div>
+                      <div className="text-sm text-[var(--text-2)] leading-relaxed">{group.notes}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
