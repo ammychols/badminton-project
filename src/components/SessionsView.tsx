@@ -454,8 +454,7 @@ function MaleAvatarSVG({ width = 200 }: { width?: number }) {
   );
 }
 
-function AvatarCard({ totalSessions, gender, onSetGender }: {
-  totalSessions: number;
+function AvatarCard({ gender, onSetGender }: {
   gender: 'male' | 'female' | null;
   onSetGender: (g: 'male' | 'female' | null) => void;
 }) {
@@ -489,13 +488,9 @@ function AvatarCard({ totalSessions, gender, onSetGender }: {
 
   return (
     <div className="mt-4 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-white shadow-md">
-      <div className="px-5 pt-5 pb-2">
-        <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide mb-1">Avatar</div>
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-sm font-semibold text-[var(--text-1)]">มือใหม่หัดตี</div>
-            <div className="text-xs text-[var(--text-3)] mt-0.5">{totalSessions} session{totalSessions !== 1 ? 's' : ''}</div>
-          </div>
+      <div className="px-5 pt-5 pb-0">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">Avatar</div>
           <button
             onClick={() => onSetGender(null)}
             className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors py-0.5 px-1.5 rounded-lg hover:bg-[var(--chip-bg)]"
@@ -505,18 +500,8 @@ function AvatarCard({ totalSessions, gender, onSetGender }: {
         </div>
       </div>
 
-      <div className="flex justify-center pt-1 pb-1">
+      <div className="flex justify-center pt-2 pb-3">
         {gender === 'female' ? <FemaleAvatarSVG /> : <MaleAvatarSVG />}
-      </div>
-
-      <div className="px-5 pb-5">
-        <div className="flex justify-between text-xs text-[var(--text-3)] mb-1.5">
-          <span>ไปอีก {Math.max(0, 5 - totalSessions)} sessions จะ evolve!</span>
-          <span>{Math.min(totalSessions, 5)}/5</span>
-        </div>
-        <div className="w-full h-2 rounded-full bg-[var(--chip-bg)]">
-          <div className="h-2 rounded-full bg-[var(--p)] transition-all" style={{ width: `${Math.min((totalSessions / 5) * 100, 100)}%` }} />
-        </div>
       </div>
     </div>
   );
@@ -1057,7 +1042,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
 
         {/* Col 3: Avatar card */}
         <div className="w-[240px] flex-shrink-0">
-          <AvatarCard totalSessions={sessions.length} gender={gender} onSetGender={onSetGender} />
+          <AvatarCard gender={gender} onSetGender={onSetGender} />
         </div>
       </div>
 
@@ -1145,6 +1130,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <span className={`text-xs font-semibold whitespace-nowrap ${ns.btn}`}>{nudge.btnLabel}</span>
           </button>
         ); })()}
+        <AvatarCard gender={gender} onSetGender={onSetGender} />
         {sessions.length === 0 ? (
           <div className={emptyState.wrapper}>
             <div className={emptyState.icon}>🏸</div>
