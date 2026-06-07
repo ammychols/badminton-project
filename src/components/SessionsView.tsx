@@ -943,7 +943,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               </div>
               <button
                 onClick={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
-                className="w-full flex items-center justify-between px-5 py-3 border-t border-[var(--card-border)] text-sm font-medium text-[var(--p)] hover:bg-[color-mix(in_srgb,var(--p)_6%,transparent)] transition-colors"
+                className="w-full flex items-center justify-end gap-1.5 px-5 py-3 border-t border-[var(--card-border)] text-sm font-medium text-[var(--p)] hover:bg-[color-mix(in_srgb,var(--p)_6%,transparent)] transition-colors"
               >
                 <span>ดูก๊วนอื่นๆ ในสนามนี้</span>
                 <span className="text-base">→</span>
