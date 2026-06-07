@@ -343,26 +343,12 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
           <img src={session.image} alt="session" className="w-full h-full object-cover" />
           {/* Hover overlay with actions */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-          <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              type="button"
-              title="เปลี่ยนรูป"
-              onClick={e => { e.stopPropagation(); photoInputRef.current?.click(); }}
-              className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              title="ลบรูป"
-              onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-              className="w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-red-500/80 transition-colors"
-            >✕</button>
-          </div>
+          <button
+            type="button"
+            title="ลบรูป"
+            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-red-500/80 transition-colors opacity-0 group-hover:opacity-100"
+          >✕</button>
         </div>
       ) : null}
 
