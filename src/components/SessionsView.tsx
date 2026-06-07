@@ -12,6 +12,7 @@ interface SessionsViewProps {
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onNavigateToCourt: (courtId: string) => void;
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
@@ -542,7 +543,7 @@ function computeInsights(
   return out;
 }
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onNavigateToCourt }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
@@ -905,7 +906,13 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               <div className="flex items-start justify-between px-5 pt-5 pb-3">
                 <div className="min-w-0">
                   <p className="text-base font-bold text-[var(--text-1)]"><span className="text-xs font-semibold text-[var(--p)] bg-[color-mix(in_srgb,var(--p)_12%,transparent)] px-1.5 py-0.5 rounded-md mr-1.5">ก๊วน</span>{group.name}</p>
-                  <p className="text-sm text-[var(--text-3)] mt-0.5">{court.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-sm text-[var(--text-3)]">{court.name}</p>
+                    <button
+                      onClick={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
+                      className="text-xs font-medium text-[var(--p)] hover:underline flex-shrink-0"
+                    >ดูก๊วนอื่นๆ →</button>
+                  </div>
                   {court.address && <p className="text-xs text-[var(--text-4)] mt-0.5">{court.address}</p>}
                 </div>
                 <button onClick={() => setViewInfoSession(null)} className="w-8 h-8 rounded-full bg-[var(--chip-bg)] flex items-center justify-center text-[var(--text-3)] text-sm ml-3 flex-shrink-0">✕</button>

@@ -5,6 +5,8 @@ import { btn, emptyState, text } from '../styles/tokens';
 
 interface CourtsViewProps {
   courts: Court[];
+  highlightCourtId?: string | null;
+  onHighlightClear?: () => void;
   onAddCourt: () => void;
   onAddGroup: (courtId: string, defaultDay?: DayOfWeek) => void;
   onDeleteCourt: (courtId: string) => void;
@@ -34,12 +36,23 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
-export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCourtId, setSelectedCourtId] = useState<string | null>(() => courts[0]?.id ?? null);
+  const courtRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!highlightCourtId) return;
+    setSelectedCourtId(highlightCourtId);
+    setSelectedDay('all');
+    setTimeout(() => {
+      courtRefs.current[highlightCourtId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      onHighlightClear?.();
+    }, 100);
+  }, [highlightCourtId]);
 
   const q = search.trim().toLowerCase();
   const filteredCourts = courts.filter(court => {
@@ -134,7 +147,7 @@ export function CourtsView({ courts, onAddCourt, onAddGroup, onDeleteCourt, onDe
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
-                <div key={court.id} className="relative flex-shrink-0 w-48 sm:w-auto">
+                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-48 sm:w-auto">
                   <button
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                     onMouseDown={e => e.preventDefault()}

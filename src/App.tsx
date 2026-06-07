@@ -54,6 +54,7 @@ export default function App() {
   const { user, loading, signIn, signOut, error } = useAuth();
   const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'courts');
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
+  const [highlightCourtId, setHighlightCourtId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -123,6 +124,8 @@ export default function App() {
         {tab === 'courts' ? (
           <CourtsView
             courts={courts}
+            highlightCourtId={highlightCourtId}
+            onHighlightClear={() => setHighlightCourtId(null)}
             onAddCourt={() => openModal({ type: 'addCourt' })}
             onAddGroup={(courtId, defaultDay) => openModal({ type: 'addGroup', courtId, defaultDay })}
             onDeleteCourt={deleteCourt}
@@ -147,7 +150,7 @@ export default function App() {
               const s = sessions.find(s => s.id === id);
               if (s) updateSession(id, { ...s, image });
             }}
-
+            onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
           />
         )}
       </main>
