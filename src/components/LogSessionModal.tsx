@@ -170,7 +170,9 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | 6>(initialSession?.mood ?? 3);
-  const [intensity, setIntensity] = useState<Intensity | undefined>(initialSession?.intensity);
+  const [intensities, setIntensities] = useState<Intensity[]>(
+    initialSession?.intensity ? (Array.isArray(initialSession.intensity) ? initialSession.intensity : [initialSession.intensity]) : []
+  );
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
 
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
@@ -202,6 +204,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const handleSave = () => {
     if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
     onClose();
+    const intensity = intensities.length === 0 ? undefined : intensities.length === 1 ? intensities[0] : intensities;
     onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, notes: notes.trim() || undefined });
   };
 
@@ -291,15 +294,19 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
       <div className="mb-4">
         <label className={text.label}>ความหนัก</label>
         <div className="flex gap-2">
-          {ALL_INTENSITIES.map(lv => (
-            <button key={lv} type="button" onClick={() => setIntensity(prev => prev === lv ? undefined : lv)}
-              className={`flex-1 py-2.5 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
-                intensity === lv ? 'bg-[var(--p)] text-white scale-105' : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
-              }`}>
-              <span className="text-xs">{INTENSITY_EMOJIS[lv]}</span>
-              {INTENSITY_LABELS[lv]}
-            </button>
-          ))}
+          {ALL_INTENSITIES.map(lv => {
+            const selected = intensities.includes(lv);
+            return (
+              <button key={lv} type="button"
+                onClick={() => setIntensities(prev => prev.includes(lv) ? prev.filter(x => x !== lv) : [...prev, lv])}
+                className={`flex-1 py-2.5 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
+                  selected ? 'bg-[var(--p)] text-white scale-105' : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
+                }`}>
+                <span className="text-xs">{INTENSITY_EMOJIS[lv]}</span>
+                {INTENSITY_LABELS[lv]}
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -9,8 +9,8 @@ interface BottomSheetProps {
 
 export function BottomSheet({ title, onClose, children, footer }: BottomSheetProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 z-[100] flex items-end justify-center sm:items-center">
-      <div className="rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-y-auto max-h-[90vh]" style={{ backgroundColor: 'var(--nav-bg)' }}>
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-end justify-center sm:items-center" onClick={onClose}>
+      <div className="rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-y-auto max-h-[90vh]" style={{ backgroundColor: 'var(--nav-bg)' }} onClick={e => e.stopPropagation()}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-lg font-bold text-[var(--text-1)]">{title}</h3>

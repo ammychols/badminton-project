@@ -81,7 +81,7 @@ export interface Session {
   endTime: string; // HH:MM
   gamesPlayed: number;
   mood: 1 | 2 | 3 | 4 | 5 | 6;
-  intensity?: Intensity;
+  intensity?: Intensity | Intensity[];
   notes?: string;
   image?: string;
 }

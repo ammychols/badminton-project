@@ -274,10 +274,12 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               <button onClick={onViewInfo} className="text-[var(--text-3)] hover:underline hover:text-[var(--p)] transition-colors font-normal">{courtName}</button>
             </div>
             {session.intensity && (
-              <div className="mt-0.5">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium leading-tight ${INTENSITY_CHIP[session.intensity]}`}>
-                  {INTENSITY_LABELS[session.intensity]}
-                </span>
+              <div className="mt-0.5 flex flex-wrap gap-1">
+                {(Array.isArray(session.intensity) ? session.intensity : [session.intensity]).map(lv => (
+                  <span key={lv} className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium leading-tight ${INTENSITY_CHIP[lv]}`}>
+                    {INTENSITY_LABELS[lv]}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -520,9 +522,10 @@ function computeInsights(
   for (const s of sessions) {
     if (!s.intensity) continue;
     if (!gi[s.groupId]) gi[s.groupId] = { sum: 0, count: 0, heavy: 0, courtId: s.courtId };
-    gi[s.groupId].sum += INTENSITY_SCORE[s.intensity];
+    const lvs = Array.isArray(s.intensity) ? s.intensity : [s.intensity];
+    gi[s.groupId].sum += lvs.reduce((acc, lv) => acc + INTENSITY_SCORE[lv], 0) / lvs.length;
     gi[s.groupId].count++;
-    if (s.intensity === 'heavy') gi[s.groupId].heavy++;
+    if (lvs.includes('heavy')) gi[s.groupId].heavy++;
   }
   const ranked = Object.entries(gi)
     .filter(([, v]) => v.count >= 2)
