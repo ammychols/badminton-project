@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Court, Session, INTENSITY_LABELS } from '../types';
+import { Court, Session, INTENSITY_LABELS, ALL_LEVELS } from '../types';
 import { uploadGroupImage } from '../utils/uploadImage';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
@@ -937,7 +937,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                     <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">🏸</div>
                     <div>
                       <div className="text-xs text-[var(--text-3)] mb-0.5">ระดับ</div>
-                      <div className="text-sm font-medium text-[var(--text-1)]">{group.levels.join(' · ')}</div>
+                      <div className="text-sm font-medium text-[var(--text-1)]">{[...group.levels].sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).join(' · ')}</div>
                     </div>
                   </div>
                 )}
