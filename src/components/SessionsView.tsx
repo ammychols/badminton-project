@@ -906,12 +906,12 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               <div className="flex items-start justify-between px-5 pt-5 pb-3">
                 <div className="min-w-0">
                   <p className="text-base font-bold text-[var(--text-1)]"><span className="text-xs font-semibold text-[var(--p)] bg-[color-mix(in_srgb,var(--p)_12%,transparent)] px-1.5 py-0.5 rounded-md mr-1.5">ก๊วน</span>{group.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                     <p className="text-sm text-[var(--text-3)]">{court.name}</p>
                     <button
                       onClick={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
-                      className="text-xs font-medium text-[var(--p)] hover:underline flex-shrink-0"
-                    >ดูก๊วนอื่นๆ →</button>
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--p)] bg-[color-mix(in_srgb,var(--p)_10%,transparent)] hover:bg-[color-mix(in_srgb,var(--p)_18%,transparent)] px-2 py-0.5 rounded-full transition-colors flex-shrink-0"
+                    >ดูก๊วนอื่นๆ <span className="text-[10px]">→</span></button>
                   </div>
                   {court.address && <p className="text-xs text-[var(--text-4)] mt-0.5">{court.address}</p>}
                 </div>
