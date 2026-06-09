@@ -57,107 +57,108 @@ const MOOD_EMOJIS: Record<number, string> = {
 const DAY_NAMES = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
 const MONTH_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const DOW_LABELS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+const DOW_LABELS_SHORT = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
 
-function Heatmap({ sessions, viewYear, viewMonth, onPrev, onNext }: {
+function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   sessions: { date: string }[];
   viewYear: number; viewMonth: number;
   onPrev: () => void; onNext: () => void;
 }) {
+  const WEEKS = 16;
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-  const isNextDisabled = viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth);
+  const todayStr = now.toISOString().slice(0, 10);
 
-  // Build last 6 months summary (always relative to today)
-  const currentYM = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-  const monthStats = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(currentYear, currentMonth - (5 - i), 1);
-    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const count = sessions.filter(s => s.date.startsWith(ym)).length;
-    return { label: MONTH_SHORT[d.getMonth()], count, ym };
-  });
-  const maxMonth = Math.max(...monthStats.map(m => m.count), 1);
+  // Build a map of date -> game count (sessions per day)
+  const countMap: Record<string, number> = {};
+  for (const s of sessions) {
+    countMap[s.date] = (countMap[s.date] || 0) + 1;
+  }
 
-  // Build viewed month calendar
-  const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
-  const sessionDays = new Set(sessions.filter(s => s.date.startsWith(viewYM)).map(s => parseInt(s.date.slice(8))));
-  const isViewingCurrentMonth = viewYM === currentYM;
-
-  // Day-of-week frequency for selected month
+  // DOW frequency (Mon=0 ... Sun=6)
   const dowCount = Array(7).fill(0);
-  sessions.filter(s => s.date.startsWith(viewYM)).forEach(s => { const d = new Date(s.date + 'T00:00:00'); dowCount[d.getDay()]++; });
+  for (const s of sessions) {
+    const d = new Date(s.date + 'T00:00:00');
+    dowCount[(d.getDay() + 6) % 7]++;
+  }
   const maxDow = Math.max(...dowCount, 1);
+
+  // Build 16-week grid: col=0 is oldest, col=15 is most recent
+  // row=0=Mon ... row=6=Sun
+  const todayDow = (now.getDay() + 6) % 7; // Mon=0
+  const getDateForCell = (col: number, row: number) => {
+    const daysAgo = (WEEKS - 1 - col) * 7 + (todayDow - row);
+    const d = new Date(now);
+    d.setDate(d.getDate() - daysAgo);
+    return d.toISOString().slice(0, 10);
+  };
+
+  const heatColor = (count: number) => {
+    if (count === 0) return 'var(--bar-i)';
+    if (count <= 1) return 'color-mix(in srgb, var(--p) 35%, transparent)';
+    if (count <= 3) return 'color-mix(in srgb, var(--p) 65%, transparent)';
+    return 'var(--p)';
+  };
 
   return (
     <div className={`${card.padded} mb-4`}>
-      <div className="text-sm font-semibold text-[var(--text-1)] mb-4">สถิติรายเดือน</div>
-
-      {/* Monthly bars */}
-      <div className="flex items-end gap-1.5 mb-5">
-        {monthStats.map(({ label, count, ym }) => {
-          const isCurrent = ym === currentYM;
-          const heightPct = Math.max((count / maxMonth) * 80, count > 0 ? 8 : 3);
-          return (
-            <div key={ym} className="flex-1 flex flex-col items-center gap-1">
-              <div className="text-xs font-semibold text-[var(--text-2)]">{count > 0 ? count : ''}</div>
-              <div className="w-full flex items-end" style={{ height: '80px' }}>
-                <div className="w-full rounded-t-xl" style={{ height: `${heightPct}px`, backgroundColor: isCurrent ? 'var(--bar-a)' : 'var(--bar-i)' }} />
-              </div>
-              <div className="text-xs" style={{ fontWeight: isCurrent ? 'bold' : 'normal', color: isCurrent ? 'var(--bar-a)' : 'var(--text-3)' }}>{label}</div>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-[var(--text-1)]">กิจกรรม</span>
+        <div className="flex items-center gap-3">
+          {([[1,'35%'],[2,'65%'],[3,'100%']] as [number, string][]).map(([n, opacity]) => (
+            <div key={n} className="flex items-center gap-1">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ background: `color-mix(in srgb, var(--p) ${opacity}, transparent)` }}/>
+              <span className="text-[10px] text-[var(--text-4)] font-medium">{n === 1 ? '1-2' : n === 2 ? '3-4' : '5+'}</span>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Calendar */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={onPrev} className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg" style={{ color: 'var(--text-4)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>‹</button>
-          <span className="text-sm font-semibold text-[var(--text-2)]">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
-          <button onClick={onNext} disabled={isNextDisabled}
-            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg disabled:opacity-20 disabled:cursor-default" style={{ color: 'var(--text-4)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--hover-bg)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>›</button>
-        </div>
-        <div className="grid grid-cols-7 mb-1">
-          {DOW_LABELS.map(d => (
-            <div key={d} className="text-center text-xs py-1" style={{ color: 'var(--text-3)' }}>{d}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-y-1">
-          {Array(firstDow).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
-          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => {
-            const isToday = isViewingCurrentMonth && d === now.getDate();
-            const hasSession = sessionDays.has(d);
-            return (
-              <div key={d} className="aspect-square flex flex-col items-center justify-center rounded-full text-sm"
-                style={{
-                  fontWeight: isToday || hasSession ? 600 : undefined,
-                  color: hasSession ? 'var(--text-1)' : isToday ? 'var(--text-1)' : 'var(--text-3)',
-                  backgroundColor: isToday ? 'var(--chip-bg)' : undefined,
-                }}>
-                {d}
-                <span className="w-1 h-1 rounded-full" style={{ backgroundColor: hasSession ? 'var(--bar-a)' : 'transparent', marginTop: '1px' }} />
-              </div>
-            );
-          })}
+      </div>
+
+      {/* Heatmap grid */}
+      <div className="flex gap-1">
+        {/* DOW labels */}
+        <div className="flex flex-col gap-[3px] pt-px flex-shrink-0">
+          {DOW_LABELS_SHORT.map(d => (
+            <div key={d} className="h-[14px] flex items-center justify-end text-[9px] font-semibold text-[var(--text-4)] w-4">{d}</div>
+          ))}
+        </div>
+        {/* Week columns */}
+        <div className="flex gap-[3px] flex-1">
+          {Array.from({ length: WEEKS }, (_, col) => (
+            <div key={col} className="flex flex-col gap-[3px] flex-1">
+              {Array.from({ length: 7 }, (_, row) => {
+                const dateStr = getDateForCell(col, row);
+                const isFuture = dateStr > todayStr;
+                const isToday = dateStr === todayStr;
+                const count = countMap[dateStr] || 0;
+                return (
+                  <div key={row} className="h-[14px] rounded-[3px]"
+                    style={{
+                      background: isFuture ? 'transparent' : heatColor(count),
+                      outline: isToday ? '1.5px solid var(--p)' : 'none',
+                      outlineOffset: '1px',
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* DOW frequency */}
+      {/* Divider */}
+      <div className="border-t border-[var(--card-border)] my-3"/>
+
+      {/* DOW frequency bars */}
       <div>
-        <div className="text-xs font-medium mb-2" style={{ color: 'var(--text-4)' }}>วันที่ตีบ่อย</div>
+        <div className="text-[11px] font-semibold text-[var(--text-4)] mb-2">วันที่ตีบ่อย</div>
         <div className="flex gap-1.5 items-end">
-          {DOW_LABELS.map((label, i) => {
-            const count = dowCount[i];
-            const heightPct = Math.max((count / maxDow) * 40, count > 0 ? 4 : 2);
+          {DOW_LABELS_SHORT.map((d, i) => {
+            const cnt = dowCount[i];
+            const h = Math.max((cnt / maxDow) * 36, cnt > 0 ? 5 : 2);
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                <div className="text-xs font-semibold text-[var(--chip-t)]" style={{ minHeight: '16px' }}>{count > 0 ? count : ''}</div>
-                <div className="w-full flex items-end" style={{ height: '40px' }}>
-                  <div className="w-full rounded-t-lg" style={{ height: `${heightPct}px`, backgroundColor: count > 0 ? 'var(--bar-a)' : 'var(--bar-i)' }} />
-                </div>
-                <div className="text-xs text-[var(--text-3)]">{label}</div>
+              <div key={d} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full rounded-t-[3px]" style={{ height: h, backgroundColor: 'var(--bar-a)' }}/>
+                <span className="text-[9px] text-[var(--text-4)] font-medium">{d}</span>
               </div>
             );
           })}
@@ -271,20 +272,22 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           <div className="min-w-0 flex-1">
             <div className="text-sm leading-snug">
               <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
-              <span className="text-[var(--text-3)] font-normal"> · </span>
-              <button onClick={onViewInfo} className="text-[var(--text-3)] hover:underline hover:text-[var(--p)] transition-colors font-normal">{courtName}</button>
             </div>
-            {session.intensity && (
-              <div className="mt-0.5 flex flex-wrap gap-1">
-                {(Array.isArray(session.intensity) ? session.intensity : [session.intensity]).map(lv => (
-                  <span key={lv} className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium leading-tight ${INTENSITY_CHIP[lv]}`}>
-                    {INTENSITY_LABELS[lv]}
-                  </span>
-                ))}
-              </div>
-            )}
+            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
+              <button onClick={onViewInfo} className="hover:text-[var(--p)] transition-colors truncate">{courtName}</button>
+              {session.intensity && (() => {
+                const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
+                const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
+                return lvs.map(lv => (
+                  <React.Fragment key={lv}>
+                    <span className="text-[var(--text-4)]">·</span>
+                    <span className="font-semibold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
+                  </React.Fragment>
+                ));
+              })()}
+            </div>
           </div>
-          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0">
             <button onClick={onEdit} title="แก้ไข" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
@@ -688,21 +691,16 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
             </div>
             <div className="relative z-10 border-t border-white/10 pt-3">
-              <div className="flex items-center justify-between mb-3">
-                <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none">‹</button>
-                <span className="text-xs text-white/70 font-medium">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
-                <button onClick={nextMonth} disabled={isNextDisabled} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none disabled:opacity-30 disabled:cursor-default">›</button>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตี</div></div>
-                <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกม</div></div>
-                <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
-                <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+              <div className="grid grid-cols-4 gap-2">
+                <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
+                <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
+                <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
+                <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
               </div>
             </div>
           </div>
           {sessions.length > 0 && (
-            <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
+            <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
         </div>
 
@@ -807,20 +805,15 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             )}
           </div>
           <div className="relative z-10 border-t border-white/10 pt-3">
-            <div className="flex items-center justify-between mb-3">
-              <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none">‹</button>
-              <span className="text-xs text-white/70 font-medium">{MONTH_SHORT[viewMonth]} {viewYear + 543}</span>
-              <button onClick={nextMonth} disabled={isNextDisabled} className="w-7 h-7 flex items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors text-lg leading-none disabled:opacity-30 disabled:cursor-default">›</button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><div className="text-2xl font-bold">{thisMonthDays}</div><div className="text-xs text-white/60">วันที่ตี</div></div>
-              <div><div className="text-2xl font-bold">{thisMonthGames}</div><div className="text-xs text-white/60">เกม</div></div>
-              <div><div className="text-2xl font-bold">{avgGamesPerDay ?? '—'}</div><div className="text-xs text-white/60">เกม/วัน</div></div>
-              <div><div className="text-2xl font-bold">{avgDuration ?? '—'}</div><div className="text-xs text-white/60">เฉลี่ย/ครั้ง</div></div>
+            <div className="grid grid-cols-4 gap-2">
+              <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
+              <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
+              <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
+              <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
             </div>
           </div>
         </div>
-        {sessions.length > 0 && <Heatmap sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+        {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
         {activeInsight && (
           <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
             style={{ touchAction: 'pan-y' }}
