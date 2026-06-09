@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { Court, Session, INTENSITY_LABELS, ALL_LEVELS } from '../types';
+import { GroupReviewModal } from './GroupReviewModal';
 import { uploadGroupImage } from '../utils/uploadImage';
 import { btn, card, text, emptyState } from '../styles/tokens';
 
@@ -322,7 +323,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
               className="w-full text-left rounded-xl px-2 py-1.5 -mx-2 -my-1.5 hover:bg-[var(--chip-bg)] transition-colors group/note">
               {session.notes
-                ? <p className="text-[15px] text-[var(--text-1)] leading-relaxed whitespace-pre-wrap border-l-2 border-[color-mix(in_srgb,var(--p)_40%,transparent)] group-hover/note:border-[var(--p)] pl-3 transition-colors">{session.notes}</p>
+                ? <p className="text-[13.5px] text-[var(--text-2)] leading-relaxed whitespace-pre-wrap">{session.notes}</p>
                 : <p className="text-sm text-[var(--text-3)] opacity-60 group-hover:opacity-100 transition-opacity">+ เพิ่มโน้ต...</p>
               }
             </button>
@@ -407,13 +408,9 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
         <div key={g.date}>
           {/* Date label */}
           <div className={`pb-3 ${gi > 0 ? 'pt-4' : 'pt-0'}`}>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-[var(--card-border)]"/>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)]"/>
-                <span className="text-[11px] font-semibold text-[var(--text-3)] tracking-wide uppercase">{g.label}</span>
-              </div>
-              <div className="flex-1 h-px bg-[var(--card-border)]"/>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)]"/>
+              <span className="text-xs font-bold text-[var(--text-3)]">{g.label}</span>
             </div>
           </div>
           {/* Each session as its own feed card */}
@@ -899,57 +896,15 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
         const court = courts.find(c => c.id === viewInfoSession.courtId);
         const group = court?.groups.find(g => g.id === viewInfoSession.groupId);
         if (!court || !group) return null;
-        const dayMap: Record<string, string> = { MON: 'จ', TUE: 'อ', WED: 'พ', THU: 'พฤ', FRI: 'ศ', SAT: 'ส', SUN: 'อา' };
+        const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
         return (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setViewInfoSession(null)}>
-            <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
-              <div className="flex items-start justify-between px-5 pt-5 pb-3">
-                <div className="min-w-0">
-                  <p className="text-base font-bold text-[var(--text-1)]"><span className="text-xs font-semibold text-[var(--p)] bg-[color-mix(in_srgb,var(--p)_12%,transparent)] px-1.5 py-0.5 rounded-md mr-1.5">ก๊วน</span>{group.name}</p>
-                  <p className="text-sm text-[var(--text-3)] mt-0.5">{court.name}</p>
-                  {court.address && <p className="text-xs text-[var(--text-4)] mt-0.5">{court.address}</p>}
-                </div>
-                <button onClick={() => setViewInfoSession(null)} className="w-8 h-8 rounded-full bg-[var(--chip-bg)] flex items-center justify-center text-[var(--text-3)] text-sm ml-3 flex-shrink-0">✕</button>
-              </div>
-              <div className="px-5 pb-6 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">📅</div>
-                  <div>
-                    <div className="text-xs text-[var(--text-3)] mb-0.5">วัน · เวลา</div>
-                    <div className="text-sm font-medium text-[var(--text-1)]">
-                      {group.days.map(d => dayMap[d] ?? d).join(' ')}
-                      {group.startTime && group.endTime ? ` · ${group.startTime}–${group.endTime}` : ''}
-                    </div>
-                  </div>
-                </div>
-                {group.levels && group.levels.length > 0 && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">🏸</div>
-                    <div>
-                      <div className="text-xs text-[var(--text-3)] mb-0.5">ระดับ</div>
-                      <div className="text-sm font-medium text-[var(--text-1)]">{[...group.levels].sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).join(' · ')}</div>
-                    </div>
-                  </div>
-                )}
-                {group.notes && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[var(--chip-bg)] flex items-center justify-center text-base flex-shrink-0">📝</div>
-                    <div>
-                      <div className="text-xs text-[var(--text-3)] mb-0.5">โน้ต</div>
-                      <div className="text-sm text-[var(--text-2)] leading-relaxed">{group.notes}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
-                className="w-full flex items-center justify-end gap-1.5 px-5 py-3 border-t border-[var(--card-border)] text-sm font-medium text-[var(--p)] hover:bg-[color-mix(in_srgb,var(--p)_6%,transparent)] transition-colors"
-              >
-                <span>ดูก๊วนอื่นๆ ในสนามนี้</span>
-                <span className="text-base">→</span>
-              </button>
-            </div>
-          </div>
+          <GroupReviewModal
+            group={group}
+            court={court}
+            sessions={groupSessions}
+            onClose={() => setViewInfoSession(null)}
+            onNavigateToCourt={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
+          />
         );
       })()}
 
