@@ -146,9 +146,9 @@ export default function App() {
               const s = sessions.find(s => s.id === id);
               if (s) updateSession(id, { ...s, notes });
             }}
-            onUpdatePhoto={(id, image) => {
+            onUpdatePhotos={(id, images) => {
               const s = sessions.find(s => s.id === id);
-              if (s) updateSession(id, { ...s, image });
+              if (s) updateSession(id, { ...s, images });
             }}
             onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
           />

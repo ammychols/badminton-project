@@ -12,7 +12,7 @@ interface SessionsViewProps {
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
-  onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onUpdatePhotos: (id: string, images: string[]) => void;
   onNavigateToCourt: (courtId: string) => void;
 }
 
@@ -95,8 +95,8 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
 
   const heatColor = (count: number) => {
     if (count === 0) return 'var(--bar-i)';
-    if (count <= 1) return 'color-mix(in srgb, var(--p) 35%, transparent)';
-    if (count <= 3) return 'color-mix(in srgb, var(--p) 65%, transparent)';
+    if (count <= 3) return 'color-mix(in srgb, var(--p) 22%, transparent)';
+    if (count <= 5) return 'color-mix(in srgb, var(--p) 53%, transparent)';
     return 'var(--p)';
   };
 
@@ -105,10 +105,10 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-[var(--text-1)]">กิจกรรม</span>
         <div className="flex items-center gap-3">
-          {([[1,'35%'],[2,'65%'],[3,'100%']] as [number, string][]).map(([n, opacity]) => (
-            <div key={n} className="flex items-center gap-1">
+          {([['2-3','22%'],['4-5','53%'],['6+','100%']] as [string,string][]).map(([label, opacity]) => (
+            <div key={label} className="flex items-center gap-1">
               <div className="w-2.5 h-2.5 rounded-sm" style={{ background: `color-mix(in srgb, var(--p) ${opacity}, transparent)` }}/>
-              <span className="text-[10px] text-[var(--text-4)] font-medium">{n === 1 ? '1-2' : n === 2 ? '3-4' : '5+'}</span>
+              <span className="text-[10px] text-[var(--text-4)] font-medium">{label}</span>
             </div>
           ))}
         </div>
@@ -155,11 +155,12 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
         <div className="flex gap-1.5 items-end">
           {DOW_LABELS_SHORT.map((d, i) => {
             const cnt = dowCount[i];
-            const h = Math.max((cnt / maxDow) * 36, cnt > 0 ? 5 : 2);
+            const h = Math.max((cnt / maxDow) * 34, cnt > 0 ? 5 : 2);
             return (
-              <div key={d} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t-[3px]" style={{ height: h, backgroundColor: 'var(--bar-a)' }}/>
-                <span className="text-[9px] text-[var(--text-4)] font-medium">{d}</span>
+              <div key={d} className="flex-1 flex flex-col items-center gap-[3px]">
+                <div className="text-[9px] font-bold leading-none" style={{ color: cnt > 0 ? 'var(--text-2)' : 'transparent' }}>{cnt > 0 ? cnt : '-'}</div>
+                <div className="w-full rounded-t-[3px]" style={{ height: h, backgroundColor: cnt > 0 ? 'var(--bar-a)' : 'var(--bar-i)' }}/>
+                <span className="text-[11px] font-medium" style={{ color: cnt > 0 ? 'var(--text-3)' : 'var(--text-4)' }}>{d}</span>
               </div>
             );
           })}
@@ -222,32 +223,46 @@ function calcStreak(sessions: { date: string }[]): number {
 }
 
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo }: {
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhotos, onViewInfo }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
   onUpdateNote: (notes: string | undefined) => void;
-  onUpdatePhoto: (image: string | undefined) => void;
+  onUpdatePhotos: (images: string[]) => void;
   onViewInfo: () => void;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
-  const [lightbox, setLightbox] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Normalise: merge legacy `image` field into `images` array
+  const photos: string[] = session.images ?? (session.image ? [session.image] : []);
+
   const commitNote = () => {
     setEditingNote(false);
     const trimmed = noteText.trim() || undefined;
     if (trimmed !== session.notes) onUpdateNote(trimmed);
   };
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async ev => {
-      const compressed = await uploadGroupImage('', '', ev.target?.result as string);
-      onUpdatePhoto(compressed);
-    };
-    reader.readAsDataURL(file);
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const newImages: string[] = [];
+    for (const file of files) {
+      await new Promise<void>(resolve => {
+        const reader = new FileReader();
+        reader.onload = async ev => {
+          const compressed = await uploadGroupImage('', '', ev.target?.result as string);
+          newImages.push(compressed);
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    onUpdatePhotos([...photos, ...newImages]);
     e.target.value = '';
+  };
+  const deletePhoto = (idx: number) => {
+    onUpdatePhotos(photos.filter((_, i) => i !== idx));
   };
   const [sh, sm] = session.startTime.split(':').map(Number);
   const [eh, em] = session.endTime.split(':').map(Number);
@@ -260,20 +275,20 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
 
   const metaDivider = <span className="text-[var(--text-4)]">·</span>;
 
+  const PHOTO_MAX = 3;
+  const shownPhotos = photos.slice(0, PHOTO_MAX);
+  const extraPhotos = photos.length - PHOTO_MAX;
+
   return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08),_0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
-      {/* Left: all content */}
-      <div className="flex-1 min-w-0 flex flex-col p-5">
+    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08),_0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)]">
+      <div className="flex flex-col p-[18px]">
         {/* Header */}
-        <div className="flex items-start gap-3">
-          <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
+        <div className="flex items-start gap-2.5">
+          <div className={`w-11 h-11 rounded-[16px] flex items-center justify-center flex-shrink-0 text-[22px] select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
           </div>
-          {/* Group + court names — only the name text triggers info */}
           <div className="min-w-0 flex-1">
-            <div className="text-sm leading-snug">
-              <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
-            </div>
+            <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors leading-snug">{groupName}</button>
             <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
               <button onClick={onViewInfo} className="hover:text-[var(--p)] transition-colors truncate">{courtName}</button>
               {session.intensity && (() => {
@@ -282,60 +297,72 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
                 return lvs.map(lv => (
                   <React.Fragment key={lv}>
                     <span className="text-[var(--text-4)]">·</span>
-                    <span className="font-semibold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
+                    <span className="font-bold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
                   </React.Fragment>
                 ));
               })()}
             </div>
           </div>
           <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0">
-            <button onClick={onEdit} title="แก้ไข" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
-              </svg>
+            <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" className="text-[var(--text-4)] hover:text-[var(--p)] transition-colors p-1 rounded-lg hover:bg-[var(--chip-bg)]">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </button>
-            <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" className={`text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)] ${session.image ? 'hidden' : ''}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-            <button onClick={onDelete} title="ลบ" className="text-[var(--text-3)] hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-red-50">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+            <button onClick={onEdit} title="แก้ไข" className="text-[var(--text-4)] hover:text-[var(--p)] transition-colors p-1 rounded-lg hover:bg-[var(--chip-bg)]">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
             </button>
           </div>
         </div>
 
         {/* Note */}
-        <div className="mt-3 flex-1">
-          {editingNote ? (
-            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
-              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
-              onBlur={commitNote}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
-              placeholder="เพิ่มโน้ต..." rows={2}
-              className="w-full text-sm text-[var(--text-2)] border border-[var(--input-b)] rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
-              style={{ backgroundColor: 'var(--app-bg)' }}
-            />
-          ) : (
-            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
-              className="w-full text-left rounded-xl px-2 py-1.5 -mx-2 -my-1.5 hover:bg-[var(--chip-bg)] transition-colors group/note">
-              {session.notes
-                ? <p className="text-[13.5px] text-[var(--text-2)] leading-relaxed whitespace-pre-wrap">{session.notes}</p>
-                : <p className="text-sm text-[var(--text-3)] opacity-60 group-hover:opacity-100 transition-opacity">+ เพิ่มโน้ต...</p>
-              }
-            </button>
-          )}
-        </div>
+        {editingNote ? (
+          <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+            onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
+            onBlur={commitNote}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
+            placeholder="เพิ่มโน้ต..." rows={2}
+            className="mt-2.5 w-full text-sm text-[var(--text-2)] border border-[var(--input-b)] rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
+            style={{ backgroundColor: 'var(--app-bg)' }}
+          />
+        ) : session.notes ? (
+          <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }} className="mt-2.5 w-full text-left">
+            <p className="text-[13.5px] text-[var(--text-2)] leading-relaxed whitespace-pre-wrap">{session.notes}</p>
+          </button>
+        ) : (
+          <button onClick={() => { setNoteText(''); setEditingNote(true); }}
+            className="mt-2 w-full text-left text-sm text-[var(--text-3)] opacity-0 group-hover:opacity-60 transition-opacity">+ เพิ่มโน้ต...</button>
+        )}
+
+        {/* Photos row */}
+        <input ref={photoInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhotoChange} />
+        {photos.length > 0 && (
+          <div className="mt-2.5 flex gap-1.5">
+            {shownPhotos.map((src, idx) => {
+              const isOverflow = idx === PHOTO_MAX - 1 && extraPhotos > 0;
+              return (
+                <div key={idx} className="relative flex-1 rounded-xl overflow-hidden cursor-pointer" style={{ height: 92 }}
+                  onClick={() => !isOverflow && setLightboxIdx(idx)}>
+                  <img src={src} alt="" className="w-full h-full object-cover block" />
+                  {isOverflow ? (
+                    <div className="absolute inset-0 flex items-center justify-center text-white font-extrabold text-lg" style={{ background: 'rgba(15,23,42,.58)' }}>+{extraPhotos}</div>
+                  ) : (
+                    <button title="ลบรูป" onClick={e => { e.stopPropagation(); deletePhoto(idx); }}
+                      className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: 'rgba(15,23,42,.65)' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Meta footer */}
         {(hasTime || session.gamesPlayed > 0) && (
-          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
-            {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
+          <div className="mt-2.5 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
+            {hasTime && <span className="tabular-nums text-[var(--text-3)] font-medium">{session.startTime} – {session.endTime}</span>}
             {hasTime && durLabel && metaDivider}
-            {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
+            {durLabel && <span className="font-bold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
             {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
             {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
             {minPerGame && metaDivider}
@@ -344,35 +371,20 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         )}
       </div>
 
-      {/* Right: photo */}
-      <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-      {session.image ? (
-        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
-          <img src={session.image} alt="session" className="w-full h-full object-cover" />
-          {/* Hover overlay with actions */}
-          <button
-            type="button"
-            title="ลบรูป"
-            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-red-500/80 transition-colors opacity-0 group-hover:opacity-100"
-          >✕</button>
-        </div>
-      ) : null}
-
       {/* Lightbox */}
-      {lightbox && session.image && (
+      {lightboxIdx !== null && photos[lightboxIdx] && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setLightbox(false)}
+          onClick={() => setLightboxIdx(null)}
         >
           <img
-            src={session.image}
+            src={photos[lightboxIdx]}
             alt="session"
             className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
             onClick={e => e.stopPropagation()}
           />
           <button
-            onClick={() => setLightbox(false)}
+            onClick={() => setLightboxIdx(null)}
             className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-lg hover:bg-white/30 transition-colors"
           >✕</button>
         </div>
@@ -381,14 +393,14 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   );
 }
 
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onViewInfo }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhotos, onViewInfo }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
   onEditSession: (s: Session) => void;
   setConfirmDeleteId: (id: string) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
-  onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onUpdatePhotos: (id: string, images: string[]) => void;
   onViewInfo: (s: Session) => void;
 }) {
   const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
@@ -420,7 +432,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
                 onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
-                onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
+                onUpdatePhotos={images => onUpdatePhotos(s.id, images)}
                 onViewInfo={() => onViewInfo(s)}
               />
             ))}
@@ -550,7 +562,7 @@ function computeInsights(
   return out;
 }
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onNavigateToCourt }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhotos, onNavigateToCourt }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
@@ -767,7 +779,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
               )}
             </div>
           )}
@@ -885,7 +897,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             )}
             {viewedSessions.length > 0 && (
               <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
+                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
             )}
           </div>
         )}

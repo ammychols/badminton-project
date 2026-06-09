@@ -83,5 +83,6 @@ export interface Session {
   mood: 1 | 2 | 3 | 4 | 5 | 6;
   intensity?: Intensity | Intensity[];
   notes?: string;
-  image?: string;
+  image?: string;   // legacy single-image (kept for backward compat)
+  images?: string[]; // multi-photo
 }
