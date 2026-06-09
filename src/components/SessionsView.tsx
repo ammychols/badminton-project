@@ -259,18 +259,18 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const metaDivider = <span className="text-[var(--text-4)]">·</span>;
 
   return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-md overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
+    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08),_0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
       {/* Left: all content */}
       <div className="flex-1 min-w-0 flex flex-col p-5">
         {/* Header */}
         <div className="flex items-start gap-3">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
+          <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
           </div>
           {/* Group + court names — only the name text triggers info */}
           <div className="min-w-0 flex-1">
             <div className="text-sm leading-snug">
-              <button onClick={onViewInfo} className="font-semibold text-[var(--text-1)] hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
+              <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
               <span className="text-[var(--text-3)] font-normal"> · </span>
               <button onClick={onViewInfo} className="text-[var(--text-3)] hover:underline hover:text-[var(--p)] transition-colors font-normal">{courtName}</button>
             </div>
@@ -403,8 +403,15 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
       {groups.map((g, gi) => (
         <div key={g.date}>
           {/* Date label */}
-          <div className={`px-1 pb-2 ${gi > 0 ? 'pt-4' : 'pt-0'}`}>
-            <span className="text-xs font-semibold text-[var(--text-3)]">{g.label}</span>
+          <div className={`pb-3 ${gi > 0 ? 'pt-4' : 'pt-0'}`}>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-[var(--card-border)]"/>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--p)]"/>
+                <span className="text-[11px] font-semibold text-[var(--text-3)] tracking-wide uppercase">{g.label}</span>
+              </div>
+              <div className="flex-1 h-px bg-[var(--card-border)]"/>
+            </div>
           </div>
           {/* Each session as its own feed card */}
           <div className="flex flex-col gap-2">
@@ -657,7 +664,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
       <div className="hidden sm:flex sm:gap-5 sm:items-start">
         {/* Col 1: Hero card + Heatmap below */}
         <div className="w-[340px] flex-shrink-0">
-          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
             <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
@@ -776,7 +783,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
 
       {/* ── Mobile: stacked ── */}
       <div className="sm:hidden">
-        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, var(--p) 60%, var(--hero-to) 100%)'}}>
+        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
           <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
           <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
           <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />

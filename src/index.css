@@ -4,27 +4,29 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #111827;
-  --p-h: #374151;
-  --app-bg: #f1f5f9;
-  --nav-bg: #ffffff;
-  --nav-border: #e2e8f0;
-  --card-border: #e2e8f0;
-  --text-1: #111827;
-  --text-2: #374151;
-  --text-3: #9ca3af;
-  --text-4: #6b7280;
-  --input-b: #e5e7eb;
-  --input-f: #6b7280;
-  --chip-bg: #f3f4f6;
-  --chip-t: #4b5563;
-  --bar-a: #111827;
-  --bar-i: #e5e7eb;
-  --dashed: #e5e7eb;
-  --cal-sel: #111827;
-  --hover-bg: #f9fafb;
-  --hero-from: #1a1a2e;
-  --hero-to: #533483;
+  --p: #84cc16;
+  --p-h: #65a30d;
+  --app-bg: #eef2f7;
+  --nav-bg: #0f172a;
+  --nav-border: #1e293b;
+  --card-border: #e9eef4;
+  --text-1: #0f172a;
+  --text-2: #334155;
+  --text-3: #64748b;
+  --text-4: #94a3b8;
+  --input-b: #e2e8f0;
+  --input-f: #64748b;
+  --chip-bg: #f1f5f9;
+  --chip-t: #475569;
+  --bar-a: #84cc16;
+  --bar-i: #e2e8f0;
+  --dashed: #e2e8f0;
+  --cal-sel: #0f172a;
+  --hover-bg: #f8fafc;
+  --hero-from: #020617;
+  --hero-to: #1e3a5f;
+  --nav-active: #84cc16;
+  --nav-inactive: #475569;
 }
 
 
