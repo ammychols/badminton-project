@@ -597,6 +597,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   const [search, setSearch] = useState('');
   const [insightIdx, setInsightIdx] = useState(0);
   const insightTouchX = useRef<number | null>(null);
+  const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('stats');
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -679,6 +680,10 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     return () => clearInterval(t);
   }, [insights.length]);
 
+  // Sparkline: last 8 sessions (oldest→newest)
+  const sparkSessions = [...sessions].sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime)).slice(-8);
+  const sparkMax = Math.max(...sparkSessions.map(s => s.gamesPlayed), 1);
+
   const sessionDurations = thisMonthSessions.map(s => {
     const [sh, sm] = s.startTime.split(':').map(Number);
     const [eh, em] = s.endTime.split(':').map(Number);
@@ -712,9 +717,9 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
             <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
             <RacketSVG clipId="rh-desk" />
-            <div className="relative z-10 flex items-end justify-between mb-4">
+            <div className="relative z-10 flex items-start justify-between mb-3">
               <div>
-                <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
+                <div className="text-xs text-white/60 mb-1">ตีไปทั้งหมด</div>
                 <div className="flex items-end gap-1.5 leading-none">
                   <span className="text-5xl font-black">{totalGames}</span>
                   <span className="text-lg text-white/60 mb-1">เกม</span>
@@ -727,6 +732,17 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 </div>
               )}
             </div>
+            {sparkSessions.length > 0 && (
+              <div className="relative z-10 flex items-end gap-1 mb-3" style={{ height: 28 }}>
+                {sparkSessions.map((s, i) => {
+                  const h = Math.max((s.gamesPlayed / sparkMax) * 24, 4);
+                  const isLast = i === sparkSessions.length - 1;
+                  return (
+                    <div key={s.id} className="flex-1 rounded-sm" style={{ height: h, background: isLast ? '#84cc16' : 'rgba(255,255,255,0.22)' }} />
+                  );
+                })}
+              </div>
+            )}
             <div className="relative z-10 border-t border-white/10 pt-3">
               <div className="grid grid-cols-4 gap-2">
                 <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
@@ -816,118 +832,152 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
 
       </div>
 
-      {/* ── Mobile: stacked ── */}
+      {/* ── Mobile: tabbed ── */}
       <div className="sm:hidden">
-        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
-          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
-          <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-          <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
-          <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
-          <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-          <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
-          <RacketSVG clipId="rh-mob" />
-          <div className="relative z-10 flex items-end justify-between mb-4">
-            <div>
-              <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
-              <div className="flex items-end gap-1.5 leading-none">
-                <span className="text-5xl font-black">{totalGames}</span>
-                <span className="text-lg text-white/60 mb-1">เกม</span>
-              </div>
-            </div>
-            {streak >= 2 && (
-              <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
-                <span className="text-lg">🔥</span>
-                <span className="text-sm font-semibold">{streak} วันติด</span>
-              </div>
-            )}
-          </div>
-          <div className="relative z-10 border-t border-white/10 pt-3">
-            <div className="grid grid-cols-4 gap-2">
-              <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
-              <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
-              <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
-              <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
-            </div>
-          </div>
+        {/* Tab pills */}
+        <div className="flex gap-2 mb-4">
+          {(['stats', 'feed'] as const).map(t => (
+            <button key={t} onClick={() => setMobileTab(t)}
+              className="flex-1 py-2 rounded-2xl text-sm font-bold transition-all"
+              style={{
+                background: mobileTab === t ? 'var(--p)' : 'var(--chip-bg)',
+                color: mobileTab === t ? '#0f172a' : 'var(--text-3)',
+              }}>
+              {t === 'stats' ? 'สถิติ' : 'ฟีด'}
+            </button>
+          ))}
         </div>
-        {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
-        {activeInsight && (
-          <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
-            style={{ touchAction: 'pan-y' }}
-            onTouchStart={e => { insightTouchX.current = e.touches[0].clientX; }}
-            onTouchEnd={e => {
-              if (insightTouchX.current === null) return;
-              const dx = e.changedTouches[0].clientX - insightTouchX.current;
-              insightTouchX.current = null;
-              if (Math.abs(dx) < 40) return;
-              if (dx < 0) setInsightIdx(i => i + 1);
-              else setInsightIdx(i => (i - 1 + insights.length) % insights.length);
-            }}
-          >
-            <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
-              <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
-              <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
-            </div>
-            {insights.length > 1 && (
-              <div className="flex items-center justify-between">
-                <div className="flex gap-1.5">
-                  {insights.map((_, i) => (
-                    <button key={i} onClick={() => setInsightIdx(i)}
-                      className="rounded-full transition-all"
-                      style={{ width: i === insightIdx % insights.length ? '20px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
-                  ))}
+
+        {/* ── Stats tab ── */}
+        {mobileTab === 'stats' && (
+          <>
+            {/* Hero card */}
+            <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
+              <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
+              <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
+              <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
+              <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
+              <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
+              <RacketSVG clipId="rh-mob" />
+              <div className="relative z-10 flex items-start justify-between mb-3">
+                <div>
+                  <div className="text-xs text-white/60 mb-1">ตีไปทั้งหมด</div>
+                  <div className="flex items-end gap-1.5 leading-none">
+                    <span className="text-5xl font-black">{totalGames}</span>
+                    <span className="text-lg text-white/60 mb-1">เกม</span>
+                  </div>
                 </div>
-                <button onClick={() => setInsightIdx(i => i + 1)}
-                  className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
-                  ถัดไป ›
-                </button>
+                {streak >= 2 && (
+                  <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
+                    <span className="text-lg">🔥</span>
+                    <span className="text-sm font-semibold">{streak} วันติด</span>
+                  </div>
+                )}
+              </div>
+              {/* Sparkline bars */}
+              {sparkSessions.length > 0 && (
+                <div className="relative z-10 flex items-end gap-1 mb-3" style={{ height: 28 }}>
+                  {sparkSessions.map((s, i) => {
+                    const h = Math.max((s.gamesPlayed / sparkMax) * 24, 4);
+                    const isLast = i === sparkSessions.length - 1;
+                    return (
+                      <div key={s.id} className="flex-1 rounded-sm" style={{ height: h, background: isLast ? '#84cc16' : 'rgba(255,255,255,0.22)' }} />
+                    );
+                  })}
+                </div>
+              )}
+              <div className="relative z-10 border-t border-white/10 pt-3">
+                <div className="grid grid-cols-4 gap-2">
+                  <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
+                </div>
+              </div>
+            </div>
+            {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+          </>
+        )}
+
+        {/* ── Feed tab ── */}
+        {mobileTab === 'feed' && (
+          <>
+            {activeInsight && (
+              <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
+                style={{ touchAction: 'pan-y' }}
+                onTouchStart={e => { insightTouchX.current = e.touches[0].clientX; }}
+                onTouchEnd={e => {
+                  if (insightTouchX.current === null) return;
+                  const dx = e.changedTouches[0].clientX - insightTouchX.current;
+                  insightTouchX.current = null;
+                  if (Math.abs(dx) < 40) return;
+                  if (dx < 0) setInsightIdx(i => i + 1);
+                  else setInsightIdx(i => (i - 1 + insights.length) % insights.length);
+                }}
+              >
+                <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
+                  <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
+                  <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
+                </div>
+                {insights.length > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-1.5">
+                      {insights.map((_, i) => (
+                        <button key={i} onClick={() => setInsightIdx(i)}
+                          className="rounded-full transition-all"
+                          style={{ width: i === insightIdx % insights.length ? '20px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
+                      ))}
+                    </div>
+                    <button onClick={() => setInsightIdx(i => i + 1)} className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">ถัดไป ›</button>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
-        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-          <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3.5 mb-4 flex items-center gap-3 text-left transition-all active:scale-[0.98] shadow-sm ${ns.wrap}`}>
-            <span className="text-2xl flex-shrink-0">{nudge.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className={`text-sm font-bold ${ns.text}`}>{nudge.message}</div>
-              {nudge.sub && <div className={`text-xs mt-0.5 opacity-80 ${ns.text}`}>{nudge.sub}</div>}
-            </div>
-            <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
-          </button>
-        ); })()}
-        {sessions.length === 0 ? (
-          <div className={emptyState.wrapper}>
-            <div className={emptyState.icon}>🏸</div>
-            <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
-            <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
-            <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 mt-4">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-              </svg>
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="ค้นหาก๊วน หรือสนาม..."
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
+              <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3.5 mb-4 flex items-center gap-3 text-left transition-all active:scale-[0.98] shadow-sm ${ns.wrap}`}>
+                <span className="text-2xl flex-shrink-0">{nudge.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div className={`text-sm font-bold ${ns.text}`}>{nudge.message}</div>
+                  {nudge.sub && <div className={`text-xs mt-0.5 opacity-80 ${ns.text}`}>{nudge.sub}</div>}
+                </div>
+                <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
+              </button>
+            ); })()}
+            {sessions.length === 0 ? (
+              <div className={emptyState.wrapper}>
+                <div className={emptyState.icon}>🏸</div>
+                <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+                <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+                <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <div className="relative">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
                   </svg>
-                </button>
-              )}
-            </div>
-            {viewedSessions.length === 0 && (
-              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+                  <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="ค้นหาก๊วน หรือสนาม..."
+                    className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                {viewedSessions.length === 0 && (
+                  <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+                )}
+                {viewedSessions.length > 0 && (
+                  <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
+                    onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
+                )}
+              </div>
             )}
-            {viewedSessions.length > 0 && (
-              <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
-            )}
-          </div>
+          </>
         )}
       </div>
 

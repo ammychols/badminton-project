@@ -156,18 +156,18 @@ export default function App() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)' }}>
-        <div className="flex items-center justify-center gap-4 px-6 py-2">
+        <div className="max-w-screen-sm mx-auto flex items-center justify-around px-8 py-2 pb-safe">
           <button onClick={() => switchTab('sessions')}
-            className="w-14 h-12 flex flex-col items-center justify-center rounded-2xl transition-all"
-            style={{ color: tab === 'sessions' ? '#84cc16' : '#475569', backgroundColor: tab === 'sessions' ? 'rgba(132,204,22,0.12)' : 'transparent' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            <span className="text-[10px] font-semibold mt-0.5">บันทึก</span>
+            className="flex flex-col items-center justify-center gap-0.5 px-6 py-2 rounded-2xl transition-all"
+            style={{ color: tab === 'sessions' ? '#84cc16' : 'var(--nav-inactive)', backgroundColor: tab === 'sessions' ? 'rgba(132,204,22,0.12)' : 'transparent' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span className="text-[10px] font-semibold">บันทึก</span>
           </button>
           <button onClick={() => switchTab('courts')}
-            className="w-14 h-12 flex flex-col items-center justify-center rounded-2xl transition-all"
-            style={{ color: tab === 'courts' ? '#84cc16' : '#475569', backgroundColor: tab === 'courts' ? 'rgba(132,204,22,0.12)' : 'transparent' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span className="text-[10px] font-semibold mt-0.5">สนาม</span>
+            className="flex flex-col items-center justify-center gap-0.5 px-6 py-2 rounded-2xl transition-all"
+            style={{ color: tab === 'courts' ? '#84cc16' : 'var(--nav-inactive)', backgroundColor: tab === 'courts' ? 'rgba(132,204,22,0.12)' : 'transparent' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span className="text-[10px] font-semibold">สนาม</span>
           </button>
         </div>
       </nav>
