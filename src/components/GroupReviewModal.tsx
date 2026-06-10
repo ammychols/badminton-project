@@ -202,15 +202,6 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
 
         </div>
 
-        {/* Navigate to court */}
-        <button
-          onClick={onNavigateToCourt}
-          className="w-full flex items-center justify-end gap-1.5 px-4 py-3 bg-white rounded-2xl text-sm font-medium"
-          style={{ color: 'var(--p)', boxShadow: '0 2px 12px rgba(0,0,0,.06)' }}
-        >
-          <span>ดูก๊วนอื่นๆ ในสนามนี้</span>
-          <span className="text-base">→</span>
-        </button>
 
       </div>
     </div>
