@@ -61,7 +61,7 @@ const DOW_LABELS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 const DOW_LABELS_SHORT = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
 
 function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
-  sessions: { date: string }[];
+  sessions: { date: string; gamesPlayed: number }[];
   viewYear: number; viewMonth: number;
   onPrev: () => void; onNext: () => void;
 }) {
@@ -69,13 +69,13 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
 
-  // Build a map of date -> game count (sessions per day)
+  // Count total games per day
   const countMap: Record<string, number> = {};
   for (const s of sessions) {
-    countMap[s.date] = (countMap[s.date] || 0) + 1;
+    countMap[s.date] = (countMap[s.date] || 0) + s.gamesPlayed;
   }
 
-  // DOW frequency (Mon=0 ... Sun=6)
+  // DOW frequency (Mon=0 ... Sun=6) — count sessions, not games
   const dowCount = Array(7).fill(0);
   for (const s of sessions) {
     const d = new Date(s.date + 'T00:00:00');
@@ -93,10 +93,10 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
     return d.toISOString().slice(0, 10);
   };
 
-  const heatColor = (count: number) => {
-    if (count === 0) return 'var(--bar-i)';
-    if (count <= 3) return 'color-mix(in srgb, var(--p) 22%, transparent)';
-    if (count <= 5) return 'color-mix(in srgb, var(--p) 53%, transparent)';
+  const heatColor = (games: number) => {
+    if (games === 0) return 'var(--bar-i)';
+    if (games <= 3) return 'color-mix(in srgb, var(--p) 22%, transparent)';
+    if (games <= 5) return 'color-mix(in srgb, var(--p) 53%, transparent)';
     return 'var(--p)';
   };
 
@@ -105,7 +105,7 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-[var(--text-1)]">กิจกรรม</span>
         <div className="flex items-center gap-3">
-          {([['2-3','22%'],['4-5','53%'],['6+','100%']] as [string,string][]).map(([label, opacity]) => (
+          {([['1-3','22%'],['4-5','53%'],['6+','100%']] as [string,string][]).map(([label, opacity]) => (
             <div key={label} className="flex items-center gap-1">
               <div className="w-2.5 h-2.5 rounded-sm" style={{ background: `color-mix(in srgb, var(--p) ${opacity}, transparent)` }}/>
               <span className="text-[10px] text-[var(--text-4)] font-medium">{label}</span>
@@ -902,47 +902,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
         {/* ── Feed tab ── */}
         {mobileTab === 'feed' && (
           <>
-            {activeInsight && (
-              <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
-                style={{ touchAction: 'pan-y' }}
-                onTouchStart={e => { insightTouchX.current = e.touches[0].clientX; }}
-                onTouchEnd={e => {
-                  if (insightTouchX.current === null) return;
-                  const dx = e.changedTouches[0].clientX - insightTouchX.current;
-                  insightTouchX.current = null;
-                  if (Math.abs(dx) < 40) return;
-                  if (dx < 0) setInsightIdx(i => i + 1);
-                  else setInsightIdx(i => (i - 1 + insights.length) % insights.length);
-                }}
-              >
-                <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
-                  <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
-                  <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
-                </div>
-                {insights.length > 1 && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-1.5">
-                      {insights.map((_, i) => (
-                        <button key={i} onClick={() => setInsightIdx(i)}
-                          className="rounded-full transition-all"
-                          style={{ width: i === insightIdx % insights.length ? '20px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
-                      ))}
-                    </div>
-                    <button onClick={() => setInsightIdx(i => i + 1)} className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">ถัดไป ›</button>
-                  </div>
-                )}
-              </div>
-            )}
-            {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-              <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3.5 mb-4 flex items-center gap-3 text-left transition-all active:scale-[0.98] shadow-sm ${ns.wrap}`}>
-                <span className="text-2xl flex-shrink-0">{nudge.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-bold ${ns.text}`}>{nudge.message}</div>
-                  {nudge.sub && <div className={`text-xs mt-0.5 opacity-80 ${ns.text}`}>{nudge.sub}</div>}
-                </div>
-                <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
-              </button>
-            ); })()}
             {sessions.length === 0 ? (
               <div className={emptyState.wrapper}>
                 <div className={emptyState.icon}>🏸</div>
