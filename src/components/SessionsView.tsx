@@ -120,6 +120,7 @@ interface SessionsViewProps {
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onUpdatePhotos: (id: string, photos: string[]) => void;
   onNavigateToCourt: (courtId: string) => void;
 }
 
@@ -330,11 +331,12 @@ function calcStreak(sessions: { date: string }[]): number {
 }
 
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo, onViewCourt }: {
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onViewInfo, onViewCourt }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
   onUpdateNote: (notes: string | undefined) => void;
   onUpdatePhoto: (image: string | undefined) => void;
+  onUpdatePhotos: (photos: string[]) => void;
   onViewInfo: () => void;
   onViewCourt: () => void;
 }) {
@@ -361,11 +363,13 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
     const reader = new FileReader();
     reader.onload = async ev => {
       const compressed = await uploadGroupImage('', '', ev.target?.result as string);
-      onUpdatePhoto(compressed);
+      const existing = session.photos ?? (session.image ? [session.image] : []);
+      onUpdatePhotos([...existing, compressed]);
     };
     reader.readAsDataURL(file);
     e.target.value = '';
   };
+  const allPhotos = session.photos ?? (session.image ? [session.image] : []);
   const [sh, sm] = session.startTime.split(':').map(Number);
   const [eh, em] = session.endTime.split(':').map(Number);
   const start = sh * 60 + sm;
@@ -473,31 +477,38 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
           </div>
         )}
+
+        {/* Photo strip */}
+        <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+        {allPhotos.length > 0 && (
+          <div className="flex gap-1.5 mt-3 pt-3 border-t border-[var(--card-border)]">
+            {allPhotos.slice(0, 3).map((photo, i) => (
+              <div key={i} className="relative flex-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
+                <img src={photo} alt="" className="w-full h-full object-cover" />
+                {i === 2 && allPhotos.length > 3 && (
+                  <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">+{allPhotos.length - 3}</span>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); const next = allPhotos.filter((_, idx) => idx !== i); onUpdatePhotos(next); }}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] hover:bg-red-500/80 transition-colors opacity-0 group-hover:opacity-100"
+                >✕</button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Right: photo */}
-      <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-      {session.image ? (
-        <div className="relative aspect-[4/3] sm:aspect-auto sm:w-44 flex-shrink-0 sm:m-3 rounded-none sm:rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
-          <img src={session.image} alt="session" className="w-full h-full object-cover" />
-          {/* Hover overlay with actions */}
-          <button
-            type="button"
-            title="ลบรูป"
-            onClick={e => { e.stopPropagation(); onUpdatePhoto(undefined); }}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-red-500/80 transition-colors opacity-0 group-hover:opacity-100"
-          >✕</button>
-        </div>
-      ) : null}
-
       {/* Lightbox */}
-      {lightbox && session.image && (
+      {lightbox && allPhotos.length > 0 && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
           onClick={() => setLightbox(false)}
         >
           <img
-            src={session.image}
+            src={allPhotos[0]}
             alt="session"
             className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
             onClick={e => e.stopPropagation()}
@@ -512,7 +523,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   );
 }
 
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onViewInfo, onViewCourt }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onViewInfo, onViewCourt }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
@@ -520,6 +531,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   setConfirmDeleteId: (id: string) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
+  onUpdatePhotos: (id: string, photos: string[]) => void;
   onViewInfo: (s: Session) => void;
   onViewCourt: (courtId: string) => void;
 }) {
@@ -553,6 +565,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
                 onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
+                onUpdatePhotos={photos => onUpdatePhotos(s.id, photos)}
                 onViewInfo={() => onViewInfo(s)}
                 onViewCourt={() => onViewCourt(s.courtId)}
               />
@@ -566,7 +579,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
 
 
 
-export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onNavigateToCourt }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
@@ -769,7 +782,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
               )}
             </div>
           )}
@@ -898,7 +911,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
               )}
             </div>
           )

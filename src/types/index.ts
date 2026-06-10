@@ -84,4 +84,5 @@ export interface Session {
   intensity?: Intensity | Intensity[];
   notes?: string;
   image?: string;
+  photos?: string[];
 }
