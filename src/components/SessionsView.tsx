@@ -1,8 +1,115 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Court, Session, INTENSITY_LABELS, ALL_LEVELS } from '../types';
+import { Court, Group, Session, INTENSITY_LABELS, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { GroupReviewModal } from './GroupReviewModal';
 import { uploadGroupImage } from '../utils/uploadImage';
 import { btn, card, text, emptyState } from '../styles/tokens';
+
+// ── Court slide-over panel (triggered from session feed) ──────────────────────
+function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
+  const [panelDay, setPanelDay] = useState<DayOfWeek | 'all'>('all');
+  const visibleGroups = panelDay === 'all' ? court.groups : court.groups.filter(g => g.days.includes(panelDay));
+
+  const mapsUrl = court.lat && court.lng
+    ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + court.address)}`;
+
+  const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
+    { key: 'all', label: 'ทั้งหมด' },
+    { key: 'MON', label: 'จ' }, { key: 'TUE', label: 'อ' }, { key: 'WED', label: 'พ' },
+    { key: 'THU', label: 'พฤ' }, { key: 'FRI', label: 'ศ' }, { key: 'SAT', label: 'ส' }, { key: 'SUN', label: 'อา' },
+  ];
+
+  return (
+    <>
+      <div className="fixed inset-0 z-[59]" style={{ backgroundColor: 'rgba(15,23,42,0.5)' }} onClick={onClose} />
+      <style>{`
+        .court-panel { top:0; right:0; bottom:0; left:0; }
+        @media(min-width:640px){ .court-panel { top:57px; left:auto; width:480px; box-shadow:-8px 0 32px rgba(0,0,0,.2); } }
+      `}</style>
+      <div className="court-panel fixed z-[60] flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-2.5 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          </button>
+          <div className="min-w-0 flex-1">
+            <div className="font-extrabold text-white text-sm leading-tight truncate">{court.name}</div>
+            {court.address && <div className="text-xs text-white/50 truncate">{court.address}</div>}
+          </div>
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+            className="flex-shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl transition-colors"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            นำทาง
+          </a>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
+          {/* Info chips */}
+          {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
+            <div className="flex gap-2 flex-wrap">
+              {court.info.floor && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{FLOOR_LABELS[court.info.floor]}</span>}
+              {court.info.air && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{AIR_LABELS[court.info.air]}</span>}
+              {court.info.parking && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{PARKING_LABELS[court.info.parking]}</span>}
+              {court.info.notes && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{court.info.notes}</span>}
+            </div>
+          )}
+
+          {/* Day filter */}
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
+            {DAY_TABS.map(({ key, label }) => (
+              <button key={key} onClick={() => setPanelDay(key)}
+                className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+                style={{
+                  background: panelDay === key ? '#84cc16' : 'var(--chip-bg)',
+                  color: panelDay === key ? '#0f172a' : 'var(--chip-t)',
+                }}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Groups */}
+          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">ก๊วนในสนามนี้</div>
+          {visibleGroups.length === 0 ? (
+            <div className="text-sm text-[var(--text-3)] text-center py-6">ไม่มีก๊วนในวันนี้</div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {visibleGroups.map(group => <PanelGroupRow key={group.id} group={group} />)}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PanelGroupRow({ group }: { group: Group }) {
+  return (
+    <div className="bg-white rounded-2xl p-3.5" style={{ boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
+      {group.image && (
+        <div className="relative h-28 rounded-xl overflow-hidden mb-3">
+          <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        </div>
+      )}
+      <div className="font-bold text-[#0f172a] text-sm">{group.name}</div>
+      {group.startTime && group.endTime && (
+        <div className="text-xs text-[#64748b] mt-0.5">{group.startTime} – {group.endTime} น.</div>
+      )}
+      <div className="flex gap-1.5 flex-wrap mt-2">
+        {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(d => group.days.includes(d)).map(d => (
+          <span key={d} className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: '#f1f5f9', color: '#475569' }}>{DAY_LABELS[d]}</span>
+        ))}
+        {group.levels?.slice().sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).map(lv => (
+          <span key={lv} className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#f1f5f9', color: '#475569' }}>{lv}</span>
+        ))}
+      </div>
+      {group.notes && <p className="text-xs text-[#94a3b8] mt-2 leading-relaxed">{group.notes}</p>}
+    </div>
+  );
+}
 
 interface SessionsViewProps {
   sessions: Session[];
@@ -17,20 +124,20 @@ interface SessionsViewProps {
 }
 
 function RacketSVG({ clipId }: { clipId: string }) {
-  // Head centered at x=190 (shifted right in viewBox so left edge never clips)
-  const cx = 190, cy = 115, rx = 90, ry = 70;
-  const ys = [-56, -42, -28, -14, 0, 14, 28, 42, 56];
-  const xs = [-72, -54, -36, -18, 0, 18, 36, 54, 72];
+  // Head in upper-right area; handle extends down-right out of the card (clipped by overflow:hidden)
+  const cx = 155, cy = 95, rx = 78, ry = 60;
+  const ys = [-48, -36, -24, -12, 0, 12, 24, 36, 48];
+  const xs = [-62, -47, -31, -16, 0, 16, 31, 47, 62];
   return (
-    <svg width="280" height="400" viewBox="0 0 280 400" fill="none"
-      className="absolute bottom-0 right-0 opacity-[0.13] pointer-events-none select-none"
-      style={{ zIndex: 2, right: '-30px', bottom: '-15px' }}>
+    <svg width="240" height="340" viewBox="0 0 240 340" fill="none"
+      className="absolute top-0 right-0 opacity-[0.14] pointer-events-none select-none"
+      style={{ zIndex: 2, right: '-12px', top: '-12px' }}>
       <defs>
         <clipPath id={clipId}>
           <ellipse cx={cx} cy={cy} rx={rx - 2} ry={ry - 2} />
         </clipPath>
       </defs>
-      <g transform={`rotate(-30, ${cx}, 230)`}>
+      <g transform={`rotate(18, ${cx}, ${cy})`}>
         <ellipse cx={cx} cy={cy} rx={rx} ry={ry} stroke="white" strokeWidth="3.5" />
         {ys.map(dy => (
           <line key={dy} x1={cx - rx} y1={cy + dy} x2={cx + rx} y2={cy + dy} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
@@ -38,8 +145,8 @@ function RacketSVG({ clipId }: { clipId: string }) {
         {xs.map(dx => (
           <line key={dx} x1={cx + dx} y1={cy - ry} x2={cx + dx} y2={cy + ry} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
         ))}
-        <line x1={cx} y1={cy + ry + 2} x2={cx} y2="315" stroke="white" strokeWidth="5" />
-        <rect x={cx - 11} y="315" width="22" height="65" rx="9" stroke="white" strokeWidth="3.5" />
+        <line x1={cx} y1={cy + ry + 2} x2={cx} y2="285" stroke="white" strokeWidth="5" />
+        <rect x={cx - 10} y="285" width="20" height="55" rx="8" stroke="white" strokeWidth="3.5" />
       </g>
     </svg>
   );
@@ -61,7 +168,7 @@ const DOW_LABELS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 const DOW_LABELS_SHORT = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
 
 function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
-  sessions: { date: string }[];
+  sessions: { date: string; gamesPlayed: number }[];
   viewYear: number; viewMonth: number;
   onPrev: () => void; onNext: () => void;
 }) {
@@ -69,17 +176,17 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
 
-  // Build a map of date -> game count (sessions per day)
+  // Sum gamesPlayed per day
   const countMap: Record<string, number> = {};
   for (const s of sessions) {
-    countMap[s.date] = (countMap[s.date] || 0) + 1;
+    countMap[s.date] = (countMap[s.date] || 0) + s.gamesPlayed;
   }
 
-  // DOW frequency (Mon=0 ... Sun=6)
+  // DOW frequency — sum gamesPlayed per day-of-week
   const dowCount = Array(7).fill(0);
   for (const s of sessions) {
     const d = new Date(s.date + 'T00:00:00');
-    dowCount[(d.getDay() + 6) % 7]++;
+    dowCount[(d.getDay() + 6) % 7] += s.gamesPlayed;
   }
   const maxDow = Math.max(...dowCount, 1);
 
@@ -93,10 +200,10 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
     return d.toISOString().slice(0, 10);
   };
 
-  const heatColor = (count: number) => {
-    if (count === 0) return 'var(--bar-i)';
-    if (count <= 1) return 'color-mix(in srgb, var(--p) 35%, transparent)';
-    if (count <= 3) return 'color-mix(in srgb, var(--p) 65%, transparent)';
+  const heatColor = (games: number) => {
+    if (games === 0) return 'var(--bar-i)';
+    if (games <= 3) return 'color-mix(in srgb, var(--p) 22%, transparent)';
+    if (games <= 5) return 'color-mix(in srgb, var(--p) 53%, transparent)';
     return 'var(--p)';
   };
 
@@ -105,10 +212,10 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-[var(--text-1)]">กิจกรรม</span>
         <div className="flex items-center gap-3">
-          {([[1,'35%'],[2,'65%'],[3,'100%']] as [number, string][]).map(([n, opacity]) => (
-            <div key={n} className="flex items-center gap-1">
+          {([['1-3','22%'],['4-5','53%'],['6+','100%']] as [string, string][]).map(([label, opacity]) => (
+            <div key={label} className="flex items-center gap-1">
               <div className="w-2.5 h-2.5 rounded-sm" style={{ background: `color-mix(in srgb, var(--p) ${opacity}, transparent)` }}/>
-              <span className="text-[10px] text-[var(--text-4)] font-medium">{n === 1 ? '1-2' : n === 2 ? '3-4' : '5+'}</span>
+              <span className="text-[10px] text-[var(--text-4)] font-medium">{label}</span>
             </div>
           ))}
         </div>
@@ -155,10 +262,11 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
         <div className="flex gap-1.5 items-end">
           {DOW_LABELS_SHORT.map((d, i) => {
             const cnt = dowCount[i];
-            const h = Math.max((cnt / maxDow) * 36, cnt > 0 ? 5 : 2);
+            const h = Math.max((cnt / maxDow) * 40, cnt > 0 ? 6 : 2);
             return (
-              <div key={d} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t-[3px]" style={{ height: h, backgroundColor: 'var(--bar-a)' }}/>
+              <div key={d} className="flex-1 flex flex-col items-center gap-0.5">
+                {cnt > 0 && <span className="text-[9px] font-bold tabular-nums" style={{ color: 'var(--p)' }}>{cnt}</span>}
+                <div className="w-full rounded-t-[3px]" style={{ height: h, backgroundColor: cnt > 0 ? 'var(--p)' : 'var(--bar-i)' }}/>
                 <span className="text-[9px] text-[var(--text-4)] font-medium">{d}</span>
               </div>
             );
@@ -222,12 +330,13 @@ function calcStreak(sessions: { date: string }[]): number {
 }
 
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo }: {
+function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onViewInfo, onViewCourt }: {
   session: Session; courtName: string; groupName: string;
   onEdit: () => void; onDelete: () => void;
   onUpdateNote: (notes: string | undefined) => void;
   onUpdatePhoto: (image: string | undefined) => void;
   onViewInfo: () => void;
+  onViewCourt: () => void;
 }) {
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
@@ -283,7 +392,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
               <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
-              <button onClick={onViewInfo} className="hover:text-[var(--p)] transition-colors truncate">{courtName}</button>
+              <button onClick={onViewCourt} className="hover:text-[var(--p)] transition-colors truncate">{courtName}</button>
               {session.intensity && (() => {
                 const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
                 const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
@@ -302,20 +411,11 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             </button>
             {menuOpen && (
               <div className="absolute right-0 top-8 z-20 bg-white rounded-xl border border-[var(--card-border)] overflow-hidden min-w-[120px]" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.12)' }}>
-                <button onClick={() => { setMenuOpen(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  แก้ไข
-                </button>
+                <button onClick={() => { setMenuOpen(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">แก้ไข</button>
                 <div className="h-px bg-[var(--card-border)]"/>
-                <button onClick={() => { setMenuOpen(false); photoInputRef.current?.click(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  เพิ่มรูป
-                </button>
+                <button onClick={() => { setMenuOpen(false); photoInputRef.current?.click(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">เพิ่มรูป</button>
                 <div className="h-px bg-[var(--card-border)]"/>
-                <button onClick={() => { setMenuOpen(false); onDelete(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  ลบ
-                </button>
+                <button onClick={() => { setMenuOpen(false); onDelete(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">ลบ</button>
               </div>
             )}
           </div>
@@ -394,7 +494,7 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   );
 }
 
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onViewInfo }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onViewInfo, onViewCourt }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
@@ -403,6 +503,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   onUpdateNote: (id: string, notes: string | undefined) => void;
   onUpdatePhoto: (id: string, image: string | undefined) => void;
   onViewInfo: (s: Session) => void;
+  onViewCourt: (courtId: string) => void;
 }) {
   const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
   // Group by date
@@ -435,6 +536,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
                 onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
                 onViewInfo={() => onViewInfo(s)}
+                onViewCourt={() => onViewCourt(s.courtId)}
               />
             ))}
           </div>
@@ -444,132 +546,15 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   );
 }
 
-function computeInsights(
-  sessions: Session[],
-  getCourtName: (id: string) => string,
-  getGroupName: (courtId: string, groupId: string) => string
-): Array<{ emoji: string; text: string }> {
-  if (sessions.length < 1) return [];
-  const out: Array<{ emoji: string; text: string }> = [];
 
-  // Most visited group
-  const gc: Record<string, { count: number; courtId: string }> = {};
-  for (const s of sessions) {
-    if (!gc[s.groupId]) gc[s.groupId] = { count: 0, courtId: s.courtId };
-    gc[s.groupId].count++;
-  }
-  const topG = Object.entries(gc).sort((a, b) => b[1].count - a[1].count)[0];
-  if (topG[1].count >= 2)
-    out.push({ emoji: '🏸', text: `ก๊วน ${getGroupName(topG[1].courtId, topG[0])} เป็นที่ที่ไปบ่อยที่สุด (${topG[1].count} ครั้ง)` });
-
-  // Best single session
-  const maxGames = Math.max(...sessions.map(s => s.gamesPlayed));
-  if (maxGames >= 3) {
-    const topSessions = sessions.filter(s => s.gamesPlayed === maxGames);
-    const label = topSessions.length === 1
-      ? ` — ${getGroupName(topSessions[0].courtId, topSessions[0].groupId)}`
-      : '';
-    out.push({ emoji: '⚡', text: `สถิติสูงสุด ${maxGames} เกมใน 1 ครั้ง${label}` });
-  }
-
-  // Favourite day of week
-  const dc: Record<number, number> = {};
-  const DL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
-  for (const s of sessions) dc[new Date(s.date + 'T00:00:00').getDay()] = (dc[new Date(s.date + 'T00:00:00').getDay()] || 0) + 1;
-  const topD = Object.entries(dc).sort((a, b) => Number(b[1]) - Number(a[1]))[0];
-  if (Number(topD[1]) >= 2)
-    out.push({ emoji: '📅', text: `วัน${DL[Number(topD[0])]}เป็นวันที่ตีบ่อยที่สุด (${topD[1]} ครั้ง)` });
-
-  // Month comparison
-  const now2 = new Date();
-  const tmStr = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}`;
-  const lmD = new Date(now2.getFullYear(), now2.getMonth() - 1, 1);
-  const lmStr = `${lmD.getFullYear()}-${String(lmD.getMonth() + 1).padStart(2, '0')}`;
-  const tmG = sessions.filter(s => s.date.startsWith(tmStr)).reduce((sum, s) => sum + s.gamesPlayed, 0);
-  const lmG = sessions.filter(s => s.date.startsWith(lmStr)).reduce((sum, s) => sum + s.gamesPlayed, 0);
-  if (lmG > 0 && tmG > 0) {
-    const diff = tmG - lmG;
-    if (diff > 0) out.push({ emoji: '📈', text: `เดือนนี้ตีมากกว่าเดือนที่แล้ว ${diff} เกม` });
-    else if (diff < 0) out.push({ emoji: '📉', text: `เดือนนี้ตีน้อยกว่าเดือนที่แล้ว ${Math.abs(diff)} เกม` });
-  }
-
-  // Best mood group
-  if (sessions.length >= 5) {
-    const gm: Record<string, { sum: number; count: number; courtId: string }> = {};
-    for (const s of sessions) {
-      if (!gm[s.groupId]) gm[s.groupId] = { sum: 0, count: 0, courtId: s.courtId };
-      gm[s.groupId].sum += s.mood; gm[s.groupId].count++;
-    }
-    const bm = Object.entries(gm).filter(([, v]) => v.count >= 2).sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count))[0];
-    if (bm) out.push({ emoji: '😄', text: `อารมณ์ดีที่สุดเมื่อตีกับก๊วน ${getGroupName(bm[1].courtId, bm[0])}` });
-  }
-
-  // All-time best streak
-  const allD = [...new Set(sessions.map(s => s.date))].sort();
-  let maxSt = 1, curSt = 1;
-  for (let i = 1; i < allD.length; i++) {
-    const p = new Date(allD[i - 1] + 'T00:00:00'); p.setDate(p.getDate() + 1);
-    if (p.toISOString().slice(0, 10) === allD[i]) { curSt++; maxSt = Math.max(maxSt, curSt); } else curSt = 1;
-  }
-  if (maxSt >= 3) out.push({ emoji: '🔥', text: `best streak ของคุณคือ ${maxSt} วันติดต่อกัน` });
-
-  // Time preference
-  const timed = sessions.filter(s => !(s.startTime === '00:00' && s.endTime === '00:00'));
-  if (timed.length >= 3) {
-    const avgH = Math.round(timed.map(s => Number(s.startTime.split(':')[0])).reduce((a, b) => a + b, 0) / timed.length);
-    const tl = avgH < 12 ? 'ช่วงเช้า' : avgH < 17 ? 'ช่วงบ่าย' : avgH < 20 ? 'ช่วงเย็น' : 'ช่วงค่ำ';
-    out.push({ emoji: '⏰', text: `ชอบตี${tl} (เริ่มเฉลี่ย ${String(avgH).padStart(2, '0')}:00 น.)` });
-  }
-
-  // Longest wait (max min/game) — sessions with both time and games recorded
-  const withMpg = sessions
-    .filter(s => s.gamesPlayed > 0 && !(s.startTime === '00:00' && s.endTime === '00:00'))
-    .map(s => {
-      const [sh, sm] = s.startTime.split(':').map(Number);
-      const [eh, em] = s.endTime.split(':').map(Number);
-      let dur = (eh * 60 + em) - (sh * 60 + sm);
-      if (dur <= 0) dur += 24 * 60;
-      return { mpg: Math.round(dur / s.gamesPlayed), courtId: s.courtId, groupId: s.groupId };
-    });
-  if (withMpg.length >= 3) {
-    const top = withMpg.reduce((a, b) => b.mpg > a.mpg ? b : a);
-    if (top.mpg >= 30)
-      out.push({ emoji: '⏳', text: `รอนานสุด ${top.mpg} นาที/เกม — ${getGroupName(top.courtId, top.groupId)}` });
-  }
-
-  // Heaviest group — which group most often delivers heavy games
-  const INTENSITY_SCORE: Record<string, number> = { light: 1, medium: 2, heavy: 3 };
-  const gi: Record<string, { sum: number; count: number; heavy: number; courtId: string }> = {};
-  for (const s of sessions) {
-    if (!s.intensity) continue;
-    if (!gi[s.groupId]) gi[s.groupId] = { sum: 0, count: 0, heavy: 0, courtId: s.courtId };
-    const lvs = Array.isArray(s.intensity) ? s.intensity : [s.intensity];
-    gi[s.groupId].sum += lvs.reduce((acc, lv) => acc + INTENSITY_SCORE[lv], 0) / lvs.length;
-    gi[s.groupId].count++;
-    if (lvs.includes('heavy')) gi[s.groupId].heavy++;
-  }
-  const ranked = Object.entries(gi)
-    .filter(([, v]) => v.count >= 2)
-    .sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count));
-  if (ranked.length > 0) {
-    const top = ranked[0];
-    const bottom = ranked[ranked.length - 1];
-    if (top[1].sum / top[1].count >= 2.5)
-      out.push({ emoji: '🔥', text: `ไปก๊วน ${getGroupName(top[1].courtId, top[0])} มักเจอเกมหนัก เตรียมตัวให้พร้อม!` });
-    else if (bottom[1].sum / bottom[1].count <= 1.5)
-      out.push({ emoji: '🌿', text: `ก๊วน ${getGroupName(bottom[1].courtId, bottom[0])} เล่นสบายๆ ชิลล์ๆ` });
-  }
-
-  return out;
-}
 
 export function SessionsView({ sessions, courts, justLogged, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onNavigateToCourt }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
+  const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [insightIdx, setInsightIdx] = useState(0);
-  const insightTouchX = useRef<number | null>(null);
+  const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -590,6 +575,18 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     else setViewMonth(m => m + 1);
   };
   const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
+
+  // Months that have at least one session (+ current month always included)
+  const currentYM = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+  const availableMonths = useMemo(() => {
+    const ymSet = new Set(sessions.map(s => s.date.slice(0, 7)));
+    ymSet.add(currentYM);
+    return [...ymSet].sort().map(ym => {
+      const [y, m] = ym.split('-').map(Number);
+      return { ym, label: MONTH_SHORT[m - 1], year: y, yearLabel: y !== currentYear ? ` ${y + 543}` : '' };
+    });
+  }, [sessions, currentYM, currentYear]);
+
   const q = search.trim().toLowerCase();
   const viewedSessions = sessions.filter(s => {
     if (!s.date.startsWith(viewYM)) return false;
@@ -599,6 +596,15 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
   const isNextDisabled = viewYear > currentYear || (viewYear === currentYear && viewMonth >= currentMonth);
   const totalSessions = sessions.length;
   const totalGames = sessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
+
+  // Last 6 months sparkline
+  const sparkMonths = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const games = sessions.filter(s => s.date.startsWith(ym)).reduce((sum, s) => sum + s.gamesPlayed, 0);
+    return { label: MONTH_SHORT[d.getMonth()], games, isCurrent: i === 5 };
+  });
+  const maxSparkGames = Math.max(...sparkMonths.map(m => m.games), 1);
   const thisMonthSessions = sessions.filter(s => s.date.startsWith(viewYM));
   const thisMonthDays = new Set(thisMonthSessions.map(s => s.date)).size;
   const thisMonthGames = thisMonthSessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
@@ -611,46 +617,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     ? Math.floor((new Date(today + 'T00:00:00').getTime() - new Date(lastSessionDate + 'T00:00:00').getTime()) / 86400000)
     : null;
 
-  type NudgeStyle = 'emerald' | 'orange' | 'amber' | 'slate';
-  const nudge: { emoji: string; message: string; sub?: string; btnLabel: string; style: NudgeStyle } | null = (() => {
-    if (!sessions.length) return null;
-    if (justLogged) {
-      if (streak >= 5) return { emoji: '🔥', message: `${streak} วันติดต่อกันแล้ว!`, sub: 'ฟอร์มร้อนแรงมาก ไปต่อเลย', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
-      if (streak >= 3) return { emoji: '🎉', message: 'บันทึกแล้ว!', sub: `ตีติดกัน ${streak} วัน สุดยอด!`, btnLabel: 'บันทึกอีกครั้ง', style: 'emerald' };
-      return { emoji: '🎉', message: 'บันทึกแล้ว!', sub: 'ตีดีมากวันนี้ เก่งมาก', btnLabel: 'บันทึกอีกครั้ง', style: 'emerald' };
-    }
-    if (hasSessionToday) {
-      if (streak >= 5) return { emoji: '🔥', message: `${streak} วันติดต่อกัน!`, sub: 'ฟอร์มร้อนแรงมาก ยอดเยี่ยม!', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
-      if (streak >= 3) return { emoji: '🔥', message: `ตีติดกัน ${streak} วันแล้ว!`, sub: 'รักษาฟอร์มนี้ไว้', btnLabel: 'บันทึกอีกครั้ง', style: 'orange' };
-      return { emoji: '✅', message: 'ตีแล้ววันนี้', btnLabel: '+ บันทึกอีกครั้ง', style: 'slate' };
-    }
-    if (streak >= 3) return { emoji: '🔥', message: `Streak ${streak} วัน กำลังมา!`, sub: 'ตีวันนี้ด้วยจะได้ครบ', btnLabel: 'บันทึกเลย →', style: 'amber' };
-    if (daysSinceLast !== null && daysSinceLast > 14) return { emoji: '😢', message: `ห่างหายไป ${daysSinceLast} วันแล้ว`, sub: 'กลับมาตีได้เลย!', btnLabel: 'บันทึกเลย →', style: 'slate' };
-    if (daysSinceLast !== null && daysSinceLast > 7) return { emoji: '😴', message: `หยุดไป ${daysSinceLast} วัน`, sub: 'เริ่มตีใหม่ได้เลย', btnLabel: 'บันทึกเลย →', style: 'slate' };
-    return { emoji: '🏸', message: 'วันนี้ยังไม่ได้ตี', btnLabel: 'บันทึกเลย →', style: 'amber' };
-  })();
-
-  const NUDGE_STYLES: Record<NudgeStyle, { wrap: string; text: string; pill: string }> = {
-    emerald: { wrap: 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 shadow-emerald-100', text: 'text-emerald-800', pill: 'bg-emerald-500 hover:bg-emerald-600' },
-    orange:  { wrap: 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 shadow-orange-100',   text: 'text-orange-800',  pill: 'bg-orange-500 hover:bg-orange-600'   },
-    amber:   { wrap: 'bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200 shadow-amber-100',     text: 'text-amber-800',   pill: 'bg-amber-500 hover:bg-amber-600'     },
-    slate:   { wrap: 'bg-gradient-to-r from-slate-100 to-gray-100 border-slate-200 shadow-slate-100',     text: 'text-slate-700',   pill: 'bg-slate-500 hover:bg-slate-600'     },
-  };
-
-  const insights = useMemo(
-    () => computeInsights(sessions, getCourtName, getGroupName),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sessions, courts]
-  );
-  const activeInsight = insights.length > 0 ? insights[insightIdx % insights.length] : null;
-  React.useEffect(() => {
-    setInsightIdx(0);
-  }, [insights.length]);
-  React.useEffect(() => {
-    if (insights.length <= 1) return;
-    const t = setInterval(() => setInsightIdx(i => i + 1), 4000);
-    return () => clearInterval(t);
-  }, [insights.length]);
 
   const sessionDurations = thisMonthSessions.map(s => {
     const [sh, sm] = s.startTime.split(':').map(Number);
@@ -667,7 +633,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
     : null;
 
   return (
-    <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
+    <div className="max-w-screen-sm mx-auto px-3 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
       {/* Header */}
       <div className="mb-5">
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
@@ -676,8 +642,8 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
       {/* ── Desktop: 2-column dashboard ── */}
       <div className="hidden sm:flex sm:gap-5 sm:items-start">
         {/* Col 1: Hero card + Heatmap below */}
-        <div className="w-[340px] flex-shrink-0">
-          <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
+        <div className="w-[400px] flex-shrink-0">
+          <div className="relative rounded-3xl p-6 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
             <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
             <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
             <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
@@ -685,7 +651,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
             <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
             <RacketSVG clipId="rh-desk" />
-            <div className="relative z-10 flex items-end justify-between mb-4">
+            <div className="relative z-10 flex items-end justify-between mb-3">
               <div>
                 <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
                 <div className="flex items-end gap-1.5 leading-none">
@@ -699,6 +665,24 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                   <span className="text-sm font-semibold">{streak} วันติด</span>
                 </div>
               )}
+            </div>
+            {/* Sparkline */}
+            <div className="relative z-10 flex items-end gap-2 mb-4" style={{ height: 68 }}>
+              {sparkMonths.map((m, i) => {
+                const h = m.games > 0 ? Math.max((m.games / maxSparkGames) * 42, 8) : 4;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
+                    {m.games > 0 && (
+                      <span className="text-[10px] font-bold tabular-nums leading-none mb-0.5"
+                        style={{ color: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)' }}>{m.games}</span>
+                    )}
+                    <div className="w-full rounded-t-[4px] transition-all"
+                      style={{ height: h, backgroundColor: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.18)' }} />
+                    <span className="text-[9px] font-medium leading-none mt-0.5"
+                      style={{ color: m.isCurrent ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)' }}>{m.label}</span>
+                  </div>
+                );
+              })}
             </div>
             <div className="relative z-10 border-t border-white/10 pt-3">
               <div className="grid grid-cols-4 gap-2">
@@ -725,62 +709,49 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-                </svg>
-                <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                  placeholder="ค้นหาก๊วน หรือสนาม..."
-                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
-                />
-                {search && (
-                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-              {(activeInsight || nudge) && (
-                <div className="hidden sm:flex gap-2">
-                  {/* Insight — left */}
-                  {activeInsight && (
-                    <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-2xl border bg-[var(--chip-bg)] border-[var(--card-border)] min-w-0 overflow-hidden">
-                      <span key={insightIdx % insights.length} className="flex items-center gap-2 flex-1 min-w-0 animate-insight-in">
-                        <span className="text-base flex-shrink-0">{activeInsight.emoji}</span>
-                        <span className="text-sm text-[var(--text-2)] min-w-0 truncate">{activeInsight.text}</span>
-                      </span>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        {insights.map((_, i) => (
-                          <span key={i} className="rounded-full transition-all inline-block"
-                            style={{ width: i === insightIdx % insights.length ? '14px' : '5px', height: '5px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)', opacity: i === insightIdx % insights.length ? 1 : 0.4 }} />
-                        ))}
-                        {insights.length > 1 && (
-                          <button onClick={() => setInsightIdx(i => i + 1)}
-                            className="ml-1 text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors leading-none">›</button>
-                        )}
-                      </div>
-                    </div>
+              <div className="flex gap-2 items-center">
+                {/* Search */}
+                <div className="relative flex-1">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+                  </svg>
+                  <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="ค้นหาก๊วน หรือสนาม..."
+                    className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
                   )}
-                  {/* State nudge — right */}
-                  {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-                    <div className={`flex-1 flex items-center gap-3 px-4 py-2.5 rounded-2xl border shadow-sm ${ns.wrap}`}>
-                      <span className="text-xl flex-shrink-0">{nudge.emoji}</span>
-                      <div className="flex-1 min-w-0">
-                        <span className={`text-sm font-semibold ${ns.text}`}>{nudge.message}</span>
-                        {nudge.sub && <span className={`text-xs opacity-75 ${ns.text}`}> — {nudge.sub}</span>}
-                      </div>
-                      <button onClick={onLogSession} className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-1.5 rounded-full transition-all active:scale-95 flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</button>
-                    </div>
-                  ); })()}
                 </div>
-              )}
+                {/* Month filter pills inline */}
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0 max-w-[240px]">
+                  {availableMonths.map(({ ym, label, yearLabel }) => (
+                    <button key={ym} onClick={() => { const [y, m] = ym.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
+                      className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold transition-all border"
+                      style={{
+                        background: viewYM === ym ? 'var(--p)' : 'var(--chip-bg)',
+                        color: viewYM === ym ? '#0f172a' : 'var(--text-3)',
+                        borderColor: viewYM === ym ? 'var(--p)' : 'var(--input-b)',
+                      }}>
+                      {label}{yearLabel}
+                    </button>
+                  ))}
+                </div>
+                {/* Add button */}
+                <button onClick={onLogSession}
+                  className="flex-shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center transition-colors"
+                  style={{ background: 'var(--p)', color: '#0f172a' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
               )}
             </div>
           )}
@@ -789,122 +760,140 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
 
       </div>
 
-      {/* ── Mobile: stacked ── */}
+      {/* ── Mobile: tabs ── */}
       <div className="sm:hidden">
-        <div className="relative rounded-3xl p-5 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
-          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
-          <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-          <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
-          <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
-          <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-          <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
-          <RacketSVG clipId="rh-mob" />
-          <div className="relative z-10 flex items-end justify-between mb-4">
-            <div>
-              <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
-              <div className="flex items-end gap-1.5 leading-none">
-                <span className="text-5xl font-black">{totalGames}</span>
-                <span className="text-lg text-white/60 mb-1">เกม</span>
-              </div>
-            </div>
-            {streak >= 2 && (
-              <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
-                <span className="text-lg">🔥</span>
-                <span className="text-sm font-semibold">{streak} วันติด</span>
-              </div>
-            )}
-          </div>
-          <div className="relative z-10 border-t border-white/10 pt-3">
-            <div className="grid grid-cols-4 gap-2">
-              <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
-              <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
-              <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
-              <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
-            </div>
-          </div>
+        {/* Tab switcher */}
+        <div className="flex rounded-2xl p-1 mb-4" style={{ backgroundColor: 'var(--chip-bg)' }}>
+          {(['feed', 'stats'] as const).map(tab => (
+            <button key={tab} onClick={() => setMobileTab(tab)}
+              className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
+              style={{
+                backgroundColor: mobileTab === tab ? '#ffffff' : 'transparent',
+                color: mobileTab === tab ? 'var(--text-1)' : 'var(--text-3)',
+                boxShadow: mobileTab === tab ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              }}>
+              {tab === 'feed' ? 'ฟีด' : 'สถิติ'}
+            </button>
+          ))}
         </div>
-        {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
-        {activeInsight && (
-          <div className={`${card.padded} mb-4 flex flex-col gap-3 overflow-hidden`}
-            style={{ touchAction: 'pan-y' }}
-            onTouchStart={e => { insightTouchX.current = e.touches[0].clientX; }}
-            onTouchEnd={e => {
-              if (insightTouchX.current === null) return;
-              const dx = e.changedTouches[0].clientX - insightTouchX.current;
-              insightTouchX.current = null;
-              if (Math.abs(dx) < 40) return;
-              if (dx < 0) setInsightIdx(i => i + 1);
-              else setInsightIdx(i => (i - 1 + insights.length) % insights.length);
-            }}
-          >
-            <div key={insightIdx % insights.length} className="flex items-start gap-3 animate-insight-in">
-              <span className="text-2xl flex-shrink-0 mt-0.5">{activeInsight.emoji}</span>
-              <p className="text-sm text-[var(--text-2)] leading-relaxed flex-1">{activeInsight.text}</p>
+
+        {/* Stats tab */}
+        {mobileTab === 'stats' && (
+          <>
+            <div className="relative rounded-3xl p-6 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
+              <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
+              <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
+              <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
+              <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
+              <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
+              <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
+              <RacketSVG clipId="rh-mob" />
+              <div className="relative z-10 flex items-end justify-between mb-3">
+                <div>
+                  <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
+                  <div className="flex items-end gap-1.5 leading-none">
+                    <span className="text-5xl font-black">{totalGames}</span>
+                    <span className="text-lg text-white/60 mb-1">เกม</span>
+                  </div>
+                </div>
+                {streak >= 2 && (
+                  <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
+                    <span className="text-lg">🔥</span>
+                    <span className="text-sm font-semibold">{streak} วันติด</span>
+                  </div>
+                )}
+              </div>
+              {/* Sparkline */}
+              <div className="relative z-10 flex items-end gap-2 mb-4" style={{ height: 68 }}>
+                {sparkMonths.map((m, i) => {
+                  const h = m.games > 0 ? Math.max((m.games / maxSparkGames) * 42, 8) : 4;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
+                      {m.games > 0 && (
+                        <span className="text-[10px] font-bold tabular-nums leading-none mb-0.5"
+                          style={{ color: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)' }}>{m.games}</span>
+                      )}
+                      <div className="w-full rounded-t-[4px]"
+                        style={{ height: h, backgroundColor: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.18)' }} />
+                      <span className="text-[9px] font-medium leading-none mt-0.5"
+                        style={{ color: m.isCurrent ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)' }}>{m.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="relative z-10 border-t border-white/10 pt-3">
+                <div className="grid grid-cols-4 gap-2">
+                  <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
+                  <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
+                </div>
+              </div>
             </div>
-            {insights.length > 1 && (
-              <div className="flex items-center justify-between">
-                <div className="flex gap-1.5">
-                  {insights.map((_, i) => (
-                    <button key={i} onClick={() => setInsightIdx(i)}
-                      className="rounded-full transition-all"
-                      style={{ width: i === insightIdx % insights.length ? '20px' : '7px', height: '7px', backgroundColor: i === insightIdx % insights.length ? 'var(--p)' : 'var(--text-3)' }} />
+            {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
+          </>
+        )}
+
+        {/* Feed tab */}
+        {mobileTab === 'feed' && (
+          sessions.length === 0 ? (
+            <div className={emptyState.wrapper}>
+              <div className={emptyState.icon}>🏸</div>
+              <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
+              <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
+              <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2 items-center">
+                <div className="relative flex-1">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
+                  </svg>
+                  <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    placeholder="ค้นหาก๊วน หรือสนาม..."
+                    className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  )}
+                </div>
+                {/* Month filter pills */}
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0 max-w-[160px]">
+                  {availableMonths.map(({ ym, label, yearLabel }) => (
+                    <button key={ym} onClick={() => { const [y, m] = ym.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
+                      className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold transition-all border"
+                      style={{
+                        background: viewYM === ym ? 'var(--p)' : 'var(--chip-bg)',
+                        color: viewYM === ym ? '#0f172a' : 'var(--text-3)',
+                        borderColor: viewYM === ym ? 'var(--p)' : 'var(--input-b)',
+                      }}>
+                      {label}{yearLabel}
+                    </button>
                   ))}
                 </div>
-                <button onClick={() => setInsightIdx(i => i + 1)}
-                  className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors">
-                  ถัดไป ›
-                </button>
               </div>
-            )}
-          </div>
-        )}
-        {nudge && (() => { const ns = NUDGE_STYLES[nudge.style]; return (
-          <button onClick={onLogSession} className={`w-full border rounded-2xl px-4 py-3.5 mb-4 flex items-center gap-3 text-left transition-all active:scale-[0.98] shadow-sm ${ns.wrap}`}>
-            <span className="text-2xl flex-shrink-0">{nudge.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className={`text-sm font-bold ${ns.text}`}>{nudge.message}</div>
-              {nudge.sub && <div className={`text-xs mt-0.5 opacity-80 ${ns.text}`}>{nudge.sub}</div>}
-            </div>
-            <span className={`text-xs font-bold whitespace-nowrap text-white px-3.5 py-2 rounded-full flex-shrink-0 shadow-sm ${ns.pill}`}>{nudge.btnLabel}</span>
-          </button>
-        ); })()}
-        {sessions.length === 0 ? (
-          <div className={emptyState.wrapper}>
-            <div className={emptyState.icon}>🏸</div>
-            <div className={emptyState.title}>เริ่มบันทึกการตีแบด</div>
-            <div className={emptyState.subtitle}>ติดตามพัฒนาการและสถิติของคุณ</div>
-            <button onClick={onLogSession} className={btn.primaryLg}>+ บันทึกครั้งแรก</button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 mt-4">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
-              </svg>
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="ค้นหาก๊วน หรือสนาม..."
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+              {viewedSessions.length === 0 && (
+                <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+              )}
+              {viewedSessions.length > 0 && (
+                <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
               )}
             </div>
-            {viewedSessions.length === 0 && (
-              <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
-            )}
-            {viewedSessions.length > 0 && (
-              <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onViewInfo={setViewInfoSession} />
-            )}
-          </div>
+          )
         )}
       </div>
 
       {/* Group / Court info sheet */}
+      {viewCourtId && (() => {
+        const court = courts.find(c => c.id === viewCourtId);
+        if (!court) return null;
+        return <CourtPanel court={court} onClose={() => setViewCourtId(null)} />;
+      })()}
+
       {viewInfoSession && (() => {
         const court = courts.find(c => c.id === viewInfoSession.courtId);
         const group = court?.groups.find(g => g.id === viewInfoSession.groupId);
