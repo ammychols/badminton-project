@@ -258,76 +258,63 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
-                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-44 sm:w-auto group/card">
+                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-40 sm:w-auto group/card">
                   <button
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                     onMouseDown={e => e.preventDefault()}
-                    className="relative text-left rounded-2xl overflow-hidden transition-all w-full"
+                    className="relative text-left rounded-2xl overflow-hidden w-full transition-all"
                     style={{
-                      background: 'linear-gradient(150deg, #0f172a 0%, #1e3a5f 100%)',
-                      opacity: isSelected ? 1 : 0.6,
-                      boxShadow: isSelected ? '0 0 0 2px #84cc16' : 'none',
-                      transition: 'opacity 0.15s, box-shadow 0.15s',
+                      background: 'linear-gradient(150deg, #1e293b 0%, #1e3a5f 100%)',
+                      opacity: isSelected ? 1 : 0.55,
+                      transition: 'opacity 0.15s',
                     }}
-                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.opacity = '1'; }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.opacity = '0.6'; }}
+                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.opacity = '0.85'; }}
+                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.opacity = '0.55'; }}
                   >
-                    {/* Lime accent top bar when selected */}
-                    {isSelected && <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #84cc16, #a3e635)' }} />}
-                    {/* Grain texture */}
-                    <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,backgroundSize:'180px 180px'}} />
-                    {/* Watermark letter */}
-                    <span className="absolute -right-1 -bottom-2 text-7xl font-black leading-none select-none pointer-events-none" style={{ color: 'rgba(255,255,255,0.04)' }}>
-                      {court.name.charAt(0).toUpperCase()}
-                    </span>
-
-                    {/* Main content */}
-                    <div className="px-4 pt-3.5 pb-2.5">
-                      {/* Top row: name + checkmark */}
-                      <div className="flex items-start justify-between gap-1 mb-1">
-                        <p className="font-extrabold text-sm leading-tight" style={{ color: isSelected ? '#a3e635' : 'white' }}>{court.name}</p>
-                        {isSelected && (
-                          <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5" style={{ background: '#84cc16' }}>
-                            <svg width="8" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#0f172a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                          </span>
+                    <div className="px-3.5 pt-3 pb-3">
+                      {/* Top: name + pin icon */}
+                      <div className="flex items-start justify-between gap-1 mb-1.5">
+                        <p className="font-bold text-sm leading-tight text-white">{court.name}</p>
+                        {((court.lat && court.lng) || court.address) ? (
+                          <a
+                            href={court.lat && court.lng ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + (court.address ?? ''))}`}
+                            target="_blank" rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg transition-colors"
+                            style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          </a>
+                        ) : (
+                          <button
+                            onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
+                            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg opacity-0 group-hover/card:opacity-100 transition-opacity"
+                            style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
+                          >
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                          </button>
                         )}
                       </div>
+                      {/* Address */}
                       {court.address && (() => {
                         const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
                         const short = parts.length >= 2 ? parts.slice(-2).join(' · ') : parts[0] ?? court.address;
-                        return <p className="text-xs truncate" style={{ color: isSelected ? 'rgba(163,230,53,0.65)' : 'rgba(255,255,255,0.38)' }}>{short}</p>;
+                        return <p className="text-xs truncate mb-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{short}</p>;
                       })()}
-                    </div>
-
-                    {/* Bottom row: group count + action buttons */}
-                    <div className="flex items-center justify-between px-4 pb-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                      <span className="text-xs font-semibold" style={{ color: isSelected ? 'rgba(163,230,53,0.8)' : 'rgba(255,255,255,0.45)' }}>{court.groups.length} ก๊วน</span>
-                      <div className="flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
-                        {((court.lat && court.lng) || court.address) && (
-                          <a
-                            href={court.lat && court.lng ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + court.address)}`}
-                            target="_blank" rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="w-5 h-5 flex items-center justify-center rounded-md transition-colors"
-                            style={{ color: 'rgba(255,255,255,0.4)' }}
-                            onMouseEnter={e => (e.currentTarget.style.color = '#60a5fa')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
-                          >
-                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                          </a>
-                        )}
-                        <button
-                          onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
-                          className="w-5 h-5 flex items-center justify-center rounded-md transition-colors"
-                          style={{ color: 'rgba(255,255,255,0.4)' }}
-                          onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
-                          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
-                        >
-                          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                        </button>
-                      </div>
+                      {/* Group count */}
+                      <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>{court.groups.length} ก๊วน</p>
                     </div>
                   </button>
+                  {/* Delete on hover (when has address) */}
+                  {((court.lat && court.lng) || court.address) && (
+                    <button
+                      onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
+                      className="absolute bottom-2.5 right-2.5 w-5 h-5 flex items-center justify-center rounded-md opacity-0 group-hover/card:opacity-100 transition-opacity"
+                      style={{ color: 'rgba(255,255,255,0.35)' }}
+                    >
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </button>
+                  )}
                 </div>
               );
             })}
