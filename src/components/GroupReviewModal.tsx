@@ -10,7 +10,7 @@ interface Props {
 }
 
 const MOOD_EMOJI: Record<number, string> = { 1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥' };
-const MOOD_BAR_COLOR = ['#ef4444', '#f97316', '#fbbf24', '#a3e635', '#65a30d', '#16a34a'];
+const MOOD_BAR_COLOR = ['#ef4444', '#f97316', '#fbbf24', '#6ee7b7', '#10b981', '#16a34a'];
 
 export function GroupReviewModal({ group, court, sessions, onClose, onNavigateToCourt }: Props) {
   // Derived stats
@@ -107,7 +107,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
 
         {/* Overview - dark gradient card */}
         <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #020617 0%, #0f172a 55%, #1e3a5f 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
-          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(132,204,22,0.09)', filter: 'blur(40px)' }}/>
+          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(52,211,153,0.09)', filter: 'blur(40px)' }}/>
           <div className="relative grid grid-cols-3 gap-3" style={{ zIndex: 1 }}>
             {([[totalSessions, 'ครั้ง'], [avgGames.toFixed(1), 'เกม/ครั้ง'], [avgMpg ?? '—', 'นาที/เกม']] as [React.ReactNode, string][]).map(([v, l]) => (
               <div key={l}>
@@ -139,7 +139,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
                 </svg>
                 {moodPts.map((p, i) => (
                   <div key={i} style={{ position: 'absolute', left: `${p.x}%`, top: p.y, transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(132,204,22,0.22)' }}/>}
+                    {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(52,211,153,0.22)' }}/>}
                     <span style={{ fontSize: p.last ? 25 : 18, lineHeight: 1, position: 'relative' }}>{MOOD_EMOJI[p.m]}</span>
                   </div>
                 ))}

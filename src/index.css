@@ -4,8 +4,8 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #84cc16;
-  --p-h: #65a30d;
+  --p: #34d399;
+  --p-h: #10b981;
   --app-bg: #eef2f7;
   --nav-bg: #0f172a;
   --nav-border: #1e293b;
@@ -18,20 +18,21 @@
   --input-f: #64748b;
   --chip-bg: #f1f5f9;
   --chip-t: #475569;
-  --bar-a: #84cc16;
+  --bar-a: #34d399;
   --bar-i: #e2e8f0;
   --dashed: #e2e8f0;
   --cal-sel: #0f172a;
   --hover-bg: #f8fafc;
   --hero-from: #020617;
   --hero-to: #1e3a5f;
-  --nav-active: #84cc16;
+  --nav-active: #34d399;
   --nav-inactive: #475569;
 }
 
 
 html {
   overflow-y: scroll;
+  background-color: #0f172a; /* dark overscroll color at top matches nav */
 }
 
 @layer base {

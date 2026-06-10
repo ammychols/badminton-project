@@ -159,16 +159,15 @@ export default function App() {
         )}
       </main>
 
-      {/* FAB */}
-      <button
-        onClick={() => openModal({ type: 'logSession' })}
-        className="fixed z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95"
-        style={{ background: '#84cc16', bottom: 'calc(env(safe-area-inset-bottom) + 56px)', right: '20px', boxShadow: '0 4px 20px rgba(132,204,22,0.45)' }}
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
-
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        {/* FAB — sits above nav, anchored to nav's top-right */}
+        <button
+          onClick={() => openModal({ type: 'logSession' })}
+          className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
+          style={{ background: '#34d399', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(52,211,153,0.4)' }}
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
         <div className="flex items-center h-14">
           {([
             { key: 'sessions', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> },
@@ -178,9 +177,9 @@ export default function App() {
             return (
               <button key={key} onClick={() => switchTab(key)}
                 className="flex-1 flex flex-col items-center justify-center gap-1.5 h-full transition-colors"
-                style={{ color: active ? '#84cc16' : '#475569' }}>
+                style={{ color: active ? '#34d399' : '#475569' }}>
                 {icon}
-                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: '#84cc16' }} />}
+                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: '#34d399' }} />}
                 {!active && <span className="w-1 h-1 rounded-full opacity-0" />}
               </button>
             );
