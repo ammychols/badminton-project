@@ -92,17 +92,18 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
+      <div className="w-full max-w-sm max-h-[88vh] flex flex-col rounded-3xl overflow-hidden" style={{ backgroundColor: 'var(--app-bg)' }} onClick={e => e.stopPropagation()}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-2.5 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
-        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        </button>
+      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
         <div className="text-base font-extrabold text-white" style={{ letterSpacing: '-0.4px' }}>{group.name}</div>
+        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
+      <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-6">
 
         {/* Overview - dark gradient card */}
         <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #020617 0%, #0f172a 55%, #1e3a5f 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
@@ -203,6 +204,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
         </div>
 
 
+      </div>
       </div>
     </div>
   );
