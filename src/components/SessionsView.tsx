@@ -792,7 +792,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
       </div>
 
       {/* ── Mobile: tabs ── */}
-      <div className="sm:hidden">
+      <div className="sm:hidden" onTouchStart={e => { const t = e.touches[0]; (e.currentTarget as HTMLElement).dataset.tx = String(t.clientX); }} onTouchEnd={e => { const startX = Number((e.currentTarget as HTMLElement).dataset.tx ?? 0); const dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx) > 50) setMobileTab(dx < 0 ? 'stats' : 'feed'); }}>
         {/* Tab switcher */}
         <div className="flex rounded-2xl p-1 mb-4" style={{ backgroundColor: 'var(--chip-bg)' }}>
           {(['feed', 'stats'] as const).map(tab => (
