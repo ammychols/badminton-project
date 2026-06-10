@@ -107,19 +107,19 @@ function CourtDetailPanel({ court, isOpen, onClose, onRateCourt, onAddGroup, onD
                 )}
               </div>
 
-              {/* Day filter */}
-              <div className="px-6 pb-3 flex gap-1.5 overflow-x-auto scrollbar-none">
-                {DAY_TABS.map(({ key, label }) => (
-                  <button key={key} onClick={() => setPanelDay(key)}
-                    className={`flex-shrink-0 ${btn.pill} ${panelDay === key ? (key === 'all' ? btn.pillActive : DAY_COLORS[key as DayOfWeek].active) : btn.pillInactive}`}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-
               {/* Groups */}
               <div className="px-6 pb-6">
                 <p className="text-xs font-semibold text-[var(--text-4)] uppercase tracking-wide mb-3">ก๊วนในสนามนี้</p>
+
+                {/* Day filter */}
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-none mb-3">
+                  {DAY_TABS.map(({ key, label }) => (
+                    <button key={key} onClick={() => setPanelDay(key)}
+                      className={`flex-shrink-0 ${btn.pill} ${panelDay === key ? (key === 'all' ? btn.pillActive : DAY_COLORS[key as DayOfWeek].active) : btn.pillInactive}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
                 <div className="grid grid-cols-1 gap-3">
                   {panelGroups.map(group => (
                     <GroupCard key={group.id} group={group}
@@ -264,20 +264,26 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     onMouseDown={e => e.preventDefault()}
                     className="relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full"
                     style={{
-                      background: 'linear-gradient(135deg, #0f172a, #1e3a5f)',
+                      background: isSelected
+                        ? 'linear-gradient(135deg, #1a2e05, #2a4a0a)'
+                        : 'linear-gradient(135deg, #0f172a, #1e3a5f)',
                       opacity: isSelected ? 1 : 0.65,
-                      boxShadow: isSelected ? '0 0 0 2px #84cc16' : 'none',
+                      boxShadow: isSelected ? '0 0 0 1.5px #84cc16 inset' : 'none',
                     }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
                     onMouseLeave={e => (e.currentTarget.style.opacity = isSelected ? '1' : '0.65')}
                   >
+                    {/* Selected top accent bar */}
+                    {isSelected && (
+                      <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: '#84cc16' }} />
+                    )}
                     {/* Grain texture */}
                     <div className="absolute inset-0 opacity-[0.08] pointer-events-none" style={{backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,backgroundSize:'180px 180px'}} />
                     {/* Big watermark letter */}
-                    <span className="absolute -right-2 -bottom-3 text-8xl font-black text-white/[0.05] leading-none select-none pointer-events-none tracking-tighter">
+                    <span className="absolute -right-2 -bottom-3 text-8xl font-black leading-none select-none pointer-events-none tracking-tighter" style={{ color: isSelected ? 'rgba(132,204,22,0.08)' : 'rgba(255,255,255,0.05)' }}>
                       {court.name.charAt(0).toUpperCase()}
                     </span>
-                    <p className="font-extrabold text-white text-sm leading-tight truncate mb-1 pr-5">{court.name}</p>
+                    <p className="font-extrabold text-sm leading-tight truncate mb-1 pr-5" style={{ color: isSelected ? '#84cc16' : 'white' }}>{court.name}</p>
                     {court.address && (() => {
                       const parts = court.address
                         .split(',')
@@ -286,9 +292,9 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                       const short = parts.length >= 2
                         ? parts.slice(-2).join(' · ')
                         : parts[0] ?? court.address;
-                      return <p className="text-xs text-white/40 truncate max-w-full">{short}</p>;
+                      return <p className="text-xs truncate max-w-full" style={{ color: isSelected ? 'rgba(132,204,22,0.6)' : 'rgba(255,255,255,0.4)' }}>{short}</p>;
                     })()}
-                    <p className="text-xs text-white/50 mt-1">{court.groups.length} ก๊วน</p>
+                    <p className="text-xs mt-1" style={{ color: isSelected ? 'rgba(132,204,22,0.7)' : 'rgba(255,255,255,0.5)' }}>{court.groups.length} ก๊วน</p>
                   </button>
                   <div className="absolute top-2 right-2 flex gap-1">
                     {(court.lat && court.lng) || court.address ? (
