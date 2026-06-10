@@ -264,9 +264,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     onMouseDown={e => e.preventDefault()}
                     className="relative text-left rounded-2xl overflow-hidden transition-all w-full"
                     style={{
-                      background: isSelected
-                        ? 'linear-gradient(150deg, #1a2e05 0%, #2a4a0a 100%)'
-                        : 'linear-gradient(150deg, #0f172a 0%, #1e3a5f 100%)',
+                      background: 'linear-gradient(150deg, #0f172a 0%, #1e3a5f 100%)',
                       opacity: isSelected ? 1 : 0.6,
                       boxShadow: isSelected ? '0 0 0 2px #84cc16' : 'none',
                       transition: 'opacity 0.15s, box-shadow 0.15s',
@@ -279,7 +277,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     {/* Grain texture */}
                     <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,backgroundSize:'180px 180px'}} />
                     {/* Watermark letter */}
-                    <span className="absolute -right-1 -bottom-2 text-7xl font-black leading-none select-none pointer-events-none" style={{ color: isSelected ? 'rgba(132,204,22,0.07)' : 'rgba(255,255,255,0.04)' }}>
+                    <span className="absolute -right-1 -bottom-2 text-7xl font-black leading-none select-none pointer-events-none" style={{ color: 'rgba(255,255,255,0.04)' }}>
                       {court.name.charAt(0).toUpperCase()}
                     </span>
 
