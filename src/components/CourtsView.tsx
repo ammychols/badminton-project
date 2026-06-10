@@ -40,9 +40,11 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedCourtId, setSelectedCourtId] = useState<string | null>(() => courts[0]?.id ?? null);
+  const [panelCourtId, setPanelCourtId] = useState<string | null>(null);
   const courtRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
   const [search, setSearch] = useState('');
+  const [panelDay, setPanelDay] = useState<DayOfWeek | 'all'>('all');
 
   useEffect(() => {
     if (!highlightCourtId) return;
@@ -149,7 +151,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
               return (
                 <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-48 sm:w-auto">
                   <button
-                    onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
+                    onClick={() => { setSelectedCourtId(isSelected ? null : court.id); setPanelCourtId(court.id); setPanelDay('all'); }}
                     onMouseDown={e => e.preventDefault()}
                     className="relative text-left rounded-2xl px-4 py-3 overflow-hidden transition-all w-full"
                     style={{
@@ -264,6 +266,105 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
           )}
         </>
       ))}
+
+      {/* ── Desktop slide-over court detail panel ── */}
+      {(() => {
+        const panelCourt = courts.find(c => c.id === panelCourtId);
+        const panelGroups = panelCourt
+          ? (panelDay === 'all' ? panelCourt.groups : panelCourt.groups.filter(g => g.days.includes(panelDay as DayOfWeek)))
+          : [];
+        return (
+          <>
+            {/* Overlay — desktop only */}
+            <div
+              className={`hidden sm:block fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ${panelCourtId ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              onClick={() => setPanelCourtId(null)}
+            />
+            {/* Panel */}
+            <div
+              className={`hidden sm:flex fixed top-[57px] right-0 bottom-0 z-40 flex-col bg-white border-l border-[var(--card-border)] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${panelCourtId ? 'translate-x-0' : 'translate-x-full'}`}
+              style={{ width: 480 }}
+            >
+              {panelCourt && (
+                <>
+                  {/* Header */}
+                  <div className="flex items-start gap-3 px-6 py-4 border-b border-[var(--card-border)] flex-shrink-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-lg text-[var(--text-1)] leading-tight truncate">{panelCourt.name}</p>
+                      {panelCourt.address && (() => {
+                        const parts = panelCourt.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
+                        const short = parts.length >= 2 ? parts.slice(-2).join(' · ') : parts[0] ?? panelCourt.address;
+                        return <p className="text-sm text-[var(--text-3)] mt-0.5 truncate">{short}</p>;
+                      })()}
+                    </div>
+                    <button onClick={() => setPanelCourtId(null)} className="w-8 h-8 rounded-full bg-[var(--chip-bg)] flex items-center justify-center text-[var(--text-3)] hover:bg-[var(--card-border)] transition-colors flex-shrink-0 text-sm">✕</button>
+                  </div>
+
+                  {/* Scrollable body */}
+                  <div className="flex-1 overflow-y-auto">
+                    {/* Info chips + action */}
+                    <div className="px-6 pt-4 pb-3 flex items-center gap-2 flex-wrap">
+                      {(panelCourt.info?.floor || panelCourt.info?.air || panelCourt.info?.parking) ? (
+                        <>
+                          {panelCourt.info.floor && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2.5 py-1 rounded-full">{FLOOR_LABELS[panelCourt.info.floor]}</span>}
+                          {panelCourt.info.air && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2.5 py-1 rounded-full">{AIR_LABELS[panelCourt.info.air]}</span>}
+                          {panelCourt.info.parking && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2.5 py-1 rounded-full">{PARKING_LABELS[panelCourt.info.parking]}</span>}
+                          <button onClick={() => onRateCourt(panelCourt.id)} className="text-xs text-[var(--p)] hover:underline ml-1">แก้ไข</button>
+                        </>
+                      ) : (
+                        <button onClick={() => onRateCourt(panelCourt.id)} className="text-xs text-[var(--text-3)] hover:text-[var(--p)] transition-colors">+ เพิ่มข้อมูลสนาม</button>
+                      )}
+                      {((panelCourt.lat && panelCourt.lng) || panelCourt.address) && (
+                        <a
+                          href={panelCourt.lat && panelCourt.lng
+                            ? `https://www.google.com/maps/dir/?api=1&destination=${panelCourt.lat},${panelCourt.lng}`
+                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(panelCourt.name)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="ml-auto flex items-center gap-1.5 text-xs text-[var(--text-3)] hover:text-[var(--p)] transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                          นำทาง
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Day filter */}
+                    <div className="px-6 pb-3 flex gap-1.5 overflow-x-auto scrollbar-none">
+                      {DAY_TABS.map(({ key, label }) => (
+                        <button key={key} onClick={() => setPanelDay(key)}
+                          className={`flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${panelDay === key ? 'bg-[var(--p)] text-[#0f172a]' : 'bg-[var(--chip-bg)] text-[var(--text-3)] hover:text-[var(--text-1)]'}`}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Groups */}
+                    <div className="px-6 pb-6">
+                      <p className="text-[11px] font-semibold text-[var(--text-4)] uppercase tracking-wide mb-3">ก๊วนในสนามนี้</p>
+                      <div className="flex flex-col gap-3">
+                        {panelGroups.map(group => (
+                          <GroupCard key={group.id} group={group}
+                            onDelete={() => onDeleteGroup(panelCourt.id, group.id)}
+                            onEdit={() => onEditGroup(panelCourt.id, group.id)}
+                            onSaveNote={notes => onAddReview(panelCourt.id, group.id, notes)}
+                          />
+                        ))}
+                        <button
+                          onClick={() => onAddGroup(panelCourt.id, panelDay !== 'all' ? panelDay : undefined)}
+                          className="min-h-[72px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
+                        >
+                          <span className="text-xl leading-none">+</span>
+                          <span className="text-xs font-medium">เพิ่มก๊วน</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        );
+      })()}
 
       {confirmDeleteCourt && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteCourt(null)}>
