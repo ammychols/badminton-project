@@ -41,9 +41,14 @@ html {
     font-size: 17px;
     line-height: 1.7;
     letter-spacing: 0.01em;
-    background-color: var(--app-bg);
+    background-color: var(--nav-bg);
     background-image: var(--bg-texture, none);
     color: var(--text-1);
+  }
+
+  #root {
+    background-color: var(--app-bg);
+    min-height: 100vh;
   }
 
   button, [role="button"] {

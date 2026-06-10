@@ -268,8 +268,6 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                       opacity: isSelected ? 1 : 0.55,
                       transition: 'opacity 0.15s',
                     }}
-                    onMouseEnter={e => { if (!isSelected) e.currentTarget.style.opacity = '0.85'; }}
-                    onMouseLeave={e => { if (!isSelected) e.currentTarget.style.opacity = '0.55'; }}
                   >
                     <div className="px-3.5 pt-3 pb-3">
                       {/* Top: name + pin icon */}
