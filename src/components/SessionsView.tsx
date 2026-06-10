@@ -233,7 +233,19 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(session.notes ?? '');
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Close menu when clicking outside
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
 
   // Normalise: merge legacy `image` field into `images` array
   const photos: string[] = session.images ?? (session.image ? [session.image] : []);
@@ -307,9 +319,25 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
             <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" className="text-[var(--text-4)] hover:text-[var(--p)] transition-colors p-1 rounded-lg hover:bg-[var(--chip-bg)]">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </button>
-            <button onClick={onEdit} title="แก้ไข" className="text-[var(--text-4)] hover:text-[var(--p)] transition-colors p-1 rounded-lg hover:bg-[var(--chip-bg)]">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
-            </button>
+            {/* ... menu */}
+            <div ref={menuRef} className="relative">
+              <button onClick={() => setMenuOpen(v => !v)} className="text-[var(--text-4)] hover:text-[var(--text-2)] transition-colors p-1 rounded-lg hover:bg-[var(--chip-bg)]">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-8 z-20 bg-white rounded-xl shadow-lg border border-[var(--card-border)] overflow-hidden min-w-[110px]" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.12)' }}>
+                  <button onClick={() => { setMenuOpen(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    แก้ไข
+                  </button>
+                  <div className="h-px bg-[var(--card-border)]"/>
+                  <button onClick={() => { setMenuOpen(false); onDelete(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    ลบ
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
