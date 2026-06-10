@@ -27,7 +27,7 @@ interface ModalState {
 
 function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string | null }) {
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ backgroundColor: 'var(--nav-bg)' }}>
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold text-white tracking-tight mb-2">BadmintonTracker</h1>
         <p className="text-sm text-slate-400">บันทึกสนาม · ก๊วน · สถิติการตี</p>
@@ -164,9 +164,9 @@ export default function App() {
         <button
           onClick={() => openModal({ type: 'logSession' })}
           className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
-          style={{ background: '#6ab187', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(106,177,135,0.4)' }}
+          style={{ background: 'var(--p)', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(74,124,89,0.4)' }}
         >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <div className="flex items-center h-14">
           {([
@@ -177,9 +177,9 @@ export default function App() {
             return (
               <button key={key} onClick={() => switchTab(key)}
                 className="flex-1 flex flex-col items-center justify-center gap-1.5 h-full transition-colors"
-                style={{ color: active ? '#6ab187' : '#475569' }}>
+                style={{ color: active ? 'var(--nav-active)' : 'var(--nav-inactive)' }}>
                 {icon}
-                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: '#6ab187' }} />}
+                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--nav-active)' }} />}
                 {!active && <span className="w-1 h-1 rounded-full opacity-0" />}
               </button>
             );

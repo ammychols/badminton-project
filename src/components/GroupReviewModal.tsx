@@ -92,21 +92,37 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-      <div className="w-full max-w-sm max-h-[88vh] flex flex-col rounded-3xl overflow-hidden" style={{ backgroundColor: 'var(--app-bg)' }} onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
-        <div className="text-base font-extrabold text-white" style={{ letterSpacing: '-0.4px' }}>{group.name}</div>
-        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)', paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
+        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
+        <div className="flex-1 min-w-0">
+          <div className="text-base font-extrabold text-white truncate" style={{ letterSpacing: '-0.4px' }}>{group.name}</div>
+          <div className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.45)' }}>{court.name}</div>
+        </div>
+        {((court.lat && court.lng) || court.address) && (
+          <a
+            href={court.lat && court.lng
+              ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name)}`
+            }
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            นำทาง
+          </a>
+        )}
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-6">
+      <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
 
         {/* Overview - dark gradient card */}
-        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #020617 0%, #0f172a 55%, #1e3a5f 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
+        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a1f12 0%, #1b3a2a 55%, #2d5c3e 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
           <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(106,177,135,0.09)', filter: 'blur(40px)' }}/>
           <div className="relative grid grid-cols-3 gap-3" style={{ zIndex: 1 }}>
             {([[totalSessions, 'ครั้ง'], [avgGames.toFixed(1), 'เกม/ครั้ง'], [avgMpg ?? '—', 'นาที/เกม']] as [React.ReactNode, string][]).map(([v, l]) => (
@@ -125,7 +141,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
           {moodHistory.length > 0 && (
             <div className="mb-3.5">
               <div className="flex items-center justify-between mb-4">
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>อารมณ์</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)' }}>อารมณ์</span>
                 <div className="flex items-center gap-1.5">
                   <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>เฉลี่ย</span>
                   <span style={{ fontSize: 30, lineHeight: 1 }}>{MOOD_EMOJI[Math.round(avgMood)]}</span>
@@ -167,7 +183,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
           {/* ความหนักของเกม */}
           {intTotal > 0 && (
             <div className="mb-3.5">
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>ความหนักของเกม</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginBottom: 10 }}>ความหนักของเกม</div>
               <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 9, gap: 2 }}>
                 {iW.light > 0 && <div style={{ flex: iW.light, background: '#16a34a', borderRadius: '4px 0 0 4px' }}/>}
                 {iW.medium > 0 && <div style={{ flex: iW.medium, background: '#f59e0b' }}/>}
@@ -188,13 +204,13 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
 
           {/* รายละเอียดก๊วน */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>รายละเอียดก๊วน</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginBottom: 10 }}>รายละเอียดก๊วน</div>
             <div>
               {detailRows.map(([label, value], i) => (
                 <div key={String(label)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: i === 0 ? 0 : 9, paddingBottom: i === detailRows.length - 1 ? 0 : 9, borderBottom: i === detailRows.length - 1 ? 'none' : '1px solid #f1f5f9' }}>
                   <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, flexShrink: 0 }}>{label}</span>
                   {typeof value === 'string'
-                    ? <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', textAlign: 'right' }}>{value}</span>
+                    ? <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', whiteSpace: 'nowrap', textAlign: 'right' }}>{value}</span>
                     : value}
                 </div>
               ))}
@@ -204,7 +220,6 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
         </div>
 
 
-      </div>
       </div>
     </div>
   );

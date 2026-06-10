@@ -152,6 +152,16 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
   const courtRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
   const [search, setSearch] = useState('');
+  const [courtMenu, setCourtMenu] = useState(false);
+  const courtMenuRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!courtMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (courtMenuRef.current && !courtMenuRef.current.contains(e.target as Node)) setCourtMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [courtMenu]);
 
   useEffect(() => {
     if (!highlightCourtId) return;
@@ -258,15 +268,13 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
-                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-40 sm:w-auto group/card">
+                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-40 sm:w-auto">
                   <button
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
-                    onMouseDown={e => e.preventDefault()}
                     className="relative text-left rounded-2xl overflow-hidden w-full transition-all"
                     style={{
-                      background: 'linear-gradient(150deg, #1e293b 0%, #1e3a5f 100%)',
-                      opacity: isSelected ? 1 : 0.55,
-                      transition: 'opacity 0.15s',
+                      background: 'linear-gradient(150deg, #1b3a2a 0%, #2d5c3e 100%)',
+                      opacity: isSelected ? 1 : 0.6,
                     }}
                   >
                     <div className="px-3.5 pt-3 pb-3">
@@ -283,15 +291,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
                           </a>
-                        ) : (
-                          <button
-                            onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
-                            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg opacity-0 group-hover/card:opacity-100 transition-opacity"
-                            style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
-                          >
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                          </button>
-                        )}
+                        ) : null}
                       </div>
                       {/* Address */}
                       {court.address && (() => {
@@ -303,16 +303,6 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                       <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>{court.groups.length} ก๊วน</p>
                     </div>
                   </button>
-                  {/* Delete on hover (when has address) */}
-                  {((court.lat && court.lng) || court.address) && (
-                    <button
-                      onClick={e => { e.stopPropagation(); setConfirmDeleteCourt({ id: court.id, name: court.name }); }}
-                      className="absolute bottom-2.5 right-2.5 w-5 h-5 flex items-center justify-center rounded-md opacity-0 group-hover/card:opacity-100 transition-opacity"
-                      style={{ color: 'rgba(255,255,255,0.35)' }}
-                    >
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                    </button>
-                  )}
                 </div>
               );
             })}
@@ -333,20 +323,59 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
             <div>
               {/* Court detail bar */}
               <div className="mb-4 pb-3 border-b border-[var(--input-b)]">
-                <div className="flex items-start gap-3">
-                  <h3 className="text-base font-semibold text-[var(--text-1)] leading-tight">{selectedCourt.name}</h3>
-                </div>
-                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                  {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking || selectedCourt.info?.notes) ? (
-                    <button onClick={() => onRateCourt(selectedCourt.id)} className="flex items-center gap-1.5 flex-wrap hover:opacity-70 transition-opacity">
-                      {selectedCourt.info.floor && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
-                      {selectedCourt.info.air   && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
-                      {selectedCourt.info.parking && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
-                      {selectedCourt.info.notes && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{selectedCourt.info.notes}</span>}
-                    </button>
-                  ) : (
-                    <button onClick={() => onRateCourt(selectedCourt.id)} className="text-xs text-[var(--text-3)] hover:text-[var(--p)]">+ ข้อมูลสนาม</button>
-                  )}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-[var(--text-1)] leading-tight truncate">{selectedCourt.name}</h3>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking || selectedCourt.info?.notes) ? (
+                        <>
+                          {selectedCourt.info.floor && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
+                          {selectedCourt.info.air   && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
+                          {selectedCourt.info.parking && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
+                          {selectedCourt.info.notes && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{selectedCourt.info.notes}</span>}
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="relative flex-shrink-0" ref={courtMenuRef}>
+                    <button
+                      onClick={() => setCourtMenu(v => !v)}
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
+                    >···</button>
+                    {courtMenu && (
+                      <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+                        <button
+                          onClick={() => { setCourtMenu(false); onRateCourt(selectedCourt.id); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left"
+                        >
+                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                          ข้อมูลสนาม
+                        </button>
+                        {((selectedCourt.lat && selectedCourt.lng) || selectedCourt.address) && (
+                          <a
+                            href={selectedCourt.lat && selectedCourt.lng
+                              ? `https://www.google.com/maps/dir/?api=1&destination=${selectedCourt.lat},${selectedCourt.lng}`
+                              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedCourt.name)}`
+                            }
+                            target="_blank" rel="noopener noreferrer"
+                            onClick={() => setCourtMenu(false)}
+                            className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors"
+                          >
+                            <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                            นำทาง
+                          </a>
+                        )}
+                        <div style={{ borderTop: '1px solid var(--card-border)' }}/>
+                        <button
+                          onClick={() => { setCourtMenu(false); setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name }); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left"
+                        >
+                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                          ลบสนาม
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

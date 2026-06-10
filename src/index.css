@@ -4,35 +4,35 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #6ab187;
-  --p-h: #4a9e6e;
-  --app-bg: #eef2f7;
-  --nav-bg: #0f172a;
-  --nav-border: #1e293b;
-  --card-border: #e9eef4;
-  --text-1: #0f172a;
-  --text-2: #334155;
-  --text-3: #64748b;
-  --text-4: #94a3b8;
-  --input-b: #e2e8f0;
-  --input-f: #64748b;
-  --chip-bg: #f1f5f9;
-  --chip-t: #475569;
-  --bar-a: #6ab187;
-  --bar-i: #e2e8f0;
-  --dashed: #e2e8f0;
-  --cal-sel: #0f172a;
-  --hover-bg: #f8fafc;
-  --hero-from: #020617;
-  --hero-to: #1e3a5f;
-  --nav-active: #6ab187;
-  --nav-inactive: #475569;
+  --p: #4a7c59;
+  --p-h: #2d6b45;
+  --app-bg: #f4f8f5;
+  --nav-bg: #1b3a2a;
+  --nav-border: #2a5040;
+  --card-border: #ddeae2;
+  --text-1: #152018;
+  --text-2: #2d4a36;
+  --text-3: #5a7a63;
+  --text-4: #8aaa93;
+  --input-b: #cfe0d5;
+  --input-f: #4a7c59;
+  --chip-bg: #e8f5ed;
+  --chip-t: #2d6b45;
+  --bar-a: #4a7c59;
+  --bar-i: #cfe0d5;
+  --dashed: #b8d4c0;
+  --cal-sel: #1b3a2a;
+  --hover-bg: #edf5f0;
+  --hero-from: #0a1f12;
+  --hero-to: #1b3a2a;
+  --nav-active: #86efac;
+  --nav-inactive: #6a9a78;
 }
 
 
 html {
   overflow-y: scroll;
-  background-color: #0f172a; /* dark overscroll color at top matches nav */
+  background-color: #1b3a2a;
 }
 
 @layer base {
