@@ -76,7 +76,7 @@ export function CourtInfoModal({ court, onClose, onSave, isNewCourt }: CourtInfo
               ข้าม
             </button>
           )}
-          <button onClick={handleSave} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-[#0f172a] transition-colors" style={{ background: '#34d399' }}>
+          <button onClick={handleSave} className="flex-1 py-3 rounded-2xl text-sm font-semibold text-[#0f172a] transition-colors" style={{ background: '#6ab187' }}>
             บันทึก
           </button>
         </div>

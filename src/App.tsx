@@ -164,7 +164,7 @@ export default function App() {
         <button
           onClick={() => openModal({ type: 'logSession' })}
           className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
-          style={{ background: '#34d399', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(52,211,153,0.4)' }}
+          style={{ background: '#6ab187', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(106,177,135,0.4)' }}
         >
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -177,9 +177,9 @@ export default function App() {
             return (
               <button key={key} onClick={() => switchTab(key)}
                 className="flex-1 flex flex-col items-center justify-center gap-1.5 h-full transition-colors"
-                style={{ color: active ? '#34d399' : '#475569' }}>
+                style={{ color: active ? '#6ab187' : '#475569' }}>
                 {icon}
-                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: '#34d399' }} />}
+                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: '#6ab187' }} />}
                 {!active && <span className="w-1 h-1 rounded-full opacity-0" />}
               </button>
             );
