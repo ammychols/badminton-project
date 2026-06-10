@@ -155,8 +155,8 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     style={{
                       background: 'linear-gradient(135deg, #0f172a, #1e3a5f)',
                       opacity: isSelected ? 1 : 0.65,
-                      boxShadow: isSelected ? '0 8px 24px rgba(0,0,0,0.3)' : undefined,
-                      outline: isSelected ? '2px solid #84cc16' : 'none',
+                      boxShadow: isSelected ? '0 0 0 2px #84cc16' : undefined,
+                      outline: 'none',
                     }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
                     onMouseLeave={e => (e.currentTarget.style.opacity = isSelected ? '1' : '0.65')}
