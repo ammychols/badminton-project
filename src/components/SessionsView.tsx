@@ -770,12 +770,6 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                     </button>
                   ))}
                 </div>
-                {/* Add button */}
-                <button onClick={onLogSession}
-                  className="flex-shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center transition-colors"
-                  style={{ background: 'var(--p)', color: '#0f172a' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
               </div>
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
