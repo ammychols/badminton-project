@@ -481,9 +481,9 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
         {/* Photo strip */}
         <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
         {allPhotos.length > 0 && (
-          <div className="flex gap-1.5 mt-3 pt-3 border-t border-[var(--card-border)]">
+          <div className="flex gap-1.5 mt-3 pt-3 border-t border-[var(--card-border)]" style={{ maxHeight: 160 }}>
             {allPhotos.slice(0, 3).map((photo, i) => (
-              <div key={i} className="relative flex-1 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer" onClick={() => setLightbox(true)}>
+              <div key={i} className="relative flex-1 rounded-xl overflow-hidden cursor-pointer" style={{ height: 160 }} onClick={() => setLightbox(true)}>
                 <img src={photo} alt="" className="w-full h-full object-cover" />
                 {i === 2 && allPhotos.length > 3 && (
                   <div className="absolute inset-0 bg-black/55 flex items-center justify-center">

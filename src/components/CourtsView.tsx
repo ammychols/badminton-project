@@ -434,6 +434,14 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
   const [confirming, setConfirming] = useState(false);
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState(review?.notes ?? '');
+  const [groupMenu, setGroupMenu] = useState(false);
+  const groupMenuRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!groupMenu) return;
+    const handler = (e: MouseEvent) => { if (groupMenuRef.current && !groupMenuRef.current.contains(e.target as Node)) setGroupMenu(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [groupMenu]);
   const firstDay = (Object.keys(DAY_LABELS) as DayOfWeek[]).find(d => group.days.includes(d));
 
   const commitNote = () => {
@@ -447,11 +455,21 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
         <div className="relative h-40 overflow-hidden">
           <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute top-2 right-2 flex gap-1">
-            <button onClick={onEdit} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors text-sm backdrop-blur-sm">✎</button>
-            <button onClick={() => setConfirming(true)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-red-500/80 transition-colors backdrop-blur-sm">
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              </button>
+          <div ref={groupMenuRef} className="absolute top-2 right-2">
+            <button onClick={() => setGroupMenu(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors backdrop-blur-sm font-bold text-base leading-none">···</button>
+            {groupMenu && (
+              <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[140px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+                <button onClick={() => { setGroupMenu(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  แก้ไข
+                </button>
+                <div style={{ borderTop: '1px solid var(--card-border)' }}/>
+                <button onClick={() => { setGroupMenu(false); setConfirming(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  ลบ
+                </button>
+              </div>
+            )}
           </div>
           <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
             <p className="font-semibold text-white text-base leading-tight">{group.name}</p>
@@ -461,11 +479,21 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
       ) : (
         <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[var(--text-4)]'} overflow-hidden`}>
           <span className="absolute -right-1 -top-2 text-6xl font-black text-white/20 leading-none select-none">{group.name.charAt(0)}</span>
-          <div className="absolute top-2 right-2 flex gap-1">
-            <button onClick={onEdit} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors text-xs">✎</button>
-            <button onClick={() => setConfirming(true)} className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-red-500/60 transition-colors">
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              </button>
+          <div ref={groupMenuRef} className="absolute top-2 right-2">
+            <button onClick={() => setGroupMenu(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors font-bold text-base leading-none">···</button>
+            {groupMenu && (
+              <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[140px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+                <button onClick={() => { setGroupMenu(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  แก้ไข
+                </button>
+                <div style={{ borderTop: '1px solid var(--card-border)' }}/>
+                <button onClick={() => { setGroupMenu(false); setConfirming(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  ลบ
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
