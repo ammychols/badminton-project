@@ -716,8 +716,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               })}
             </div>
             <div className="relative z-10 border-t border-white/10 pt-3">
-              <div className="grid grid-cols-4 gap-2">
-                <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
+              <div className="grid grid-cols-3 gap-2">
                 <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
                 <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
                 <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
@@ -847,9 +846,8 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 })}
               </div>
               <div className="relative z-10 border-t border-white/10 pt-3">
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="text-center"><div className="text-xl font-black">{thisMonthDays}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">วันตี</div></div>
-                  <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
+                <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
                   <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
                   <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
                 </div>
