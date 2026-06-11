@@ -390,24 +390,24 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
             {MOOD_EMOJIS[session.mood]}
           </div>
-          {/* Group + court names — only the name text triggers info */}
+          {/* Group + court names — click whole frame to view info */}
           <div className="min-w-0 flex-1">
-            <div className="text-sm leading-snug">
-              <button onClick={onViewInfo} className="font-bold text-[var(--text-1)] text-[15px] tracking-tight hover:underline hover:text-[var(--p)] transition-colors">{groupName}</button>
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
-              <button onClick={onViewCourt} className="hover:text-[var(--p)] transition-colors truncate">{courtName}</button>
-              {session.intensity && (() => {
-                const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
-                const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
-                return lvs.map(lv => (
-                  <React.Fragment key={lv}>
-                    <span className="text-[var(--text-4)]">·</span>
-                    <span className="font-semibold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
-                  </React.Fragment>
-                ));
-              })()}
-            </div>
+            <button onClick={onViewInfo} className="text-left w-full px-2.5 py-1.5 -mx-2.5 -my-1.5 rounded-xl hover:bg-[var(--chip-bg)] transition-colors">
+              <div className="font-bold text-[var(--text-1)] text-[15px] tracking-tight leading-snug">{groupName}</div>
+              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
+                <span className="truncate">{courtName}</span>
+                {session.intensity && (() => {
+                  const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
+                  const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
+                  return lvs.map(lv => (
+                    <React.Fragment key={lv}>
+                      <span className="text-[var(--text-4)]">·</span>
+                      <span className="font-semibold flex-shrink-0" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
+                    </React.Fragment>
+                  ));
+                })()}
+              </div>
+            </button>
           </div>
           <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0">
             {!session.image && (
