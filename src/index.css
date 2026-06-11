@@ -4,35 +4,41 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #4a7c59;
-  --p-h: #2d6b45;
-  --app-bg: #f4f8f5;
-  --nav-bg: #1b3a2a;
-  --nav-border: #2a5040;
-  --card-border: #ddeae2;
-  --text-1: #152018;
-  --text-2: #2d4a36;
-  --text-3: #5a7a63;
-  --text-4: #8aaa93;
-  --input-b: #cfe0d5;
-  --input-f: #4a7c59;
-  --chip-bg: #e8f5ed;
-  --chip-t: #2d6b45;
-  --bar-a: #4a7c59;
-  --bar-i: #cfe0d5;
-  --dashed: #b8d4c0;
-  --cal-sel: #1b3a2a;
-  --hover-bg: #edf5f0;
-  --hero-from: #0a1f12;
-  --hero-to: #1b3a2a;
-  --nav-active: #86efac;
-  --nav-inactive: #6a9a78;
+  --p: #000000;
+  --p-h: #222222;
+  --app-bg: #ffffff;
+  --nav-bg: #010120;
+  --nav-border: rgba(255,255,255,0.08);
+  --card-border: #ebebeb;
+  --text-1: #000000;
+  --text-2: #1a1a1a;
+  --text-3: #959494;
+  --text-4: #b0b0b0;
+  --input-b: #ebebeb;
+  --input-f: #000000;
+  --chip-bg: #ebebeb;
+  --chip-t: #000000;
+  --bar-a: #bdbbff;
+  --bar-i: #ebebeb;
+  --dashed: #ebebeb;
+  --cal-sel: #010120;
+  --hover-bg: #f5f5f5;
+  --hero-from: #010120;
+  --hero-to: #010120;
+  --nav-active: #c8f6f9;
+  --nav-inactive: rgba(255,255,255,0.5);
+  --surface-dark-soft: #313641;
+  --accent-orange: #fc4c02;
+  --accent-magenta: #ef2cc1;
+  --accent-periwinkle: #bdbbff;
+  --accent-mint: #c8f6f9;
+  --brand-gradient: linear-gradient(135deg, #fc4c02, #ef2cc1, #bdbbff);
 }
 
 
 html {
   overflow-y: scroll;
-  background-color: #1b3a2a;
+  background-color: #010120;
 }
 
 @layer base {

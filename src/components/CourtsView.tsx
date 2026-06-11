@@ -273,7 +273,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
                     className="relative text-left rounded-2xl overflow-hidden w-full transition-all"
                     style={{
-                      background: 'linear-gradient(150deg, #1b3a2a 0%, #2d5c3e 100%)',
+                      background: 'linear-gradient(150deg, #010120 0%, #0d0d35 100%)',
                       opacity: isSelected ? 1 : 0.6,
                     }}
                   >

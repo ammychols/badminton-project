@@ -122,8 +122,8 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
       <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
 
         {/* Overview - dark gradient card */}
-        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a1f12 0%, #1b3a2a 55%, #2d5c3e 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
-          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(106,177,135,0.09)', filter: 'blur(40px)' }}/>
+        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fc4c02 0%, #ef2cc1 50%, #bdbbff 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
+          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(200,246,249,0.15)', filter: 'blur(40px)' }}/>
           <div className="relative grid grid-cols-3 gap-3" style={{ zIndex: 1 }}>
             {([[totalSessions, 'ครั้ง'], [avgGames.toFixed(1), 'เกม/ครั้ง'], [avgMpg ?? '—', 'นาที/เกม']] as [React.ReactNode, string][]).map(([v, l]) => (
               <div key={l}>
