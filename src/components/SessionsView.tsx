@@ -686,8 +686,8 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               <div>
                 <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
                 <div className="flex items-end gap-1.5 leading-none">
-                  <span className="text-5xl font-black">{totalGames}</span>
-                  <span className="text-lg text-white/60 mb-1">เกม</span>
+                  <span className="text-5xl font-black">{totalSessions}</span>
+                  <span className="text-lg text-white/60 mb-1">ครั้ง</span>
                 </div>
               </div>
               {streak >= 2 && (
@@ -817,8 +817,8 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                 <div>
                   <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
                   <div className="flex items-end gap-1.5 leading-none">
-                    <span className="text-5xl font-black">{totalGames}</span>
-                    <span className="text-lg text-white/60 mb-1">เกม</span>
+                    <span className="text-5xl font-black">{totalSessions}</span>
+                    <span className="text-lg text-white/60 mb-1">ครั้ง</span>
                   </div>
                 </div>
                 {streak >= 2 && (
