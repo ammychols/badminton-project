@@ -755,20 +755,17 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                     </button>
                   )}
                 </div>
-                {/* Month filter pills inline */}
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0 max-w-[240px]">
+                {/* Month filter dropdown */}
+                <select
+                  value={viewYM}
+                  onChange={e => { const [y, m] = e.target.value.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
+                  className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold border bg-white focus:outline-none"
+                  style={{ color: 'var(--text-1)', borderColor: 'var(--input-b)' }}
+                >
                   {availableMonths.map(({ ym, label, yearLabel }) => (
-                    <button key={ym} onClick={() => { const [y, m] = ym.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
-                      className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold transition-all border"
-                      style={{
-                        background: viewYM === ym ? 'var(--p)' : 'var(--chip-bg)',
-                        color: viewYM === ym ? '#0f172a' : 'var(--text-3)',
-                        borderColor: viewYM === ym ? 'var(--p)' : 'var(--input-b)',
-                      }}>
-                      {label}{yearLabel}
-                    </button>
+                    <option key={ym} value={ym}>{label}{yearLabel}</option>
                   ))}
-                </div>
+                </select>
               </div>
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
@@ -883,20 +880,17 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
                     </button>
                   )}
                 </div>
-                {/* Month filter pills */}
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0 max-w-[160px]">
+                {/* Month filter dropdown */}
+                <select
+                  value={viewYM}
+                  onChange={e => { const [y, m] = e.target.value.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
+                  className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold border bg-white focus:outline-none"
+                  style={{ color: 'var(--text-1)', borderColor: 'var(--input-b)' }}
+                >
                   {availableMonths.map(({ ym, label, yearLabel }) => (
-                    <button key={ym} onClick={() => { const [y, m] = ym.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
-                      className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold transition-all border"
-                      style={{
-                        background: viewYM === ym ? 'var(--p)' : 'var(--chip-bg)',
-                        color: viewYM === ym ? '#0f172a' : 'var(--text-3)',
-                        borderColor: viewYM === ym ? 'var(--p)' : 'var(--input-b)',
-                      }}>
-                      {label}{yearLabel}
-                    </button>
+                    <option key={ym} value={ym}>{label}{yearLabel}</option>
                   ))}
-                </div>
+                </select>
               </div>
               {viewedSessions.length === 0 && (
                 <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
