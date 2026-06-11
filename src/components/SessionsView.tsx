@@ -187,7 +187,7 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   const dowCount = Array(7).fill(0);
   for (const s of sessions) {
     const d = new Date(s.date + 'T00:00:00');
-    dowCount[(d.getDay() + 6) % 7] += s.gamesPlayed;
+    dowCount[(d.getDay() + 6) % 7] += 1;
   }
   const maxDow = Math.max(...dowCount, 1);
 
