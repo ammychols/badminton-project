@@ -351,20 +351,6 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                           <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
                           ข้อมูลสนาม
                         </button>
-                        {((selectedCourt.lat && selectedCourt.lng) || selectedCourt.address) && (
-                          <a
-                            href={selectedCourt.lat && selectedCourt.lng
-                              ? `https://www.google.com/maps/dir/?api=1&destination=${selectedCourt.lat},${selectedCourt.lng}`
-                              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedCourt.name)}`
-                            }
-                            target="_blank" rel="noopener noreferrer"
-                            onClick={() => setCourtMenu(false)}
-                            className="flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors"
-                          >
-                            <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                            นำทาง
-                          </a>
-                        )}
                         <div style={{ borderTop: '1px solid var(--card-border)' }}/>
                         <button
                           onClick={() => { setCourtMenu(false); setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name }); }}
