@@ -394,20 +394,22 @@ function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateN
           <div className="min-w-0 flex-1">
             <button onClick={onViewInfo} className="text-left w-full px-2.5 py-1.5 -mx-2.5 -my-1.5 rounded-xl hover:bg-[var(--chip-bg)] transition-colors">
               <div className="font-bold text-[var(--text-1)] text-[15px] tracking-tight leading-snug">{groupName}</div>
-              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-3)]">
-                <span className="truncate">{courtName}</span>
-                {session.intensity && (() => {
-                  const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
-                  const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
-                  return lvs.map(lv => (
-                    <React.Fragment key={lv}>
-                      <span className="text-[var(--text-4)]">·</span>
-                      <span className="font-semibold flex-shrink-0" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
-                    </React.Fragment>
-                  ));
-                })()}
-              </div>
+              <div className="text-xs text-[var(--text-3)] truncate mt-0.5">{courtName}</div>
             </button>
+            {session.intensity && (() => {
+              const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
+              const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
+              return (
+                <div className="flex items-center gap-1 mt-1">
+                  {lvs.map((lv, i) => (
+                    <React.Fragment key={lv}>
+                      {i > 0 && <span className="text-[var(--text-4)] text-xs">·</span>}
+                      <span className="text-xs font-semibold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
+                    </React.Fragment>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
           <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0">
             {!session.image && (
