@@ -450,9 +450,9 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[var(--card-border)]">
+    <div className="bg-white rounded-2xl shadow-sm border border-[var(--card-border)]">
       {group.image ? (
-        <div className="relative h-40 overflow-hidden">
+        <div className="relative h-40 overflow-hidden rounded-t-2xl">
           <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div ref={groupMenuRef} className="absolute top-2 right-2">
@@ -477,7 +477,7 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
           </div>
         </div>
       ) : (
-        <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[var(--text-4)]'} overflow-hidden`}>
+        <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[var(--text-4)]'} overflow-visible rounded-t-2xl`}>
           <span className="absolute -right-1 -top-2 text-6xl font-black text-white/20 leading-none select-none">{group.name.charAt(0)}</span>
           <div ref={groupMenuRef} className="absolute top-2 right-2">
             <button onClick={() => setGroupMenu(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors font-bold text-base leading-none">···</button>
