@@ -277,7 +277,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                       opacity: isSelected ? 1 : 0.6,
                     }}
                   >
-                    <div className="px-3.5 pt-3 pb-3">
+                    <div className="px-3.5 pt-3 pb-3 min-h-[88px] flex flex-col justify-between">
                       {/* Top: name + pin icon */}
                       <div className="flex items-start justify-between gap-1 mb-1.5">
                         <p className="font-bold text-sm leading-tight text-white">{court.name}</p>
