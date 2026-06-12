@@ -27,13 +27,17 @@ export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
     return () => clearInterval(interval);
   }, [googleReady]);
 
+  // Stable key so the effect re-runs when any court's name/position changes,
+  // not just when the count changes.
+  const courtsKey = courts.map(c => `${c.id}:${c.name}:${c.lat}:${c.lng}`).join('|');
+
   useEffect(() => {
     if (!googleReady || !mapRef.current) return;
 
     const bounds = new google.maps.LatLngBounds();
     const center = courts.length > 0
       ? { lat: courts[0].lat!, lng: courts[0].lng! }
-      : { lat: 13.75, lng: 100.5 }; // Bangkok default
+      : { lat: 13.75, lng: 100.5 };
 
     const map = new google.maps.Map(mapRef.current, {
       center,
@@ -41,39 +45,44 @@ export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
+      mapId: 'DEMO_MAP_ID',
     });
 
-    courts.forEach(court => {
-      const pos = { lat: court.lat!, lng: court.lng! };
-      bounds.extend(pos);
+    (async () => {
+      const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary('marker') as any;
 
-      const marker = new google.maps.Marker({
-        position: pos,
-        map,
-        title: court.name,
-        label: { text: court.name[0], color: 'white', fontWeight: 'bold' },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 14,
-          fillColor: '#16a34a',
-          fillOpacity: 1,
-          strokeColor: 'white',
-          strokeWeight: 2,
-        },
+      courts.forEach(court => {
+        const pos = { lat: court.lat!, lng: court.lng! };
+        bounds.extend(pos);
+
+        const pin = new PinElement({
+          glyph: court.name[0],
+          glyphColor: '#ffffff',
+          background: getComputedStyle(document.documentElement).getPropertyValue('--p').trim() || '#000',
+          borderColor: '#ffffff',
+        });
+
+        const marker = new AdvancedMarkerElement({
+          position: pos,
+          map,
+          title: court.name,
+          content: pin.element,
+        });
+
+        const info = new google.maps.InfoWindow({
+          content: `<div style="font-family:Prompt,sans-serif;padding:2px 4px">
+            <p style="font-weight:600;margin:0">${court.name}</p>
+            <p style="color:#6b7280;font-size:12px;margin:2px 0 0">${court.groups.length} ก๊วน</p>
+          </div>`,
+        });
+
+        marker.addListener('click', () => info.open(map, marker));
       });
 
-      const info = new google.maps.InfoWindow({
-        content: `<div style="font-family:Kanit,sans-serif;padding:2px 4px">
-          <p style="font-weight:600;margin:0">${court.name}</p>
-          <p style="color:#6b7280;font-size:12px;margin:2px 0 0">${court.groups.length} ก๊วน</p>
-        </div>`,
-      });
-
-      marker.addListener('click', () => info.open(map, marker));
-    });
-
-    if (courts.length > 1) map.fitBounds(bounds);
-  }, [googleReady, courts.length]);
+      if (courts.length > 1) map.fitBounds(bounds);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [googleReady, courtsKey]);
 
   if (courts.length === 0) {
     return (

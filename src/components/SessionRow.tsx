@@ -1,6 +1,46 @@
 import React, { useState, useRef } from 'react';
 import { Session, INTENSITY_LABELS } from '../types';
 import { uploadGroupImage } from '../utils/uploadImage';
+import { useOverlay } from '../hooks/useOverlay';
+import { Z, BACKDROP } from '../styles/overlay';
+
+function Lightbox({ photos, initialIndex, onClose }: { photos: string[]; initialIndex: number; onClose: () => void }) {
+  const [idx, setIdx] = useState(initialIndex);
+  const ref = useOverlay(onClose);
+  const step = (dir: 1 | -1) => setIdx(i => (i + dir + photos.length) % photos.length);
+  return (
+    <div
+      ref={ref}
+      role="dialog"
+      aria-modal="true"
+      aria-label="รูปภาพ"
+      tabIndex={-1}
+      className="fixed inset-0 flex items-center justify-center backdrop-blur-sm focus:outline-none"
+      style={{ zIndex: Z.lightbox, background: 'rgba(0,0,0,0.82)' }}
+      onClick={onClose}
+    >
+      <img
+        src={photos[idx]}
+        alt="session"
+        className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      />
+      {photos.length > 1 && (
+        <>
+          <button onClick={e => { e.stopPropagation(); step(-1); }} aria-label="รูปก่อนหน้า"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-xl hover:bg-white/30 transition-colors">‹</button>
+          <button onClick={e => { e.stopPropagation(); step(1); }} aria-label="รูปถัดไป"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-xl hover:bg-white/30 transition-colors">›</button>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-xs tabular-nums">
+            {idx + 1} / {photos.length}
+          </div>
+        </>
+      )}
+      <button onClick={e => { e.stopPropagation(); onClose(); }} aria-label="ปิด"
+        className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-lg hover:bg-white/30 transition-colors">✕</button>
+    </div>
+  );
+}
 
 const MOOD_EMOJIS: Record<number, string> = {
   1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥',
@@ -212,27 +252,7 @@ export function SessionRow({
 
       {/* Lightbox — opens to the tapped photo, with prev/next when multiple */}
       {lightboxOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={closeLightbox}>
-          <img
-            src={allPhotos[lightboxIndex!]}
-            alt="session"
-            className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          />
-          {allPhotos.length > 1 && (
-            <>
-              <button onClick={e => { e.stopPropagation(); step(-1); }} aria-label="รูปก่อนหน้า"
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-xl hover:bg-white/30 transition-colors">‹</button>
-              <button onClick={e => { e.stopPropagation(); step(1); }} aria-label="รูปถัดไป"
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-xl hover:bg-white/30 transition-colors">›</button>
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-xs tabular-nums">
-                {lightboxIndex! + 1} / {allPhotos.length}
-              </div>
-            </>
-          )}
-          <button onClick={e => { e.stopPropagation(); closeLightbox(); }} aria-label="ปิด"
-            className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-lg hover:bg-white/30 transition-colors">✕</button>
-        </div>
+        <Lightbox photos={allPhotos} initialIndex={lightboxIndex!} onClose={closeLightbox} />
       )}
     </div>
   );

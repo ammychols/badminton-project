@@ -7,7 +7,7 @@ import { btn, card, text, emptyState } from '../styles/tokens';
 import { HeroCard, HeroSparkMonth } from './HeroCard';
 import { SessionRow } from './SessionRow';
 import { DetailPanel } from './DetailPanel';
-import { DAY_NAMES, MONTH_SHORT, DOW_LABELS_SHORT, todayString, thisMonthString, calcStreak, formatDate } from '../utils/date';
+import { DAY_NAMES, MONTH_SHORT, DOW_LABELS_SHORT, todayString, toDateString, thisMonthString, calcStreak, formatDate } from '../utils/date';
 
 // ── Court slide-over panel (triggered from session feed) ──────────────────────
 function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
@@ -120,8 +120,8 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   onPrev: () => void; onNext: () => void;
 }) {
   const WEEKS = 16;
-  const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = todayString();
+  const now = new Date(todayStr + 'T00:00:00');
 
   // Sum gamesPlayed per day
   const countMap: Record<string, number> = {};
@@ -144,7 +144,7 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
     const daysAgo = (WEEKS - 1 - col) * 7 + (todayDow - row);
     const d = new Date(now);
     d.setDate(d.getDate() - daysAgo);
-    return d.toISOString().slice(0, 10);
+    return toDateString(d);
   };
 
   const heatColor = (games: number) => {

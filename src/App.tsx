@@ -11,7 +11,8 @@ import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
 import { LogCelebration } from './components/LogCelebration';
-import { calcStreak, thisMonthString } from './utils/date';
+import { calcStreak, thisMonthString, todayString } from './utils/date';
+import { Z } from './styles/overlay';
 
 import { Court, DayOfWeek } from './types';
 
@@ -77,7 +78,7 @@ export default function App() {
   // Hide the FAB when QuickLogCard is already showing — same visibility logic as the card itself.
   const hasQuickLogCandidate = useMemo(() => {
     const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+    const today = todayString();
     const dow = DOW_MAP[new Date(today + 'T00:00:00').getDay()];
     return courts.some(c => c.groups.some(g =>
       g.days.includes(dow) && !sessions.some(s => s.groupId === g.id && s.date === today)
@@ -120,7 +121,7 @@ export default function App() {
       </header>
 
       {showUserMenu && (
-        <div ref={userMenuRef} className="fixed top-14 right-4 rounded-2xl shadow-xl overflow-hidden z-[50] min-w-[200px]" style={{ backgroundColor: '#ffffff', border: '1px solid var(--card-border)' }}>
+        <div ref={userMenuRef} className="fixed top-14 right-4 rounded-2xl shadow-xl overflow-hidden min-w-[200px]" style={{ zIndex: Z.dropdown, backgroundColor: '#ffffff', border: '1px solid var(--card-border)' }}>
           <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--card-border)' }}>
             <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-1)' }}>{user.displayName}</p>
             <p className="text-xs truncate" style={{ color: 'var(--text-3)' }}>{user.email}</p>
