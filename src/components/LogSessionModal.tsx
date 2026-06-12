@@ -206,7 +206,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
 
   const saveButton = (
     <button onClick={handleSave} disabled={!courtId || !groupId || noCourtsToday || noGroupsToday}
-      className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
+      className="w-full bg-[var(--p)] text-[var(--p-text)] py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
       บันทึก
     </button>
   );
@@ -279,7 +279,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         <div className="flex gap-2">
           {([1, 2, 3, 4, 5, 6] as const).map(m => (
             <button key={m} type="button" onClick={() => setMood(m)}
-              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[var(--p)] scale-105' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'}`}>
+              className={`flex-1 py-2 rounded-2xl text-2xl transition-all ${mood === m ? 'bg-[var(--p-tint)] scale-105 shadow-[0_0_0_2px_var(--p)]' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'}`}>
               {MOOD_EMOJIS[m]}
             </button>
           ))}
@@ -296,7 +296,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
               <button key={lv} type="button"
                 onClick={() => setIntensities(prev => prev.includes(lv) ? prev.filter(x => x !== lv) : [...prev, lv])}
                 className={`flex-1 py-2.5 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-1.5 ${
-                  selected ? 'bg-[var(--p)] text-white scale-105' : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
+                  selected ? 'bg-[var(--p)] text-[var(--p-text)] scale-105' : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
                 }`}>
                 <span className="text-xs">{INTENSITY_EMOJIS[lv]}</span>
                 {INTENSITY_LABELS[lv]}

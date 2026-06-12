@@ -53,7 +53,7 @@ function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
               className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
               style={{
                 background: panelDay === key ? 'var(--p)' : 'var(--chip-bg)',
-                color: panelDay === key ? '#ffffff' : 'var(--chip-t)',
+                color: panelDay === key ? 'var(--p-text)' : 'var(--chip-t)',
               }}>
               {label}
             </button>

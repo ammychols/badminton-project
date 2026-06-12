@@ -93,7 +93,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
 
   const saveButton = (
     <button onClick={handleSave} disabled={!name.trim() || days.length === 0 || isBusy}
-      className="w-full bg-[var(--p)] text-white py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
+      className="w-full bg-[var(--p)] text-[var(--p-text)] py-3 rounded-2xl font-medium hover:bg-[var(--p-h)] disabled:opacity-40 transition-colors">
       {saveLabel}
     </button>
   );
@@ -135,7 +135,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
           {ALL_DAYS.map(day => (
             <button key={day} onClick={() => toggleDay(day)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                days.includes(day) ? 'bg-[var(--p)] text-white' : 'bg-[var(--chip-bg)] text-[var(--chip-t)] hover:bg-[var(--bar-i)]'
+                days.includes(day) ? 'bg-[var(--p)] text-[var(--p-text)]' : 'bg-[var(--chip-bg)] text-[var(--chip-t)] hover:bg-[var(--bar-i)]'
               }`}>
               {DAY_LABELS[day]}
             </button>
@@ -149,7 +149,7 @@ export function AddGroupModal({ courtName, defaultDay, initialValues, onClose, o
           {ALL_LEVELS.map(lv => (
             <button key={lv} type="button" onClick={() => toggleLevel(lv)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                levels.includes(lv) ? 'bg-[var(--p)] text-white' : 'bg-[var(--chip-bg)] text-[var(--chip-t)] hover:bg-[var(--bar-i)]'
+                levels.includes(lv) ? 'bg-[var(--p)] text-[var(--p-text)]' : 'bg-[var(--chip-bg)] text-[var(--chip-t)] hover:bg-[var(--bar-i)]'
               }`}>
               {lv}
             </button>

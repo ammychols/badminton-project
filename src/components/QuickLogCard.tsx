@@ -98,7 +98,7 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
               onClick={() => handleSwitchGroup(group.id)}
               className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${
                 group.id === active.group.id
-                  ? 'bg-[var(--p)] text-white'
+                  ? 'bg-[var(--p)] text-[var(--p-text)]'
                   : 'bg-[var(--chip-bg)] text-[var(--text-2)] hover:bg-[var(--bar-i)]'
               }`}
             >
@@ -143,7 +143,7 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
               onClick={() => setMood(m)}
               aria-label={`อารมณ์ระดับ ${m}`}
               className={`flex-1 py-1.5 rounded-xl text-xl transition-all ${
-                mood === m ? 'bg-[var(--p)] scale-105' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'
+                mood === m ? 'bg-[var(--p-tint)] scale-105 shadow-[0_0_0_2px_var(--p)]' : 'bg-[var(--chip-bg)] opacity-50 hover:opacity-80'
               }`}
             >
               {MOOD_EMOJIS[m]}

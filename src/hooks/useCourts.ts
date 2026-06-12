@@ -36,7 +36,7 @@ export function useCourts(uid: string) {
 
   const addCourt = (data: Omit<Court, 'id' | 'createdAt' | 'groups'>) => {
     const id = crypto.randomUUID();
-    const court: Court = { ...data, id, createdAt: new Date().toISOString(), groups: [] };
+    const court: Court = { ...data, id, createdAt: new Date().toJSON(), groups: [] };
     setDoc(ref(id), court);
     return court;
   };

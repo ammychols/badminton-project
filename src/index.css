@@ -4,8 +4,10 @@
 
 :root {
   --leaf-opacity: 0;
-  --p: #000000;
-  --p-h: #222222;
+  --p: #2fbf7f;
+  --p-h: #29a86f;
+  --p-text: #010120;
+  --p-tint: #e2f7ed;
   --app-bg: #ffffff;
   --nav-bg: #010120;
   --nav-border: rgba(255,255,255,0.08);
@@ -21,12 +23,14 @@
   --bar-a: #bdbbff;
   --bar-i: #ebebeb;
   --dashed: #ebebeb;
-  --cal-sel: #010120;
+  --cal-sel: #2fbf7f;
   --hover-bg: #f5f5f5;
   --hero-from: #010120;
   --hero-to: #010120;
-  --nav-active: #c8f6f9;
+  --nav-active: #6ee3ab;
   --nav-inactive: rgba(255,255,255,0.5);
+  --hero-gold: rgba(47,191,127,0.20);
+  --hero-gold2: rgba(47,191,127,0.10);
   --surface-dark-soft: #313641;
   --accent-orange: #fc4c02;
   --accent-magenta: #ef2cc1;

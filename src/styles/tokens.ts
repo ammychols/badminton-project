@@ -1,14 +1,14 @@
 // Design tokens — edit here to change styles app-wide
 
 export const btn = {
-  primary: 'bg-[var(--p)] text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors',
-  primaryIcon: 'bg-[var(--p)] text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors flex items-center gap-1.5',
-  primaryLg: 'bg-[var(--p)] text-white px-6 py-3 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors',
+  primary: 'bg-[var(--p)] text-[var(--p-text)] px-4 py-2 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors',
+  primaryIcon: 'bg-[var(--p)] text-[var(--p-text)] px-4 py-2 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors flex items-center gap-1.5',
+  primaryLg: 'bg-[var(--p)] text-[var(--p-text)] px-6 py-3 rounded-2xl text-sm font-medium hover:bg-[var(--p-h)] transition-colors',
   ghost: 'text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors',
   danger: 'flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors',
   cancel: 'flex-1 py-2.5 rounded-xl border border-[var(--input-b)] text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors',
   pill: 'px-3.5 py-1.5 rounded-full text-sm font-medium transition-all',
-  pillActive: 'bg-[var(--p)] text-white',
+  pillActive: 'bg-[var(--p)] text-[var(--p-text)]',
   pillInactive: 'bg-white border border-[var(--input-b)] text-[var(--text-4)] hover:border-[var(--input-f)]',
 };
 

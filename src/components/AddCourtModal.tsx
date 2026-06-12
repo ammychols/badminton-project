@@ -70,7 +70,7 @@ export function AddCourtModal({ onClose, onSave }: AddCourtModalProps) {
   const saveButton = (
     <button onClick={handleSave} disabled={!name.trim()}
       className="w-full py-3 rounded-2xl font-medium disabled:opacity-40 transition-colors"
-      style={{ background: 'var(--p)', color: '#fff' }}
+      style={{ background: 'var(--p)', color: 'var(--p-text)' }}
       onMouseEnter={e => (e.currentTarget.style.background = 'var(--p-h)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'var(--p)')}>
       ถัดไป

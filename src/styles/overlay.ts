@@ -15,3 +15,4 @@ export const Z = {
 // One scrim for every overlay. Derived from --nav-bg (#010120) so the dim
 // reads as "the app behind, darkened" rather than four different greys.
 export const BACKDROP = 'rgba(1, 1, 32, 0.55)';
+export const BACKDROP_LIGHTBOX = 'rgba(1, 1, 32, 0.85)';

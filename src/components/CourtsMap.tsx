@@ -29,7 +29,7 @@ export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
 
   // Stable key so the effect re-runs when any court's name/position changes,
   // not just when the count changes.
-  const courtsKey = courts.map(c => `${c.id}:${c.name}:${c.lat}:${c.lng}`).join('|');
+  const courtsKey = courts.map(c => `${c.id}:${c.lat},${c.lng}:${c.name}:${c.groups.length}`).join('|');
 
   useEffect(() => {
     if (!googleReady || !mapRef.current) return;
@@ -62,6 +62,7 @@ export function CourtsMap({ courts: allCourts }: CourtsMapProps) {
           borderColor: '#ffffff',
         });
 
+        // TODO: migrate to AdvancedMarkerElement (requires mapId) — tracked in backlog
         const marker = new AdvancedMarkerElement({
           position: pos,
           map,

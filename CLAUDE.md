@@ -25,6 +25,9 @@
 ### สี & tokens
 - ใช้ CSS variables (`var(--p)`, `var(--text-1..4)`, `var(--card-border)`, `var(--chip-bg)`, ฯลฯ ใน `src/index.css`) และ class presets ใน `src/styles/tokens.ts`
 - **ห้าม** hardcode hex ใหม่ (เช่น `#84cc16`, `#f1f5f9`) — ถ้าจำเป็นต้องมีสีใหม่ ให้เพิ่มเป็น CSS variable ก่อน
+- Primary colour: `--p: #2fbf7f` — ข้อความบน `var(--p)` ต้องใช้ `text-[var(--p-text)]` หรือ `color: 'var(--p-text)'` เสมอ (**ห้ามใช้ `text-white`** บนพื้น `var(--p)`)
+- `--p-tint: #e2f7ed` — ใช้สำหรับ selected state แบบ ring+tint (เช่น mood button ที่เลือก): `bg-[var(--p-tint)] shadow-[0_0_0_2px_var(--p)]`
+- `BACKDROP_LIGHTBOX` จาก `src/styles/overlay.ts` (`rgba(1, 1, 32, 0.85)`) — ใช้เป็น scrim สำหรับ lightbox เท่านั้น
 - การ์ดเด่น/gradient ใช้โทน hero: `linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)` 
 
 ### วันที่/เวลา

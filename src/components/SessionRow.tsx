@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Session, INTENSITY_LABELS } from '../types';
 import { uploadGroupImage } from '../utils/uploadImage';
 import { useOverlay } from '../hooks/useOverlay';
-import { Z, BACKDROP } from '../styles/overlay';
+import { Z, BACKDROP_LIGHTBOX } from '../styles/overlay';
 
 function Lightbox({ photos, initialIndex, onClose }: { photos: string[]; initialIndex: number; onClose: () => void }) {
   const [idx, setIdx] = useState(initialIndex);
@@ -16,7 +16,7 @@ function Lightbox({ photos, initialIndex, onClose }: { photos: string[]; initial
       aria-label="รูปภาพ"
       tabIndex={-1}
       className="fixed inset-0 flex items-center justify-center backdrop-blur-sm focus:outline-none"
-      style={{ zIndex: Z.lightbox, background: 'rgba(0,0,0,0.82)' }}
+      style={{ zIndex: Z.lightbox, background: BACKDROP_LIGHTBOX }}
       onClick={onClose}
     >
       <img

@@ -145,7 +145,7 @@ export default function App() {
             onDeleteGroup={deleteGroup}
             onEditGroup={(courtId, groupId) => openModal({ type: 'editGroup', courtId, groupId })}
             onRateCourt={courtId => openModal({ type: 'courtInfo', courtId })}
-            onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toISOString() })}
+            onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toJSON() })}
           />
         ) : (
           <SessionsView
@@ -178,9 +178,9 @@ export default function App() {
           <button
             onClick={() => openModal({ type: 'logSession' })}
             className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
-            style={{ background: 'var(--p)', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(74,124,89,0.4)' }}
+            style={{ background: 'var(--p)', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(47,191,127,0.4)' }}
           >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--p-text)" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
           </button>
         )}
         <div className="flex items-center h-14">

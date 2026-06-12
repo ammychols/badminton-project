@@ -136,8 +136,8 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
 
       {/* List / Map toggle */}
       <div className="flex rounded-full border border-[var(--input-b)] overflow-hidden text-sm w-fit mb-5 bg-white">
-        <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-[var(--p)] text-white' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>รายการ</button>
-        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-[var(--p)] text-white' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>แผนที่</button>
+        <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-[var(--p)] text-[var(--p-text)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>รายการ</button>
+        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-[var(--p)] text-[var(--p-text)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>แผนที่</button>
       </div>
 
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}

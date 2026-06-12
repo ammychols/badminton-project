@@ -18,7 +18,7 @@ export function ReviewModal({ court, groupId, onClose, onSave }: ReviewModalProp
   if (!group) return null;
 
   const handleSave = () => {
-    onSave({ fun: 0, arrangement: 0, notes: notes.trim() || undefined, date: new Date().toISOString() });
+    onSave({ fun: 0, arrangement: 0, notes: notes.trim() || undefined, date: new Date().toJSON() });
     onClose();
   };
 
