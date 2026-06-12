@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useCourts } from './hooks/useCourts';
 import { useSessions } from './hooks/useSessions';
@@ -73,6 +73,16 @@ export default function App() {
   }, [showUserMenu]);
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
+
+  // Hide the FAB when QuickLogCard is already showing — same visibility logic as the card itself.
+  const hasQuickLogCandidate = useMemo(() => {
+    const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+    const dow = DOW_MAP[new Date(today + 'T00:00:00').getDay()];
+    return courts.some(c => c.groups.some(g =>
+      g.days.includes(dow) && !sessions.some(s => s.groupId === g.id && s.date === today)
+    ));
+  }, [courts, sessions]);
   const [justLogged, setJustLogged] = useState(false);
   const justLoggedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const triggerJustLogged = () => {
@@ -162,14 +172,16 @@ export default function App() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        {/* FAB — sits above nav, anchored to nav's top-right */}
-        <button
-          onClick={() => openModal({ type: 'logSession' })}
-          className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
-          style={{ background: 'var(--p)', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(74,124,89,0.4)' }}
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
+        {/* FAB — hidden when QuickLogCard is showing (card already has "บันทึกเลย" + "กรอกแบบละเอียด") */}
+        {!hasQuickLogCandidate && (
+          <button
+            onClick={() => openModal({ type: 'logSession' })}
+            className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
+            style={{ background: 'var(--p)', bottom: '100%', right: '20px', marginBottom: '12px', boxShadow: '0 4px 20px rgba(74,124,89,0.4)' }}
+          >
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        )}
         <div className="flex items-center h-14">
           {([
             { key: 'sessions', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> },
