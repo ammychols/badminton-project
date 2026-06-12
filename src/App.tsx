@@ -10,6 +10,8 @@ import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
+import { LogCelebration } from './components/LogCelebration';
+import { calcStreak, thisMonthString } from './utils/date';
 
 import { Court, DayOfWeek } from './types';
 
@@ -138,8 +140,8 @@ export default function App() {
           <SessionsView
             sessions={sessions}
             courts={courts}
-            justLogged={justLogged}
             onLogSession={() => openModal({ type: 'logSession' })}
+            onQuickLog={data => { addSession(data); triggerJustLogged(); }}
             onDeleteSession={deleteSession}
             onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
             onUpdateNote={(id, notes) => {
@@ -186,6 +188,15 @@ export default function App() {
           })}
         </div>
       </nav>
+
+      {justLogged && (
+        <LogCelebration
+          streak={calcStreak(sessions)}
+          monthGames={sessions
+            .filter(s => s.date.startsWith(thisMonthString()))
+            .reduce((sum, s) => sum + s.gamesPlayed, 0)}
+        />
+      )}
 
       {modal?.type === 'addCourt' && (
         <AddCourtModal onClose={closeModal} onSave={data => {
