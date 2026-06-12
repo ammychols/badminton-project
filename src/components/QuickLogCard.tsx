@@ -43,29 +43,20 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
   }, [courts, sessions, dow, today]);
 
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [gamesOverride, setGamesOverride] = useState<number | null>(null);
+  const [games, setGames] = useState(0);
   const [mood, setMood] = useState<1 | 2 | 3 | 4 | 5 | 6>(4);
 
   const active = candidates.find(x => x.group.id === selectedGroupId) ?? candidates[0];
 
-  // Prefill games with this group's historical average — the "เดาให้" part.
-  const avgGames = useMemo(() => {
-    if (!active) return 8;
-    const past = sessions.filter(s => s.groupId === active.group.id && s.gamesPlayed > 0);
-    if (past.length === 0) return 8;
-    return Math.max(1, Math.round(past.reduce((sum, s) => sum + s.gamesPlayed, 0) / past.length));
-  }, [active, sessions]);
-
   if (!active) return null;
 
-  const games = gamesOverride ?? avgGames;
   const scheduleTime = active.group.startTime && active.group.endTime
     ? `${active.group.startTime} – ${active.group.endTime}`
     : null;
 
   const handleSwitchGroup = (id: string) => {
     setSelectedGroupId(id);
-    setGamesOverride(null); // follow the new group's average
+    setGames(0);
   };
 
   const handleSave = () => {
@@ -82,7 +73,7 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
     });
     // Reset for the next candidate (this group disappears from the list).
     setSelectedGroupId(null);
-    setGamesOverride(null);
+    setGames(0);
     setMood(4);
   };
 
@@ -130,19 +121,16 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
           <button
             type="button"
             aria-label="ลดจำนวนเกม"
-            onClick={() => setGamesOverride(Math.max(0, games - 1))}
+            onClick={() => setGames(g => Math.max(0, g - 1))}
             className="w-9 h-9 rounded-full bg-[var(--chip-bg)] text-[var(--text-2)] text-xl font-bold hover:bg-[var(--bar-i)] flex items-center justify-center"
           >−</button>
           <span className="text-2xl font-black text-[var(--text-1)] tabular-nums w-10 text-center">{games}</span>
           <button
             type="button"
             aria-label="เพิ่มจำนวนเกม"
-            onClick={() => setGamesOverride(games + 1)}
+            onClick={() => setGames(g => g + 1)}
             className="w-9 h-9 rounded-full bg-[var(--chip-bg)] text-[var(--text-2)] text-xl font-bold hover:bg-[var(--bar-i)] flex items-center justify-center"
           >+</button>
-          {gamesOverride === null && (
-            <span className="text-[10px] text-[var(--text-4)]">จากค่าเฉลี่ย</span>
-          )}
         </div>
       </div>
       <div className="flex items-center gap-3 mb-4">
