@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Court, Session, DayOfWeek, Intensity, ALL_INTENSITIES, INTENSITY_LABELS, INTENSITY_EMOJIS } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
-import { todayString } from '../utils/date';
+import { todayString, formatDate } from '../utils/date';
 
 interface LogSessionModalProps {
   courts: Court[];
@@ -170,6 +170,10 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
     initialSession?.intensity ? (Array.isArray(initialSession.intensity) ? initialSession.intensity : [initialSession.intensity]) : []
   );
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const { day, full } = formatDate(date);
+  const isToday = date === todayString();
 
   const selectedDow = DOW_MAP[new Date(date + 'T00:00:00').getDay()];
 
@@ -213,9 +217,35 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
 
   return (
     <BottomSheet title={initialSession ? 'แก้ไขบันทึก' : 'บันทึกการตี'} onClose={onClose} footer={saveButton}>
-      {/* Calendar */}
-      <div className="rounded-2xl p-3 mb-4" style={{ backgroundColor: 'var(--app-bg)' }}>
-        <MiniCalendar selected={date} onChange={handleDateChange} />
+      {/* Date — แถบยุบ กดเพอกางปฏิทิน */}
+      <div className="mb-4">
+        <label className={text.label}>วันที่</label>
+        <button
+          type="button"
+          onClick={() => setCalendarOpen(v => !v)}
+          aria-expanded={calendarOpen}
+          className="w-full flex items-center justify-between border border-[var(--input-b)] rounded-xl px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-[var(--input-f)]"
+        >
+          <span className="text-[var(--text-1)]">
+            {isToday ? 'วันนี้' : `วัน${day}`} · {full}
+          </span>
+          <svg
+            className={`w-4 h-4 transition-transform ${calendarOpen ? 'rotate-180' : ''}`}
+            style={{ color: 'var(--text-3)' }}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {calendarOpen && (
+          <div className="rounded-2xl p-3 mt-2 border border-[var(--input-b)]" style={{ backgroundColor: 'var(--app-bg)' }}>
+            <MiniCalendar
+              selected={date}
+              onChange={d => { handleDateChange(d); setCalendarOpen(false); }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Court + Group */}

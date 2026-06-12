@@ -334,7 +334,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
     return { label: MONTH_SHORT[d.getMonth()], games, isCurrent: i === 5 };
   });
   const maxSparkGames = Math.max(...sparkMonths.map(m => m.games), 1);
-  const thisMonthSessions = sessions.filter(s => s.date.startsWith(viewYM));
+  const thisMonthSessions = sessions.filter(s => s.date.startsWith(currentYM));
   const thisMonthDays = new Set(thisMonthSessions.map(s => s.date)).size;
   const thisMonthGames = thisMonthSessions.reduce((sum, s) => sum + s.gamesPlayed, 0);
   const avgGamesPerDay = thisMonthDays > 0 ? (thisMonthGames / thisMonthDays).toFixed(1) : null;
