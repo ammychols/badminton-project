@@ -5,6 +5,7 @@ import { QuickLogCard } from './QuickLogCard';
 import { btn, card, text, emptyState } from '../styles/tokens';
 import { HeroCard, HeroSparkMonth } from './HeroCard';
 import { SessionRow } from './SessionRow';
+import { DetailPanel } from './DetailPanel';
 import { DAY_NAMES, MONTH_SHORT, DOW_LABELS_SHORT, todayString, thisMonthString, calcStreak, formatDate } from '../utils/date';
 
 // ── Court slide-over panel (triggered from session feed) ──────────────────────
@@ -22,69 +23,53 @@ function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
     { key: 'THU', label: 'พฤ' }, { key: 'FRI', label: 'ศ' }, { key: 'SAT', label: 'ส' }, { key: 'SUN', label: 'อา' },
   ];
 
+  const mapsAction = (
+    <a href={mapsUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+      className="flex-shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl transition-colors"
+      style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      นำทาง
+    </a>
+  );
+
   return (
-    <>
-      <div className="fixed inset-0 z-[59]" style={{ backgroundColor: 'rgba(15,23,42,0.5)' }} onClick={onClose} />
-      <style>{`
-        .court-panel { top:0; right:0; bottom:0; left:0; }
-        @media(min-width:640px){ .court-panel { top:57px; left:auto; width:480px; box-shadow:-8px 0 32px rgba(0,0,0,.2); } }
-      `}</style>
-      <div className="court-panel fixed z-[60] flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
-        {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-2.5 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)' }}>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          </button>
-          <div className="min-w-0 flex-1">
-            <div className="font-extrabold text-white text-sm leading-tight truncate">{court.name}</div>
-            {court.address && <div className="text-xs text-white/50 truncate">{court.address}</div>}
+    <DetailPanel title={court.name} subtitle={court.address} action={mapsAction} onClose={onClose}>
+      <div className="px-4 py-3.5 flex flex-col gap-3 pb-8">
+        {/* Info chips */}
+        {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
+          <div className="flex gap-2 flex-wrap">
+            {court.info.floor && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{FLOOR_LABELS[court.info.floor]}</span>}
+            {court.info.air && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{AIR_LABELS[court.info.air]}</span>}
+            {court.info.parking && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{PARKING_LABELS[court.info.parking]}</span>}
+            {court.info.notes && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{court.info.notes}</span>}
           </div>
-          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-            className="flex-shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl transition-colors"
-            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            นำทาง
-          </a>
+        )}
+
+        {/* Day filter */}
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
+          {DAY_TABS.map(({ key, label }) => (
+            <button key={key} onClick={() => setPanelDay(key)}
+              className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={{
+                background: panelDay === key ? 'var(--p)' : 'var(--chip-bg)',
+                color: panelDay === key ? '#ffffff' : 'var(--chip-t)',
+              }}>
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
-          {/* Info chips */}
-          {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
-            <div className="flex gap-2 flex-wrap">
-              {court.info.floor && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{FLOOR_LABELS[court.info.floor]}</span>}
-              {court.info.air && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{AIR_LABELS[court.info.air]}</span>}
-              {court.info.parking && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{PARKING_LABELS[court.info.parking]}</span>}
-              {court.info.notes && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{court.info.notes}</span>}
-            </div>
-          )}
-
-          {/* Day filter */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
-            {DAY_TABS.map(({ key, label }) => (
-              <button key={key} onClick={() => setPanelDay(key)}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
-                style={{
-                  background: panelDay === key ? '#84cc16' : 'var(--chip-bg)',
-                  color: panelDay === key ? '#0f172a' : 'var(--chip-t)',
-                }}>
-                {label}
-              </button>
-            ))}
+        {/* Groups */}
+        <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">ก๊วนในสนามนี้</div>
+        {visibleGroups.length === 0 ? (
+          <div className="text-sm text-[var(--text-3)] text-center py-6">ไม่มีก๊วนในวันนี้</div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {visibleGroups.map(group => <PanelGroupRow key={group.id} group={group} />)}
           </div>
-
-          {/* Groups */}
-          <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">ก๊วนในสนามนี้</div>
-          {visibleGroups.length === 0 ? (
-            <div className="text-sm text-[var(--text-3)] text-center py-6">ไม่มีก๊วนในวันนี้</div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {visibleGroups.map(group => <PanelGroupRow key={group.id} group={group} />)}
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    </>
+    </DetailPanel>
   );
 }
 

@@ -34,7 +34,7 @@
 
 ### ภาษา & copy
 - UI เป็นภาษาไทย; ไทยปนอังกฤษต้องเว้นวรรค (เช่น "ตี S.T.A Badminton วันนี้?")
-- สถิติจากข้อมูล < 3 ครั้ง: เลี่ยงคำว่า "เฉลี่ย/ส่วนใหญ่" (backlog ข้อ 1 ด้านล่าง)
+- สถิติจากข้อมูล < 3 ครั้ง: เลี่ยงคำว่า "เฉลี่ย/ส่วนใหญ่"
 
 ### Core loop components
 - **`QuickLogCard`** — การ์ดบันทึกเร็วบนหัวฟีด (เดาก๊วนจากตาราง `days`, บันทึกเวลาเป็น '00:00') — เจ้าของโปรเจกต์ปรับเองแล้ว (เกมเริ่มที่ 0 ไม่ prefill) อย่า revert
@@ -44,16 +44,12 @@
 
 - Groups เก็บ nested ใน court document (Firestore) — มีแผน migrate เป็น subcollection ภายหลัง
 - `LogSessionModal` กรองสนาม/ก๊วนตามวันในสัปดาห์ (day filter) — **เจ้าของโปรเจกต์ตั้งใจคงไว้** อย่าปลดล็อกโดยไม่ถาม
-- `SessionsView.tsx` ยังใหญ่ (~700+ บรรทัด) — มีไฟล์ extraction (HeroCard, SessionRow) วางไว้ที่ `src/components/` แล้วแต่ยังไม่ได้ wire เข้า (ดู backlog)
-
 ## Backlog (เรียงตามที่คุยกันไว้)
 
-1. Wire `HeroCard`/`SessionRow` (อยู่ที่ `src/components/` แล้ว ยังไม่ได้ import) เข้า `SessionsView` แทนโค้ดซ้ำเดิม + ย้าย date helpers ไปใช้ `utils/date.ts`
-2. แทน `CourtPanel` ใน SessionsView ด้วย `DetailPanel` + ลบ `CourtDetailPanel` (dead code) ใน CourtsView
-3. Migrate confirm dialogs ทั้ง 3 จุดไปใช้ `ConfirmDialog` กลาง
-4. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
-5. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
-6. Bottom nav: เพิ่ม label ไทย + เปลี่ยนไอคอนสนาม (ตอนนี้เป็นลูกโลก)
+1. Migrate confirm dialogs ทั้ง 3 จุดไปใช้ `ConfirmDialog` กลาง
+2. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
+3. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
+4. Bottom nav: เพิ่ม label ไทย + เปลี่ยนไอคอนสนาม (ตอนนี้เป็นลูกโลก)
 
 ## Assets
 
