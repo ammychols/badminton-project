@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
 import { CourtsMap } from './CourtsMap';
+import { ConfirmDialog } from './ConfirmDialog';
 import { btn, emptyState, text } from '../styles/tokens';
 
 interface CourtsViewProps {
@@ -282,16 +283,12 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
       ))}
 
       {confirmDeleteCourt && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteCourt(null)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-            <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบสนาม</p>
-            <p className="text-sm text-[var(--text-3)] mb-5">"{confirmDeleteCourt.name}" และก๊วนทั้งหมด</p>
-            <div className="flex gap-2">
-              <button onClick={() => setConfirmDeleteCourt(null)} className={btn.cancel}>ยกเลิก</button>
-              <button onClick={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }} className={btn.danger}>ลบ</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="ลบสนาม"
+          message={`"${confirmDeleteCourt.name}" และก๊วนทั้งหมด`}
+          onConfirm={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }}
+          onCancel={() => setConfirmDeleteCourt(null)}
+        />
       )}
     </div>
   );
@@ -306,20 +303,6 @@ function MiniStars({ val }: { val: number }) {
   );
 }
 
-function ConfirmDialog({ name, onConfirm, onCancel }: { name: string; onConfirm: () => void; onCancel: () => void }) {
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={onCancel}>
-      <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-        <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบก๊วน</p>
-        <p className="text-sm text-[var(--text-3)] mb-5">"{name}"</p>
-        <div className="flex gap-2">
-          <button onClick={onCancel} className={btn.cancel}>ยกเลิก</button>
-          <button onClick={onConfirm} className={btn.danger}>ลบ</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDelete: () => void; onEdit: () => void; onSaveNote: (notes: string) => void }) {
   const review = group.reviews[0];
@@ -433,7 +416,7 @@ function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDe
           )}
         </div>
       </div>
-      {confirming && <ConfirmDialog name={group.name} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
+      {confirming && <ConfirmDialog title="ลบก๊วน" message={`"${group.name}"`} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
     </div>
   );
 }

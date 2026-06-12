@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { GroupReviewModal } from './GroupReviewModal';
 import { QuickLogCard } from './QuickLogCard';
+import { ConfirmDialog } from './ConfirmDialog';
 import { btn, card, text, emptyState } from '../styles/tokens';
 import { HeroCard, HeroSparkMonth } from './HeroCard';
 import { SessionRow } from './SessionRow';
@@ -551,16 +552,12 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
       })()}
 
       {confirmDeleteId && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setConfirmDeleteId(null)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-            <p className="text-base font-semibold text-[var(--text-1)] mb-1">ลบบันทึก</p>
-            <p className="text-sm text-[var(--text-3)] mb-5">ลบรายการนี้ออกจากประวัติ?</p>
-            <div className="flex gap-2">
-              <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--input-b)] text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors">ยกเลิก</button>
-              <button onClick={() => { onDeleteSession(confirmDeleteId); setConfirmDeleteId(null); }} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">ลบ</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="ลบบันทึก"
+          message="ลบรายการนี้ออกจากประวัติ?"
+          onConfirm={() => { onDeleteSession(confirmDeleteId); setConfirmDeleteId(null); }}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
       )}
     </div>
   );
