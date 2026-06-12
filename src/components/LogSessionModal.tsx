@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Court, Session, DayOfWeek, Intensity, ALL_INTENSITIES, INTENSITY_LABELS, INTENSITY_EMOJIS } from '../types';
 import { BottomSheet } from './BottomSheet';
 import { text, input } from '../styles/tokens';
+import { todayString } from '../utils/date';
 
 interface LogSessionModalProps {
   courts: Court[];
@@ -15,11 +16,6 @@ const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
 const DOW = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 const MONTH_LABELS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
 
 function toDateStr(y: number, m: number, d: number) {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -310,6 +306,11 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
+      {/* Notes */}
+      <div className="mb-2">
+        <label className={text.label}>โน้ต</label>
+        <NoteField value={notes} onChange={setNotes} />
+      </div>
 
     </BottomSheet>
   );
