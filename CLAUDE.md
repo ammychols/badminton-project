@@ -48,7 +48,6 @@
 
 1. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
 2. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
-3. Bottom nav: เพิ่ม label ไทย + เปลี่ยนไอคอนสนาม (ตอนนี้เป็นลูกโลก)
 
 ## Assets
 

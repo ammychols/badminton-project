@@ -184,17 +184,16 @@ export default function App() {
         )}
         <div className="flex items-center h-14">
           {([
-            { key: 'sessions', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> },
-            { key: 'courts', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
-          ] as { key: 'sessions' | 'courts'; icon: React.ReactNode }[]).map(({ key, icon }) => {
+            { key: 'sessions', label: 'บันทึก', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> },
+            { key: 'courts', label: 'สนาม', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M7 5v14M17 5v14" strokeWidth="1" strokeDasharray="2 2"/></svg> },
+          ] as { key: 'sessions' | 'courts'; label: string; icon: React.ReactNode }[]).map(({ key, label, icon }) => {
             const active = tab === key;
             return (
               <button key={key} onClick={() => switchTab(key)}
-                className="flex-1 flex flex-col items-center justify-center gap-1.5 h-full transition-colors"
+                className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-colors"
                 style={{ color: active ? 'var(--nav-active)' : 'var(--nav-inactive)' }}>
                 {icon}
-                {active && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--nav-active)' }} />}
-                {!active && <span className="w-1 h-1 rounded-full opacity-0" />}
+                <span className="text-[10px] font-medium">{label}</span>
               </button>
             );
           })}
