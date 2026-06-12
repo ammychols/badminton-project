@@ -55,10 +55,11 @@ function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string 
 
 export default function App() {
   const { user, loading, signIn, signOut, error } = useAuth();
-  const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'courts');
+  const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'sessions');
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [highlightCourtId, setHighlightCourtId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
+  const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -168,13 +169,14 @@ export default function App() {
               if (s) updateSession(id, { ...s, photos });
             }}
             onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
+            onMobileTabChange={setMobileTab}
           />
         )}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* FAB — hidden when QuickLogCard is showing (card already has "บันทึกเลย" + "กรอกแบบละเอียด") */}
-        {!hasQuickLogCandidate && (
+        {tab === 'sessions' && (mobileTab === 'stats' || !hasQuickLogCandidate) && (
           <button
             onClick={() => openModal({ type: 'logSession' })}
             className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"

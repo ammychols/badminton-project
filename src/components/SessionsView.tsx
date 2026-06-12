@@ -111,6 +111,7 @@ interface SessionsViewProps {
   onUpdatePhoto: (id: string, image: string | undefined) => void;
   onUpdatePhotos: (id: string, photos: string[]) => void;
   onNavigateToCourt: (courtId: string) => void;
+  onMobileTabChange: (tab: 'feed' | 'stats') => void;
 }
 
 
@@ -277,13 +278,17 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
 
 
 
-export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onMobileTabChange }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
   const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
+  const handleMobileTabChange = (t: 'feed' | 'stats') => {
+    setMobileTab(t);
+    onMobileTabChange(t);
+  };
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -446,7 +451,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
         {/* Tab switcher */}
         <div className="flex rounded-2xl p-1 mb-4" style={{ backgroundColor: 'var(--chip-bg)' }}>
           {(['feed', 'stats'] as const).map(tab => (
-            <button key={tab} onClick={() => setMobileTab(tab)}
+            <button key={tab} onClick={() => handleMobileTabChange(tab)}
               className="flex-1 py-2 rounded-xl text-sm font-semibold transition-all"
               style={{
                 backgroundColor: mobileTab === tab ? '#ffffff' : 'transparent',
