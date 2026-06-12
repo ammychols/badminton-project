@@ -107,7 +107,7 @@ export function QuickLogCard({ courts, sessions, onQuickLog, onOpenFullForm }: Q
           ))}
         </div>
       ) : (
-        <div className="font-bold text-[var(--text-1)] text-base leading-snug">ตี{active.group.name}วันนี้ใช่ไหม?</div>
+        <div className="font-bold text-[var(--text-1)] text-base leading-snug">ตี {active.group.name} วันนี้?</div>
       )}
       <div className="text-xs text-[var(--text-3)] mb-3">
         {active.court.name}
