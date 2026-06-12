@@ -1,8 +1,10 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { Court, Group, Session, INTENSITY_LABELS, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
+import React, { useState, useMemo } from 'react';
+import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { GroupReviewModal } from './GroupReviewModal';
-import { uploadGroupImage } from '../utils/uploadImage';
+import { SessionRow } from './SessionRow';
+import { HeroCard } from './HeroCard';
 import { btn, card, text, emptyState } from '../styles/tokens';
+import { todayString, formatDate, calcStreak, MONTH_SHORT, DOW_LABELS_SHORT } from '../utils/date';
 
 // ── Court slide-over panel (triggered from session feed) ──────────────────────
 function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
@@ -124,49 +126,6 @@ interface SessionsViewProps {
   onNavigateToCourt: (courtId: string) => void;
 }
 
-function RacketSVG({ clipId }: { clipId: string }) {
-  // Head in upper-right area; handle extends down-right out of the card (clipped by overflow:hidden)
-  const cx = 155, cy = 95, rx = 78, ry = 60;
-  const ys = [-48, -36, -24, -12, 0, 12, 24, 36, 48];
-  const xs = [-62, -47, -31, -16, 0, 16, 31, 47, 62];
-  return (
-    <svg width="240" height="340" viewBox="0 0 240 340" fill="none"
-      className="absolute top-0 right-0 opacity-[0.14] pointer-events-none select-none"
-      style={{ zIndex: 2, right: '-12px', top: '-12px' }}>
-      <defs>
-        <clipPath id={clipId}>
-          <ellipse cx={cx} cy={cy} rx={rx - 2} ry={ry - 2} />
-        </clipPath>
-      </defs>
-      <g transform={`rotate(18, ${cx}, ${cy})`}>
-        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} stroke="white" strokeWidth="3.5" />
-        {ys.map(dy => (
-          <line key={dy} x1={cx - rx} y1={cy + dy} x2={cx + rx} y2={cy + dy} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
-        ))}
-        {xs.map(dx => (
-          <line key={dx} x1={cx + dx} y1={cy - ry} x2={cx + dx} y2={cy + ry} stroke="white" strokeWidth="1.5" clipPath={`url(#${clipId})`} />
-        ))}
-        <line x1={cx} y1={cy + ry + 2} x2={cx} y2="285" stroke="white" strokeWidth="5" />
-        <rect x={cx - 10} y="285" width="20" height="55" rx="8" stroke="white" strokeWidth="3.5" />
-      </g>
-    </svg>
-  );
-}
-
-const MOOD_EMOJIS: Record<number, string> = {
-  1: '😡',
-  2: '😴',
-  3: '😐',
-  4: '🙂',
-  5: '😄',
-  6: '🔥',
-};
-
-
-const DAY_NAMES = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์'];
-const MONTH_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-const DOW_LABELS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-const DOW_LABELS_SHORT = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
 
 function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   sessions: { date: string; gamesPlayed: number }[];
@@ -278,264 +237,17 @@ function ActivityCard({ sessions, viewYear, viewMonth, onPrev, onNext }: {
   );
 }
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const day = DAY_NAMES[d.getDay()];
-  const dd = d.getDate();
-  const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-  const month = monthNames[d.getMonth()];
-  const year = d.getFullYear() + 543;
-  return { day, full: `${dd} ${month} ${year}` };
-}
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function thisMonthString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-}
-
-const INTENSITY_CHIP: Record<string, string> = {
-  light: 'bg-emerald-50 text-emerald-600',
-  medium: 'bg-amber-50 text-amber-600',
-  heavy: 'bg-red-50 text-red-500',
-};
-
-const MOOD_BUBBLE: Record<number, string> = {
-  1: 'bg-red-50',
-  2: 'bg-slate-100',
-  3: 'bg-blue-50',
-  4: 'bg-amber-50',
-  5: 'bg-emerald-50',
-  6: 'bg-orange-50',
-};
-
-function calcStreak(sessions: { date: string }[]): number {
-  if (sessions.length === 0) return 0;
-  const dates = [...new Set(sessions.map(s => s.date))].sort().reverse();
-  const today = todayString();
-  const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
-  if (dates[0] !== today && dates[0] !== yesterday) return 0;
-  let streak = 1;
-  for (let i = 1; i < dates.length; i++) {
-    const prev = new Date(dates[i-1] + 'T00:00:00');
-    const curr = new Date(dates[i] + 'T00:00:00');
-    prev.setDate(prev.getDate() - 1);
-    if (prev.toISOString().slice(0,10) === curr.toISOString().slice(0,10)) streak++;
-    else break;
-  }
-  return streak;
-}
 
 
-function SessionRow({ session, courtName, groupName, onEdit, onDelete, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onViewInfo, onViewCourt }: {
-  session: Session; courtName: string; groupName: string;
-  onEdit: () => void; onDelete: () => void;
-  onUpdateNote: (notes: string | undefined) => void;
-  onUpdatePhoto: (image: string | undefined) => void;
-  onUpdatePhotos: (photos: string[]) => void;
-  onViewInfo: () => void;
-  onViewCourt: () => void;
-}) {
-  const [editingNote, setEditingNote] = useState(false);
-  const [noteText, setNoteText] = useState(session.notes ?? '');
-  const [lightbox, setLightbox] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const photoInputRef = useRef<HTMLInputElement>(null);
-  React.useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
-  const commitNote = () => {
-    setEditingNote(false);
-    const trimmed = noteText.trim() || undefined;
-    if (trimmed !== session.notes) onUpdateNote(trimmed);
-  };
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async ev => {
-      const compressed = await uploadGroupImage('', '', ev.target?.result as string);
-      const existing = session.photos ?? (session.image ? [session.image] : []);
-      onUpdatePhotos([...existing, compressed]);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-  const allPhotos = session.photos ?? (session.image ? [session.image] : []);
-  const [sh, sm] = session.startTime.split(':').map(Number);
-  const [eh, em] = session.endTime.split(':').map(Number);
-  const start = sh * 60 + sm;
-  const end = eh * 60 + em;
-  const durMin = (() => { if (start === 0 && end === 0) return 0; let d = end - start; if (d <= 0) d += 24 * 60; return (d > 0 && d < 24 * 60) ? d : 0; })();
-  const durLabel = durMin > 0 ? (Math.floor(durMin / 60) > 0 ? `${Math.floor(durMin / 60)}ชม.` : '') + (durMin % 60 > 0 ? `${durMin % 60}น.` : '') : null;
-  const hasTime = !(start === 0 && end === 0);
-  const minPerGame = (durMin > 0 && session.gamesPlayed > 0) ? Math.round(durMin / session.gamesPlayed) : null;
-
-  const metaDivider = <span className="text-[var(--text-4)]">·</span>;
-
-  return (
-    <div className="group bg-white border border-[var(--card-border)] rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08),_0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden transition-colors hover:border-[color-mix(in_srgb,var(--p)_35%,transparent)] flex flex-col sm:flex-row">
-      {/* Left: all content */}
-      <div className="flex-1 min-w-0 flex flex-col p-5">
-        {/* Header */}
-        <div className="flex items-start gap-3">
-          <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 text-2xl select-none ${MOOD_BUBBLE[session.mood]}`}>
-            {MOOD_EMOJIS[session.mood]}
-          </div>
-          {/* Group + court names — click whole frame to view info */}
-          <div className="min-w-0 flex-1">
-            <button onClick={onViewInfo} className="text-left w-full px-2.5 py-1.5 -mx-2.5 -my-1.5 rounded-xl hover:bg-[var(--chip-bg)] transition-colors">
-              <div className="font-bold text-[var(--text-1)] text-[15px] tracking-tight leading-snug">{groupName}</div>
-              <div className="text-xs text-[var(--text-3)] truncate mt-0.5">{courtName}</div>
-            </button>
-            {session.intensity && (() => {
-              const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
-              const ivColorMap: Record<string, string> = { light: '#16a34a', medium: '#ca8a04', heavy: '#ef4444' };
-              return (
-                <div className="flex items-center gap-1 mt-1">
-                  {lvs.map((lv, i) => (
-                    <React.Fragment key={lv}>
-                      {i > 0 && <span className="text-[var(--text-4)] text-xs">·</span>}
-                      <span className="text-xs font-semibold" style={{ color: ivColorMap[lv] }}>{INTENSITY_LABELS[lv]}</span>
-                    </React.Fragment>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-          <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-shrink-0">
-            {!session.image && (
-              <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </button>
-            )}
-            <div ref={menuRef} className="relative">
-              <button onClick={() => setMenuOpen(v => !v)} className="p-1.5 rounded-lg hover:bg-[var(--chip-bg)] transition-colors" style={{ color: 'var(--text-3)' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 top-8 z-20 bg-white rounded-xl border border-[var(--card-border)] overflow-hidden min-w-[120px]" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.12)' }}>
-                  <button onClick={() => { setMenuOpen(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--text-1)] hover:bg-[var(--chip-bg)] transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-[var(--text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 16H9v-3z" />
-                    </svg>
-                    แก้ไข
-                  </button>
-                  <div className="h-px bg-[var(--card-border)]"/>
-                  <button onClick={() => { setMenuOpen(false); onDelete(); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    ลบ
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Note */}
-        <div className="mt-3 flex-1">
-          {editingNote ? (
-            <textarea autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
-              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
-              onBlur={commitNote}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(session.notes ?? ''); setEditingNote(false); } }}
-              placeholder="เพิ่มโน้ต..." rows={2}
-              className="w-full text-sm text-[var(--text-2)] border border-[var(--input-b)] rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
-              style={{ backgroundColor: 'var(--app-bg)' }}
-            />
-          ) : (
-            <button onClick={() => { setNoteText(session.notes ?? ''); setEditingNote(true); }}
-              className="w-full text-left rounded-xl px-2 py-1.5 -mx-2 -my-1.5 hover:bg-[var(--chip-bg)] transition-colors group/note">
-              {session.notes
-                ? <p className="text-[13.5px] text-[var(--text-2)] leading-relaxed whitespace-pre-wrap">{session.notes}</p>
-                : <p className="text-sm text-[var(--text-3)] opacity-60 group-hover:opacity-100 transition-opacity">+ เพิ่มโน้ต...</p>
-              }
-            </button>
-          )}
-        </div>
-
-        {/* Meta footer */}
-        {(hasTime || session.gamesPlayed > 0) && (
-          <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
-            {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
-            {hasTime && durLabel && metaDivider}
-            {durLabel && <span className="font-semibold tabular-nums text-[var(--text-2)]">{durLabel}</span>}
-            {(hasTime || durLabel) && session.gamesPlayed > 0 && metaDivider}
-            {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
-            {minPerGame && metaDivider}
-            {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
-          </div>
-        )}
-
-        {/* Photo strip */}
-        <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-        {allPhotos.length > 0 && (
-          <div className="flex gap-1.5 mt-3 pt-3 border-t border-[var(--card-border)]" style={{ maxHeight: 160 }}>
-            {allPhotos.slice(0, 3).map((photo, i) => (
-              <div key={i} className="relative flex-1 rounded-xl overflow-hidden cursor-pointer" style={{ height: 160 }} onClick={() => setLightbox(true)}>
-                <img src={photo} alt="" className="w-full h-full object-cover" />
-                {i === 2 && allPhotos.length > 3 && (
-                  <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">+{allPhotos.length - 3}</span>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={e => { e.stopPropagation(); const next = allPhotos.filter((_, idx) => idx !== i); onUpdatePhotos(next); }}
-                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] hover:bg-red-500/80 transition-colors opacity-0 group-hover:opacity-100"
-                >✕</button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Lightbox */}
-      {lightbox && allPhotos.length > 0 && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setLightbox(false)}
-        >
-          <img
-            src={allPhotos[0]}
-            alt="session"
-            className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          />
-          <button
-            onClick={() => setLightbox(false)}
-            className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center text-lg hover:bg-white/30 transition-colors"
-          >✕</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onViewInfo, onViewCourt }: {
+function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhotos, onViewInfo }: {
   sessions: Session[];
   getCourtName: (id: string) => string;
   getGroupName: (courtId: string, groupId: string) => string;
   onEditSession: (s: Session) => void;
   setConfirmDeleteId: (id: string) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
-  onUpdatePhoto: (id: string, image: string | undefined) => void;
   onUpdatePhotos: (id: string, photos: string[]) => void;
   onViewInfo: (s: Session) => void;
-  onViewCourt: (courtId: string) => void;
 }) {
   const sorted = [...sessions].sort((a, b) => b.date.localeCompare(a.date));
   // Group by date
@@ -566,10 +278,8 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
                 courtName={getCourtName(s.courtId)} groupName={getGroupName(s.courtId, s.groupId)}
                 onEdit={() => onEditSession(s)} onDelete={() => setConfirmDeleteId(s.id)}
                 onUpdateNote={notes => onUpdateNote(s.id, notes)}
-                onUpdatePhoto={image => onUpdatePhoto(s.id, image)}
                 onUpdatePhotos={photos => onUpdatePhotos(s.id, photos)}
                 onViewInfo={() => onViewInfo(s)}
-                onViewCourt={() => onViewCourt(s.courtId)}
               />
             ))}
           </div>
@@ -676,55 +386,9 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
       <div className="hidden sm:flex sm:gap-5 sm:items-start">
         {/* Col 1: Hero card + Heatmap below */}
         <div className="w-[400px] flex-shrink-0">
-          <div className="relative rounded-3xl p-6 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
-            <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
-            <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-            <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
-            <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
-            <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-            <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
-            <RacketSVG clipId="rh-desk" />
-            <div className="relative z-10 flex items-end justify-between mb-3">
-              <div>
-                <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
-                <div className="flex items-end gap-1.5 leading-none">
-                  <span className="text-5xl font-black">{totalSessions}</span>
-                  <span className="text-lg text-white/60 mb-1">ครั้ง</span>
-                </div>
-              </div>
-              {streak >= 2 && (
-                <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
-                  <span className="text-lg">🔥</span>
-                  <span className="text-sm font-semibold">{streak} วันติด</span>
-                </div>
-              )}
-            </div>
-            {/* Sparkline */}
-            <div className="relative z-10 flex items-end gap-2 mb-4" style={{ height: 68 }}>
-              {sparkMonths.map((m, i) => {
-                const h = m.games > 0 ? Math.max((m.games / maxSparkGames) * 42, 8) : 4;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
-                    {m.games > 0 && (
-                      <span className="text-[10px] font-bold tabular-nums leading-none mb-0.5"
-                        style={{ color: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)' }}>{m.games}</span>
-                    )}
-                    <div className="w-full rounded-t-[4px] transition-all"
-                      style={{ height: h, backgroundColor: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.18)' }} />
-                    <span className="text-[9px] font-medium leading-none mt-0.5"
-                      style={{ color: m.isCurrent ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)' }}>{m.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="relative z-10 border-t border-white/10 pt-3">
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
-                <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
-                <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
-              </div>
-            </div>
-          </div>
+          <HeroCard clipId="rh-desk" totalSessions={totalSessions} streak={streak}
+            sparkMonths={sparkMonths} maxSparkGames={maxSparkGames}
+            thisMonthGames={thisMonthGames} avgGamesPerDay={avgGamesPerDay} avgDuration={avgDuration} />
           {sessions.length > 0 && (
             <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />
           )}
@@ -774,7 +438,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
               )}
             </div>
           )}
@@ -803,55 +467,9 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
         {/* Stats tab */}
         {mobileTab === 'stats' && (
           <>
-            <div className="relative rounded-3xl p-6 mb-4 text-white overflow-hidden shadow-xl" style={{background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)'}}>
-              <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.18)'}} />
-              <div className="absolute -bottom-12 -left-8 w-52 h-52 rounded-full blur-3xl" style={{background: 'rgba(255,255,255,0.10)'}} />
-              <div className="absolute top-0 right-8 w-36 h-36 rounded-full blur-3xl" style={{background: 'var(--hero-gold, rgba(255,255,255,0.08))'}} />
-              <div className="absolute bottom-2 right-1/4 w-20 h-20 rounded-full blur-2xl" style={{background: 'var(--hero-gold2, rgba(255,255,255,0.06))'}} />
-              <div className="absolute inset-0 opacity-[0.12]" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`, backgroundSize: '180px 180px'}} />
-              <div className="absolute inset-0 rounded-3xl" style={{boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15)'}} />
-              <RacketSVG clipId="rh-mob" />
-              <div className="relative z-10 flex items-end justify-between mb-3">
-                <div>
-                  <div className="text-xs text-white/60 mb-0.5">ตีไปทั้งหมด</div>
-                  <div className="flex items-end gap-1.5 leading-none">
-                    <span className="text-5xl font-black">{totalSessions}</span>
-                    <span className="text-lg text-white/60 mb-1">ครั้ง</span>
-                  </div>
-                </div>
-                {streak >= 2 && (
-                  <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1.5 rounded-full">
-                    <span className="text-lg">🔥</span>
-                    <span className="text-sm font-semibold">{streak} วันติด</span>
-                  </div>
-                )}
-              </div>
-              {/* Sparkline */}
-              <div className="relative z-10 flex items-end gap-2 mb-4" style={{ height: 68 }}>
-                {sparkMonths.map((m, i) => {
-                  const h = m.games > 0 ? Math.max((m.games / maxSparkGames) * 42, 8) : 4;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
-                      {m.games > 0 && (
-                        <span className="text-[10px] font-bold tabular-nums leading-none mb-0.5"
-                          style={{ color: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)' }}>{m.games}</span>
-                      )}
-                      <div className="w-full rounded-t-[4px]"
-                        style={{ height: h, backgroundColor: m.isCurrent ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.18)' }} />
-                      <span className="text-[9px] font-medium leading-none mt-0.5"
-                        style={{ color: m.isCurrent ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)' }}>{m.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="relative z-10 border-t border-white/10 pt-3">
-                <div className="grid grid-cols-3 gap-2">
-                    <div className="text-center"><div className="text-xl font-black">{thisMonthGames}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม</div></div>
-                  <div className="text-center"><div className="text-xl font-black">{avgGamesPerDay ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เกม/วัน</div></div>
-                  <div className="text-center"><div className="text-xl font-black">{avgDuration ?? '—'}</div><div className="text-[10px] text-white/50 font-medium mt-0.5">เฉลี่ย</div></div>
-                </div>
-              </div>
-            </div>
+            <HeroCard clipId="rh-mob" totalSessions={totalSessions} streak={streak}
+              sparkMonths={sparkMonths} maxSparkGames={maxSparkGames}
+              thisMonthGames={thisMonthGames} avgGamesPerDay={avgGamesPerDay} avgDuration={avgDuration} />
             {sessions.length > 0 && <ActivityCard sessions={sessions} viewYear={viewYear} viewMonth={viewMonth} onPrev={prevMonth} onNext={nextMonth} />}
           </>
         )}
@@ -899,7 +517,7 @@ export function SessionsView({ sessions, courts, justLogged, onLogSession, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhoto={onUpdatePhoto} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} onViewCourt={setViewCourtId} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
               )}
             </div>
           )
