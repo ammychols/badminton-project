@@ -46,10 +46,12 @@
 - `LogSessionModal` กรองสนาม/ก๊วนตามวันในสัปดาห์ (day filter) — **เจ้าของโปรเจกต์ตั้งใจคงไว้** อย่าปลดล็อกโดยไม่ถาม
 ## Backlog (เรียงตามที่คุยกันไว้)
 
-1. Migrate confirm dialogs ทั้ง 3 จุดไปใช้ `ConfirmDialog` กลาง
-2. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
-3. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
-4. Bottom nav: เพิ่ม label ไทย + เปลี่ยนไอคอนสนาม (ตอนนี้เป็นลูกโลก)
+1. Migrate confirm dialogs ทั้ง 3 จุดไปใช้ `ConfirmDialog` กลาง (CourtsView ลบ court/group, SessionsView ลบ session) — รวมแก้ hardcode `z-50` / `bg-black/50` ให้ใช้ `Z.confirm` + `BACKDROP`
+2. แก้ `AddCourtModal` ให้ใช้ CSS variables แทน hardcode hex (`#3d6b4f`, `#8a9e90` ฯลฯ)
+3. แก้ `LogSessionModal` ให้ import `todayString` จาก `utils/date.ts` แทน define ซ้ำ + ลบ `NoteField` dead component หรือ wire เข้า UI
+4. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
+5. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
+6. Bottom nav: เพิ่ม label ไทย + เปลี่ยนไอคอนสนาม (ตอนนี้เป็นลูกโลก)
 
 ## Assets
 
