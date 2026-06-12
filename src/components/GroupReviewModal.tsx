@@ -1,6 +1,7 @@
 import React from 'react';
 import { Court, Group, Session, ALL_LEVELS } from '../types';
 import { DetailPanel } from './DetailPanel';
+import { formatDate } from '../utils/date';
 
 interface Props {
   group: Group;
@@ -83,10 +84,10 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
     ['สนาม', court.name],
     ['วัน', dayStr],
     ...(timeStr ? [['เวลา', timeStr] as [string, React.ReactNode]] : []),
-    ...(levelsSorted.length > 0 ? [['ระดับ', (
+    ...(levelsSorted.length > 0 ? [['ระดับมือ', (
       <div key="levels" className="flex gap-1.5 flex-wrap justify-end">
         {levelsSorted.map(l => (
-          <span key={l} className="text-[11px] font-bold px-2 py-0.5" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)', borderRadius: 8 }}>{l}</span>
+          <span key={l} title={`ระดับมือ ${l}`} className="text-[11px] font-bold px-2 py-0.5" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)', borderRadius: 8 }}>{l}</span>
         ))}
       </div>
     )] as [string, React.ReactNode]] : []),
@@ -110,14 +111,14 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
     <DetailPanel title={group.name} subtitle={court.name} action={mapsAction} onClose={onClose}>
       <div className="px-4 py-3.5 flex flex-col gap-3 pb-8">
 
-        {/* Overview - brand gradient card */}
-        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fc4c02 0%, #ef2cc1 50%, #bdbbff 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
-          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(200,246,249,0.15)', filter: 'blur(40px)' }} />
+        {/* Overview - navy gradient card (matches hero) */}
+        <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
+          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(255,255,255,0.12)', filter: 'blur(40px)' }} />
           <div className="relative grid grid-cols-3 gap-3" style={{ zIndex: 1 }}>
             {([[totalSessions, 'ครั้ง'], [avgGames.toFixed(1), 'เกม/ครั้ง'], [avgMpg ?? '—', 'นาที/เกม']] as [React.ReactNode, string][]).map(([v, l]) => (
               <div key={l}>
                 <div className="font-extrabold text-white leading-none" style={{ fontSize: 28, letterSpacing: '-0.5px' }}>{v}</div>
-                <div className="mt-1" style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>{l}</div>
+                <div className="mt-1" style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{l}</div>
               </div>
             ))}
           </div>
@@ -137,18 +138,29 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
                 </div>
               </div>
 
-              <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 4 }}>ย้อนหลัง</div>
-              <div className="relative mb-5" style={{ height: H }}>
-                <svg viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-                  <polyline points={moodPts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
-                </svg>
-                {moodPts.map((p, i) => (
-                  <div key={i} style={{ position: 'absolute', left: `${p.x}%`, top: p.y, transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(106,177,135,0.22)' }} />}
-                    <span style={{ fontSize: p.last ? 25 : 18, lineHeight: 1, position: 'relative' }}>{MOOD_EMOJI[p.m]}</span>
+              {moodHistory.length >= 2 ? (
+                <>
+                  <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 4 }}>ย้อนหลัง</div>
+                  <div className="relative mb-5" style={{ height: H }}>
+                    <svg viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+                      <polyline points={moodPts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+                    </svg>
+                    {moodPts.map((p, i) => (
+                      <div key={i} style={{ position: 'absolute', left: `${p.x}%`, top: p.y, transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(106,177,135,0.22)' }} />}
+                        <span style={{ fontSize: p.last ? 25 : 18, lineHeight: 1, position: 'relative' }}>{MOOD_EMOJI[p.m]}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-2.5 mb-5 rounded-xl px-3 py-2.5" style={{ background: 'var(--chip-bg)' }}>
+                  <span style={{ fontSize: 24, lineHeight: 1 }}>{MOOD_EMOJI[moodHistory[0]]}</span>
+                  <span style={{ fontSize: 12, color: '#64748b' }}>
+                    ครั้งล่าสุด · {formatDate(sortedSessions[sortedSessions.length - 1].date).full}
+                  </span>
+                </div>
+              )}
 
               <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 8 }}>ส่วนใหญ่เจอ</div>
               <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 9, gap: 2 }}>
@@ -167,7 +179,7 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
             </div>
           )}
 
-          {moodHistory.length > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }} />}
+          {moodHistory.length > 0 && <div style={{ borderTop: '1px solid var(--card-border)', marginBottom: 14 }} />}
 
           {/* ความหนักของเกม */}
           {intTotal > 0 && (
@@ -189,14 +201,14 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
             </div>
           )}
 
-          {intTotal > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }} />}
+          {intTotal > 0 && <div style={{ borderTop: '1px solid var(--card-border)', marginBottom: 14 }} />}
 
           {/* รายละเอียดก๊วน */}
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginBottom: 10 }}>รายละเอียดก๊วน</div>
             <div>
               {detailRows.map(([label, value], i) => (
-                <div key={String(label)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: i === 0 ? 0 : 9, paddingBottom: i === detailRows.length - 1 ? 0 : 9, borderBottom: i === detailRows.length - 1 ? 'none' : '1px solid #f1f5f9' }}>
+                <div key={String(label)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: i === 0 ? 0 : 9, paddingBottom: i === detailRows.length - 1 ? 0 : 9, borderBottom: i === detailRows.length - 1 ? 'none' : '1px solid var(--card-border)' }}>
                   <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, flexShrink: 0 }}>{label}</span>
                   {typeof value === 'string'
                     ? <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', whiteSpace: 'nowrap', textAlign: 'right' }}>{value}</span>
@@ -207,6 +219,30 @@ export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
           </div>
 
         </div>
+
+        {/* บันทึกล่าสุดของก๊วนนี้ */}
+        {sortedSessions.length > 0 && (
+          <div className="bg-white rounded-2xl px-4 py-3.5" style={{ boxShadow: '0 2px 12px rgba(0,0,0,.09), 0 8px 32px rgba(0,0,0,.06)' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginBottom: 10 }}>บันทึกล่าสุด</div>
+            <div>
+              {[...sortedSessions].reverse().slice(0, 5).map((s, i, arr) => {
+                const hasTime = !(s.startTime === '00:00' && s.endTime === '00:00');
+                return (
+                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: i === 0 ? 0 : 9, paddingBottom: i === arr.length - 1 ? 0 : 9, borderBottom: i === arr.length - 1 ? 'none' : '1px solid var(--card-border)' }}>
+                    <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{MOOD_EMOJI[s.mood]}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>{formatDate(s.date).full}</div>
+                      {hasTime && <div style={{ fontSize: 11, color: '#94a3b8' }}>{s.startTime} – {s.endTime}</div>}
+                    </div>
+                    {s.gamesPlayed > 0 && (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)', flexShrink: 0 }} className="tabular-nums">{s.gamesPlayed} เกม</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </DetailPanel>
   );

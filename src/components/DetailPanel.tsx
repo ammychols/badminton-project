@@ -54,7 +54,9 @@ export function DetailPanel({ title, subtitle, action, onClose, children }: Deta
             className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{ background: 'rgba(255,255,255,0.08)' }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+            {/* mobile (full-screen): back arrow — desktop (slide-over): X */}
+            <svg className="sm:hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+            <svg className="hidden sm:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
           <div className="flex-1 min-w-0">
             <div className="text-base font-extrabold text-white truncate" style={{ letterSpacing: '-0.4px' }}>{title}</div>
