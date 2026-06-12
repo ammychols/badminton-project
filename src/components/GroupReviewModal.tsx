@@ -1,5 +1,6 @@
 import React from 'react';
 import { Court, Group, Session, ALL_LEVELS } from '../types';
+import { DetailPanel } from './DetailPanel';
 
 interface Props {
   group: Group;
@@ -12,7 +13,7 @@ interface Props {
 const MOOD_EMOJI: Record<number, string> = { 1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥' };
 const MOOD_BAR_COLOR = ['#ef4444', '#f97316', '#fbbf24', '#a8d5b5', '#4a9e6e', '#16a34a'];
 
-export function GroupReviewModal({ group, court, sessions, onClose, onNavigateToCourt }: Props) {
+export function GroupReviewModal({ group, court, sessions, onClose }: Props) {
   // Derived stats
   const totalSessions = sessions.length;
   const avgGames = totalSessions > 0
@@ -91,39 +92,27 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
     )] as [string, React.ReactNode]] : []),
   ];
 
+  const mapsAction = ((court.lat && court.lng) || court.address) ? (
+    <a
+      href={court.lat && court.lng
+        ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name)}`}
+      target="_blank" rel="noopener noreferrer"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold flex-shrink-0"
+      style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+      นำทาง
+    </a>
+  ) : undefined;
+
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col" style={{ backgroundColor: 'var(--app-bg)' }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--nav-border)', paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
-        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        </button>
-        <div className="flex-1 min-w-0">
-          <div className="text-base font-extrabold text-white truncate" style={{ letterSpacing: '-0.4px' }}>{group.name}</div>
-          <div className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.45)' }}>{court.name}</div>
-        </div>
-        {((court.lat && court.lng) || court.address) && (
-          <a
-            href={court.lat && court.lng
-              ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
-              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name)}`
-            }
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            นำทาง
-          </a>
-        )}
-      </div>
+    <DetailPanel title={group.name} subtitle={court.name} action={mapsAction} onClose={onClose}>
+      <div className="px-4 py-3.5 flex flex-col gap-3 pb-8">
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-3.5 flex flex-col gap-3 pb-8">
-
-        {/* Overview - dark gradient card */}
+        {/* Overview - brand gradient card */}
         <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #fc4c02 0%, #ef2cc1 50%, #bdbbff 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
-          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(200,246,249,0.15)', filter: 'blur(40px)' }}/>
+          <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(200,246,249,0.15)', filter: 'blur(40px)' }} />
           <div className="relative grid grid-cols-3 gap-3" style={{ zIndex: 1 }}>
             {([[totalSessions, 'ครั้ง'], [avgGames.toFixed(1), 'เกม/ครั้ง'], [avgMpg ?? '—', 'นาที/เกม']] as [React.ReactNode, string][]).map(([v, l]) => (
               <div key={l}>
@@ -151,11 +140,11 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
               <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 4 }}>ย้อนหลัง</div>
               <div className="relative mb-5" style={{ height: H }}>
                 <svg viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-                  <polyline points={moodPts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round"/>
+                  <polyline points={moodPts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#e2e8f0" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
                 </svg>
                 {moodPts.map((p, i) => (
                   <div key={i} style={{ position: 'absolute', left: `${p.x}%`, top: p.y, transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(106,177,135,0.22)' }}/>}
+                    {p.last && <span style={{ position: 'absolute', width: 34, height: 34, borderRadius: '50%', background: 'rgba(106,177,135,0.22)' }} />}
                     <span style={{ fontSize: p.last ? 25 : 18, lineHeight: 1, position: 'relative' }}>{MOOD_EMOJI[p.m]}</span>
                   </div>
                 ))}
@@ -164,7 +153,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
               <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 8 }}>ส่วนใหญ่เจอ</div>
               <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 9, gap: 2 }}>
                 {moodCounts.map((o, idx) => (
-                  <div key={o.lvl} style={{ flex: o.n, background: MOOD_BAR_COLOR[o.lvl - 1], borderRadius: idx === 0 ? '4px 0 0 4px' : idx === moodCounts.length - 1 ? '0 4px 4px 0' : 0 }}/>
+                  <div key={o.lvl} style={{ flex: o.n, background: MOOD_BAR_COLOR[o.lvl - 1], borderRadius: idx === 0 ? '4px 0 0 4px' : idx === moodCounts.length - 1 ? '0 4px 4px 0' : 0 }} />
                 ))}
               </div>
               <div style={{ display: 'flex', gap: 14, marginTop: 9, flexWrap: 'wrap' }}>
@@ -178,21 +167,21 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
             </div>
           )}
 
-          {moodHistory.length > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }}/>}
+          {moodHistory.length > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }} />}
 
           {/* ความหนักของเกม */}
           {intTotal > 0 && (
             <div className="mb-3.5">
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginBottom: 10 }}>ความหนักของเกม</div>
               <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 9, gap: 2 }}>
-                {iW.light > 0 && <div style={{ flex: iW.light, background: '#16a34a', borderRadius: '4px 0 0 4px' }}/>}
-                {iW.medium > 0 && <div style={{ flex: iW.medium, background: '#f59e0b' }}/>}
-                {iW.heavy > 0 && <div style={{ flex: iW.heavy, background: '#ef4444', borderRadius: '0 4px 4px 0' }}/>}
+                {iW.light > 0 && <div style={{ flex: iW.light, background: '#16a34a', borderRadius: '4px 0 0 4px' }} />}
+                {iW.medium > 0 && <div style={{ flex: iW.medium, background: '#f59e0b' }} />}
+                {iW.heavy > 0 && <div style={{ flex: iW.heavy, background: '#ef4444', borderRadius: '0 4px 4px 0' }} />}
               </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 {([[`#16a34a`, 'เบา', intTotal > 0 ? Math.round(intensityDist.light / intTotal * 100) : 0], ['#f59e0b', 'ปานกลาง', intTotal > 0 ? Math.round(intensityDist.medium / intTotal * 100) : 0], ['#ef4444', 'หนัก', intTotal > 0 ? Math.round(intensityDist.heavy / intTotal * 100) : 0]] as [string, string, number][]).map(([color, label, pct]) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: 2, background: color }}/>
+                    <div style={{ width: 8, height: 8, borderRadius: 2, background: color }} />
                     <span style={{ fontSize: 11, color: '#475569', whiteSpace: 'nowrap' }}>{label} <strong>{pct}%</strong></span>
                   </div>
                 ))}
@@ -200,7 +189,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
             </div>
           )}
 
-          {intTotal > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }}/>}
+          {intTotal > 0 && <div style={{ borderTop: '1px solid #f1f5f9', marginBottom: 14 }} />}
 
           {/* รายละเอียดก๊วน */}
           <div>
@@ -218,9 +207,7 @@ export function GroupReviewModal({ group, court, sessions, onClose, onNavigateTo
           </div>
 
         </div>
-
-
       </div>
-    </div>
+    </DetailPanel>
   );
 }
