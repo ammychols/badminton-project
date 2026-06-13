@@ -1,59 +1,101 @@
 # 🏸 BadmintonTracker
 
-แอปติดตามการตีแบดมินตัน — บันทึกสนาม ก๊วน และสถิติการตีของคุณ
+PWA ติดตามการตีแบดมินตัน — บันทึกสนาม ก๊วน และสถิติการตีของคุณ ข้อมูล sync ทุก device ผ่าน Firebase
 
 ## Features
 
 ### 🏟️ สนาม
-- บันทึกสนามพร้อม Google Maps search
-- เพิ่มก๊วนแต่ละสนาม (วัน/เวลา/ระดับ)
-- จดโน้ตแต่ละก๊วนได้ inline ไม่ต้องเปิด modal
+- ค้นหาสนามผ่าน Google Maps Places autocomplete
+- เพิ่มก๊วนแต่ละสนาม (วัน/เวลา/ระดับมือ/รูปภาพ)
+- ดูรีวิว + โน้ตก๊วนใน slide-over panel
+- แสดงข้อมูลสนาม (พื้น/แอร์/ที่จอดรถ) + นำทาง Google Maps
+- มุมมองแผนที่ (map view) สลับกับรายการได้
 
 ### 📝 บันทึกการตี
-- บันทึก session พร้อมวันที่ (ปฏิทิน), เวลา, จำนวนเกม, อารมณ์
-- แก้ไขหรือลบบันทึกได้ (กดที่การ์ด)
-- สถิติ hero card: เกมทั้งหมด, วันที่ตีเดือนนี้, เกม/วัน
-- Heatmap รายเดือน: bar chart 6 เดือน + ปฏิทินดูย้อนหลัง + ความถี่รายวัน
-- Streak counter 🔥 เมื่อตีติดต่อกัน
+- **QuickLogCard** — การ์ดบันทึกเร็วบนหัวฟีด กดยืนยันได้เลย ไม่ต้องเปิด modal (หายอัตโนมัติหลังบันทึกครั้งแรกของวัน)
+- บันทึก session พร้อม: วันที่ (ปฏิทินยุบ/กาง), เวลา, เกม, อารมณ์, ความหนัก, โน้ต
+- แก้ไขหรือลบบันทึกได้ กดไอคอน ··· บนการ์ด
+- อัปโหลดรูปภาพได้หลายรูปต่อ session พร้อม lightbox
+
+### 📊 สถิติ
+- Hero card: ครั้งทั้งหมด, streak 🔥, เกมเดือนนี้, เกม/วัน, เวลาเฉลี่ย
+- Bar chart 6 เดือน (นับครั้ง)
+- Heatmap 16 สัปดาห์ย้อนหลัง
+- ความถี่รายวันในสัปดาห์
+- ดูสถิติย้อนหลังแต่ละเดือนได้
+
+## Tech Stack
+
+- **React 18** + TypeScript (strict) + Vite
+- **Tailwind CSS** + CSS variables design token system
+- **Firebase** — Firestore (realtime sync) + Google Auth
+- **vite-plugin-pwa** — installable PWA, offline-ready
+- Deploy บน **GitHub Pages** (`/badminton-project/`)
 
 ## วิธีติดตั้ง
 
 ```bash
 npm install
-npm run dev
+npm run dev        # dev server
+npm run build      # production build + PWA service worker
+npx tsc --noEmit   # typecheck (ต้องผ่านก่อน commit)
 ```
 
 ## Google Maps Integration
 
 1. สร้าง API key ที่ [Google Cloud Console](https://console.cloud.google.com)
-2. เปิด API: Maps JavaScript API, Places API
-3. แก้ `index.html` ใส่ key:
+2. เปิด API: Maps JavaScript API, Places API (New)
+3. ใส่ key ใน `index.html`:
+
 ```html
 <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
 ```
+
+## Design System
+
+Design token ทั้งหมดอยู่ใน `src/index.css` (CSS variables) และ `src/styles/tokens.ts`
+
+| Token | ค่า | ใช้สำหรับ |
+|-------|-----|----------|
+| `--p` | `#2fbf7f` | Primary action |
+| `--p-text` | `#010120` | Text บนพื้น primary (ห้ามใช้ `text-white`) |
+| `--p-tint` | `#e2f7ed` | Selected state แบบ ring+tint |
+| `--nav-bg` | `#010120` | Header/nav background |
+| `--app-bg` | `#f8f8f8` | Page background |
+
+Overlay surfaces (ห้าม hand-roll ใหม่):
+- **`BottomSheet`** — ฟอร์ม create/edit
+- **`DetailPanel`** — slide-over detail (480px desktop / fullscreen mobile)
+- **`ConfirmDialog`** — destructive confirmation
 
 ## โครงสร้างไฟล์
 
 ```
 src/
 ├── types/index.ts
-├── styles/tokens.ts          # Design token system
+├── styles/
+│   ├── tokens.ts             # btn/card/text/input presets
+│   └── overlay.ts            # Z-index constants + BACKDROP values
 ├── hooks/
-│   ├── useCourts.ts          # Courts state + localStorage
-│   └── useSessions.ts        # Sessions state + localStorage
+│   ├── useAuth.ts
+│   ├── useCourts.ts          # Firestore courts + groups
+│   ├── useSessions.ts        # Firestore sessions
+│   └── useOverlay.ts         # Focus trap, Escape, scroll lock
+├── utils/date.ts             # Date helpers (UTC+7 safe)
 └── components/
-    ├── BottomSheet.tsx        # Shared modal wrapper
-    ├── CourtsView.tsx
-    ├── SessionsView.tsx
-    ├── LogSessionModal.tsx
+    ├── SessionsView.tsx       # Feed + stats tabs
+    ├── CourtsView.tsx         # Court list + map toggle
+    ├── HeroCard.tsx           # Stats hero card
+    ├── SessionRow.tsx         # Session card + lightbox
+    ├── QuickLogCard.tsx       # One-tap log card
+    ├── LogCelebration.tsx     # Post-log toast
+    ├── DetailPanel.tsx        # Slide-over panel
+    ├── BottomSheet.tsx        # Modal bottom sheet
+    ├── ConfirmDialog.tsx      # Destructive confirm
+    ├── GroupReviewModal.tsx   # Group detail + history
+    ├── LogSessionModal.tsx    # Full session form
     ├── AddCourtModal.tsx
     ├── AddGroupModal.tsx
     ├── CourtInfoModal.tsx
-    └── ReviewModal.tsx
+    └── CourtsMap.tsx          # Google Maps view
 ```
-
-## TODO
-- [ ] แผนที่แสดงสนามทั้งหมด
-- [ ] Export ข้อมูลเป็น CSV
-- [ ] แชร์ก๊วนให้เพื่อน
-- [ ] Push notification แจ้งเตือนวันที่มีก๊วน
