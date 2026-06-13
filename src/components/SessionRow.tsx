@@ -146,7 +146,9 @@ export function SessionRow({
               <div className="text-xs text-[var(--text-3)] truncate mt-0.5">{courtName}</div>
             </button>
             {session.intensity && (() => {
-              const lvs = Array.isArray(session.intensity) ? session.intensity : [session.intensity];
+              const ORDER = ['light', 'medium', 'heavy'];
+              const lvs = (Array.isArray(session.intensity) ? session.intensity : [session.intensity])
+                .slice().sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
               return (
                 <div className="flex items-center gap-1 mt-1">
                   {lvs.map((lv, i) => (
