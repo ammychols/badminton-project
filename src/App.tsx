@@ -76,14 +76,14 @@ export default function App() {
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
-  // Hide the FAB when QuickLogCard is already showing — same visibility logic as the card itself.
+  // Show QuickLogCard only before the first log of the day.
+  // Once any session is logged today, switch to FAB only.
   const hasQuickLogCandidate = useMemo(() => {
     const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const today = todayString();
+    if (sessions.some(s => s.date === today)) return false;
     const dow = DOW_MAP[new Date(today + 'T00:00:00').getDay()];
-    return courts.some(c => c.groups.some(g =>
-      g.days.includes(dow) && !sessions.some(s => s.groupId === g.id && s.date === today)
-    ));
+    return courts.some(c => c.groups.some(g => g.days.includes(dow)));
   }, [courts, sessions]);
   const [justLogged, setJustLogged] = useState(false);
   const justLoggedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

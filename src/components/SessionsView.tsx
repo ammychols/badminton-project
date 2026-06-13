@@ -394,7 +394,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
 
         {/* Col 2: Session feed */}
         <div className="flex-1 min-w-0">
-          <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />
+          {!sessions.some(s => s.date === today) && <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />}
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
@@ -483,7 +483,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
         {/* Feed tab */}
         {mobileTab === 'feed' && (
           <>
-          <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />
+          {!sessions.some(s => s.date === today) && <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />}
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
