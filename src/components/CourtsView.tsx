@@ -158,6 +158,16 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
             <div className="text-center text-sm text-[var(--text-3)] py-10">ไม่พบ "{search}"</div>
           )}
           <div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:mb-6 flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
+            {/* Add court card — first */}
+            <div className="flex-shrink-0 w-48 sm:w-auto">
+              <button
+                onClick={onAddCourt}
+                className="w-full h-full min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
+              >
+                <span className="text-2xl leading-none">+</span>
+                <span className="text-xs font-medium">เพิ่มสนาม</span>
+              </button>
+            </div>
             {filteredCourts.map(court => {
               const isSelected = selectedCourt?.id === court.id;
               return (
@@ -199,16 +209,6 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                 </div>
               );
             })}
-            {/* Add court card */}
-            <div className="flex-shrink-0 w-48 sm:w-auto">
-              <button
-                onClick={onAddCourt}
-                className="w-full h-full min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
-              >
-                <span className="text-2xl leading-none">+</span>
-                <span className="text-xs font-medium">เพิ่มสนาม</span>
-              </button>
-            </div>
           </div>
 
           {/* Selected court groups */}
@@ -259,6 +259,14 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* Add group card — first */}
+                <button
+                  onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
+                  className="min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
+                >
+                  <span className="text-2xl leading-none">+</span>
+                  <span className="text-xs font-medium">เพิ่มก๊วน</span>
+                </button>
                 {visibleGroups.map(group => (
                   <GroupCard
                     key={group.id}
@@ -268,14 +276,6 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                     onSaveNote={(notes) => onAddReview(selectedCourt.id, group.id, notes)}
                   />
                 ))}
-                {/* Add group card */}
-                <button
-                  onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                  className="min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
-                >
-                  <span className="text-2xl leading-none">+</span>
-                  <span className="text-xs font-medium">เพิ่มก๊วน</span>
-                </button>
               </div>
             </div>
           )}
