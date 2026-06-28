@@ -65,11 +65,14 @@ function GroupRow({ group, onEdit, onDelete }: {
   const [confirming, setConfirming] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const menuDivRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!menu) return;
     const handler = (e: MouseEvent) => {
-      if (btnRef.current && btnRef.current.contains(e.target as Node)) return;
+      // Don't dismiss when clicking the toggle button or inside the menu itself
+      if (btnRef.current?.contains(e.target as Node)) return;
+      if (menuDivRef.current?.contains(e.target as Node)) return;
       setMenu(false);
     };
     document.addEventListener('mousedown', handler);
@@ -126,6 +129,7 @@ function GroupRow({ group, onEdit, onDelete }: {
       >···</button>
       {menu && menuPos && (
         <div
+          ref={menuDivRef}
           className="rounded-2xl overflow-hidden shadow-xl min-w-[140px]"
           style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 200, backgroundColor: '#fff', border: '1px solid var(--card-border)' }}
         >
