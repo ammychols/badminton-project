@@ -359,7 +359,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
   const showFab = viewMode === 'list' && courts.length > 0;
 
   return (
-    <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-32 sm:max-w-screen-2xl sm:px-10">
+    <div className="max-w-screen-sm mx-auto px-3 pt-5 pb-10">
       {/* Top bar */}
       <div className="flex items-center mb-5">
         <h2 className={text.pageTitle}>สนามของฉัน</h2>
