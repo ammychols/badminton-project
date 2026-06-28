@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Court, Group, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS, ALL_LEVELS } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { Court, Group, DAY_LABELS, DayOfWeek, ALL_LEVELS, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
 import { CourtsMap } from './CourtsMap';
 import { ConfirmDialog } from './ConfirmDialog';
-import { btn, emptyState, text } from '../styles/tokens';
+import { btn, emptyState, text, chip } from '../styles/tokens';
 
 interface CourtsViewProps {
   courts: Court[];
@@ -17,15 +17,6 @@ interface CourtsViewProps {
   onAddReview: (courtId: string, groupId: string, notes: string) => void;
 }
 
-const DAY_COLORS: Record<DayOfWeek, { pill: string; active: string; bg: string }> = {
-  MON: { pill: 'bg-yellow-100 text-yellow-700',   active: 'bg-yellow-500 text-white', bg: 'bg-yellow-400' },
-  TUE: { pill: 'bg-pink-100 text-pink-700',        active: 'bg-pink-500 text-white',   bg: 'bg-pink-400' },
-  WED: { pill: 'bg-green-100 text-green-700',      active: 'bg-green-600 text-white',  bg: 'bg-green-500' },
-  THU: { pill: 'bg-orange-100 text-orange-700',    active: 'bg-orange-500 text-white', bg: 'bg-orange-400' },
-  FRI: { pill: 'bg-blue-100 text-blue-700',        active: 'bg-blue-500 text-white',   bg: 'bg-blue-500' },
-  SAT: { pill: 'bg-purple-100 text-purple-700',    active: 'bg-purple-500 text-white', bg: 'bg-purple-500' },
-  SUN: { pill: 'bg-red-100 text-red-600',          active: 'bg-red-500 text-white',    bg: 'bg-red-400' },
-};
 const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'all', label: 'ทั้งหมด' },
   { key: 'MON', label: 'จ' },
@@ -37,59 +28,288 @@ const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
   { key: 'SUN', label: 'อา' },
 ];
 
+const WEEK_ORDER: DayOfWeek[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview }: CourtsViewProps) {
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [selectedCourtId, setSelectedCourtId] = useState<string | null>(() => courts[0]?.id ?? null);
-  const courtRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const [confirmDeleteCourt, setConfirmDeleteCourt] = useState<{ id: string; name: string } | null>(null);
-  const [search, setSearch] = useState('');
-  const [courtMenu, setCourtMenu] = useState(false);
-  const courtMenuRef = useRef<HTMLDivElement | null>(null);
+const AVATAR_TINTS = [
+  { bg: '#E6F1FB', fg: '#185FA5' },
+  { bg: '#FAEEDA', fg: '#854F0B' },
+  { bg: '#EEEDFE', fg: '#534AB7' },
+  { bg: '#FAECE7', fg: '#993C1D' },
+  { bg: '#FBEAF0', fg: '#993556' },
+];
+
+function tintFor(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return AVATAR_TINTS[h % AVATAR_TINTS.length];
+}
+
+const COLLAPSE_KEY = 'badminton.collapsedCourts';
+
+function loadCollapsed(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '[]')); } catch { return new Set(); }
+}
+
+function saveCollapsed(set: Set<string>) {
+  localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...set]));
+}
+
+// ---- GroupRow ----
+function GroupRow({ group, courtId, onEdit, onDelete }: {
+  group: Group;
+  courtId: string;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (!courtMenu) return;
+    if (!menu) return;
     const handler = (e: MouseEvent) => {
-      if (courtMenuRef.current && !courtMenuRef.current.contains(e.target as Node)) setCourtMenu(false);
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenu(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [courtMenu]);
+  }, [menu]);
+
+  const tint = tintFor(group.id);
+  const initial = group.name.charAt(0).toUpperCase();
+
+  const days = WEEK_ORDER.filter(d => group.days.includes(d)).map(d => DAY_LABELS[d]).join(' ');
+  const noTime = group.startTime === '00:00' && group.endTime === '00:00';
+  const meta = noTime ? days : `${group.startTime}–${group.endTime}${days ? ` · ${days}` : ''}`;
+
+  return (
+    <div className="flex items-center gap-3 py-2.5 px-1">
+      {/* Avatar */}
+      <div
+        className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
+        style={{ backgroundColor: tint.bg, color: tint.fg }}
+      >
+        {group.image
+          ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+          : initial}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[var(--text-1)] truncate">{group.name}</p>
+        <p className="text-xs text-[var(--text-3)] truncate">{meta}</p>
+        {group.levels && group.levels.length > 0 && (
+          <div className="flex gap-1 flex-wrap mt-1">
+            {ALL_LEVELS.filter(l => group.levels!.includes(l)).map(lv => (
+              <span key={lv} className={`${chip.base} ${chip.gray}`}>{lv}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Menu */}
+      <div className="relative flex-shrink-0" ref={menuRef}>
+        <button
+          onClick={() => setMenu(v => !v)}
+          className="w-10 h-10 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
+        >···</button>
+        {menu && (
+          <div className="absolute right-0 top-11 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[140px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+            <button onClick={() => { setMenu(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
+              <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              แก้ไข
+            </button>
+            <div style={{ borderTop: '1px solid var(--card-border)' }} />
+            <button onClick={() => { setMenu(false); setConfirming(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
+              <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              ลบ
+            </button>
+          </div>
+        )}
+      </div>
+
+      {confirming && <ConfirmDialog title="ลบก๊วน" message={`"${group.name}"`} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
+    </div>
+  );
+}
+
+// ---- CourtSection ----
+function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEditCourt, onDeleteCourt, onEditGroup, onDeleteGroup }: {
+  court: Court;
+  expanded: boolean;
+  selectedDay: DayOfWeek | 'all';
+  onToggle: () => void;
+  onAddGroup: (defaultDay?: DayOfWeek) => void;
+  onEditCourt: () => void;
+  onDeleteCourt: () => void;
+  onEditGroup: (groupId: string) => void;
+  onDeleteGroup: (groupId: string) => void;
+}) {
+  const [menu, setMenu] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!menu) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menu]);
+
+  const visibleGroups = selectedDay === 'all'
+    ? court.groups
+    : court.groups.filter(g => g.days.includes(selectedDay));
+
+  const infoChips = [
+    court.info?.floor ? FLOOR_LABELS[court.info.floor] : null,
+    court.info?.air ? AIR_LABELS[court.info.air] : null,
+    court.info?.parking ? PARKING_LABELS[court.info.parking] : null,
+    court.info?.notes ?? null,
+  ].filter(Boolean) as string[];
+
+  return (
+    <div className="border border-[var(--card-border)] rounded-2xl bg-white shadow-sm overflow-hidden mb-3">
+      {/* Section header */}
+      <div className="flex items-center gap-2 px-4 py-3">
+        <button
+          className="flex-1 min-w-0 flex items-center gap-2 text-left"
+          onClick={onToggle}
+        >
+          <svg
+            className="flex-shrink-0 w-4 h-4 text-[var(--text-3)] transition-transform"
+            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[var(--text-1)] truncate">{court.name}</p>
+            {infoChips.length > 0 && (
+              <div className="flex gap-1 flex-wrap mt-0.5">
+                {infoChips.map(c => (
+                  <span key={c} className="text-xs text-[var(--text-3)]">{c}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="ml-auto flex-shrink-0 text-xs text-[var(--text-4)] pl-2">{court.groups.length} ก๊วน</span>
+        </button>
+
+        {/* Map link */}
+        {((court.lat && court.lng) || court.address) && (
+          <a
+            href={court.lat && court.lng
+              ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + (court.address ?? ''))}`}
+            target="_blank" rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </a>
+        )}
+
+        {/* Court ··· menu */}
+        <div className="relative flex-shrink-0" ref={menuRef}>
+          <button
+            onClick={() => setMenu(v => !v)}
+            className="w-10 h-10 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
+          >···</button>
+          {menu && (
+            <div className="absolute right-0 top-11 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+              <button onClick={() => { setMenu(false); onEditCourt(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
+                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                แก้ไข
+              </button>
+              <div style={{ borderTop: '1px solid var(--card-border)' }} />
+              <button onClick={() => { setMenu(false); setConfirmDelete(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
+                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                ลบสนาม
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Groups */}
+      {expanded && (
+        <div className="border-t border-[var(--card-border)] px-3 pb-2">
+          {/* Add group row */}
+          <button
+            onClick={() => onAddGroup(selectedDay !== 'all' ? selectedDay : undefined)}
+            className="flex items-center gap-3 py-2.5 px-1 w-full text-left group"
+          >
+            <div className="flex-shrink-0 w-11 h-11 rounded-full border-2 border-dashed border-[var(--dashed)] flex items-center justify-center text-xl text-[var(--text-4)] group-hover:border-[var(--p-deep)] group-hover:text-[var(--p-deep)] transition-colors">+</div>
+            <span className="text-sm font-medium" style={{ color: 'var(--p-deep)' }}>เพิ่มก๊วน</span>
+          </button>
+          {visibleGroups.map(group => (
+            <GroupRow
+              key={group.id}
+              group={group}
+              courtId={court.id}
+              onEdit={() => onEditGroup(group.id)}
+              onDelete={() => onDeleteGroup(group.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="ลบสนาม"
+          message={`"${court.name}" และก๊วนทั้งหมด`}
+          onConfirm={onDeleteCourt}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ---- CourtsView ----
+export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview: _onAddReview }: CourtsViewProps) {
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [search, setSearch] = useState('');
+  const [collapsed, setCollapsed] = useState<Set<string>>(loadCollapsed);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const dayFilterActive = selectedDay !== 'all';
+
+  const toggleCollapse = (courtId: string) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      if (next.has(courtId)) next.delete(courtId); else next.add(courtId);
+      saveCollapsed(next);
+      return next;
+    });
+  };
+
+  const isExpanded = (courtId: string) => dayFilterActive || !collapsed.has(courtId);
 
   useEffect(() => {
     if (!highlightCourtId) return;
-    setSelectedCourtId(highlightCourtId);
     setSelectedDay('all');
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      next.delete(highlightCourtId);
+      saveCollapsed(next);
+      return next;
+    });
     setTimeout(() => {
-      courtRefs.current[highlightCourtId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      sectionRefs.current[highlightCourtId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       onHighlightClear?.();
     }, 100);
   }, [highlightCourtId]);
 
   const q = search.trim().toLowerCase();
+
   const filteredCourts = courts.filter(court => {
-    const dayMatch = selectedDay === 'all' || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek));
+    const dayMatch = !dayFilterActive || court.groups.some(g => g.days.includes(selectedDay as DayOfWeek));
     const searchMatch = !q || court.name.toLowerCase().includes(q) || court.groups.some(g => g.name.toLowerCase().includes(q));
     return dayMatch && searchMatch;
   });
-
-  const selectedCourt = filteredCourts.find(c => c.id === selectedCourtId) ?? filteredCourts[0] ?? null;
-
-  // Reset day filter when a group is added to the currently selected court
-  const prevCourtSnapshot = useRef<{ id: string; count: number } | null>(null);
-  const courtSnapshot = selectedCourt ? { id: selectedCourt.id, count: selectedCourt.groups.length } : null;
-  useEffect(() => {
-    const prev = prevCourtSnapshot.current;
-    if (prev && courtSnapshot && prev.id === courtSnapshot.id && courtSnapshot.count > prev.count) {
-      setSelectedDay('all');
-    }
-    prevCourtSnapshot.current = courtSnapshot;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courtSnapshot?.id, courtSnapshot?.count]);
-
-  const visibleGroups = selectedCourt
-    ? (selectedDay === 'all' ? selectedCourt.groups : selectedCourt.groups.filter(g => g.days.includes(selectedDay as DayOfWeek)))
-    : [];
 
   return (
     <div className="max-w-screen-sm mx-auto px-4 pt-5 pb-10 sm:max-w-screen-2xl sm:px-10">
@@ -104,11 +324,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
           <button
             key={key}
             onClick={() => setSelectedDay(key)}
-            className={`flex-shrink-0 ${btn.pill} ${
-              selectedDay === key
-                ? (key === 'all' ? btn.pillActive : DAY_COLORS[key as DayOfWeek].active)
-                : btn.pillInactive
-            }`}
+            className={`flex-shrink-0 ${btn.pill} ${selectedDay === key ? btn.pillActive : btn.pillInactive}`}
           >
             {label}
           </button>
@@ -137,7 +353,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
       {/* List / Map toggle */}
       <div className="flex rounded-full border border-[var(--input-b)] overflow-hidden text-sm w-fit mb-5 bg-white">
         <button onClick={() => setViewMode('list')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'list' ? 'bg-[var(--p)] text-[var(--p-text)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>รายการ</button>
-        <button onClick={() => setViewMode('map')}  className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map'  ? 'bg-[var(--p)] text-[var(--p-text)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>แผนที่</button>
+        <button onClick={() => setViewMode('map')} className={`px-5 py-1.5 font-medium text-center transition-colors rounded-full ${viewMode === 'map' ? 'bg-[var(--p)] text-[var(--p-text)]' : 'text-[var(--text-3)] hover:text-[var(--text-2)]'}`}>แผนที่</button>
       </div>
 
       {viewMode === 'map' && <CourtsMap courts={filteredCourts} />}
@@ -147,276 +363,42 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
           <div className={emptyState.icon}>🏸</div>
           <div className={emptyState.title}>เพิ่มสนามแบดมินตัน</div>
           <div className={emptyState.subtitle}>บันทึกสนามที่ชอบไปตีไว้ที่นี่</div>
-          <button onClick={onAddCourt} className={btn.primaryLg}>
-            + เพิ่มสนามแรก
-          </button>
+          <button onClick={onAddCourt} className={btn.primaryLg}>+ เพิ่มสนามแรก</button>
         </div>
       ) : (
         <>
-          {/* Court grid */}
-          {filteredCourts.length === 0 && q && (
-            <div className="text-center text-sm text-[var(--text-3)] py-10">ไม่พบ "{search}"</div>
-          )}
-          <div className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-3 sm:mb-6 flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
-            {/* Add court card — first */}
-            <div className="flex-shrink-0 w-48 sm:w-auto">
-              <button
-                onClick={onAddCourt}
-                className="w-full h-full min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
-              >
-                <span className="text-2xl leading-none">+</span>
-                <span className="text-xs font-medium">เพิ่มสนาม</span>
-              </button>
-            </div>
-            {filteredCourts.map(court => {
-              const isSelected = selectedCourt?.id === court.id;
-              return (
-                <div key={court.id} ref={el => { courtRefs.current[court.id] = el; }} className="relative flex-shrink-0 w-40 sm:w-auto">
-                  <button
-                    onClick={() => setSelectedCourtId(isSelected ? null : court.id)}
-                    className="relative text-left rounded-2xl overflow-hidden w-full transition-all"
-                    style={{
-                      background: 'linear-gradient(150deg, #010120 0%, #0d0d35 100%)',
-                      opacity: isSelected ? 1 : 0.6,
-                    }}
-                  >
-                    <div className="px-3.5 pt-3 pb-3 min-h-[88px] flex flex-col justify-between">
-                      {/* Top: name + pin icon */}
-                      <div className="flex items-start justify-between gap-1 mb-1.5">
-                        <p className="font-bold text-sm leading-tight text-white">{court.name}</p>
-                        {((court.lat && court.lng) || court.address) ? (
-                          <a
-                            href={court.lat && court.lng ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + (court.address ?? ''))}`}
-                            target="_blank" rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-lg transition-colors"
-                            style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
-                          >
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                          </a>
-                        ) : null}
-                      </div>
-                      {/* Address */}
-                      {court.address && (() => {
-                        const parts = court.address.split(',').map(s => s.trim()).filter(s => s && s !== 'Thailand' && !/^\d{5}/.test(s) && s.length > 1);
-                        const short = parts.length >= 2 ? parts.slice(-2).join(' · ') : parts[0] ?? court.address;
-                        return <p className="text-xs truncate mb-2.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{short}</p>;
-                      })()}
-                      {/* Group count */}
-                      <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>{court.groups.length} ก๊วน</p>
-                    </div>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Selected court groups */}
-          {selectedCourt && (
-            <div>
-              {/* Court detail bar */}
-              <div className="mb-4 pb-3 border-b border-[var(--input-b)]">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-[var(--text-1)] leading-tight truncate">{selectedCourt.name}</h3>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      {(selectedCourt.info?.floor || selectedCourt.info?.air || selectedCourt.info?.parking || selectedCourt.info?.notes) ? (
-                        <>
-                          {selectedCourt.info.floor && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{FLOOR_LABELS[selectedCourt.info.floor]}</span>}
-                          {selectedCourt.info.air   && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{AIR_LABELS[selectedCourt.info.air]}</span>}
-                          {selectedCourt.info.parking && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{PARKING_LABELS[selectedCourt.info.parking]}</span>}
-                          {selectedCourt.info.notes && <span className="bg-[var(--chip-bg)] text-[var(--chip-t)] text-xs px-2 py-0.5 rounded-full">{selectedCourt.info.notes}</span>}
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="relative flex-shrink-0" ref={courtMenuRef}>
-                    <button
-                      onClick={() => setCourtMenu(v => !v)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
-                    >···</button>
-                    {courtMenu && (
-                      <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
-                        <button
-                          onClick={() => { setCourtMenu(false); onRateCourt(selectedCourt.id); }}
-                          className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left"
-                        >
-                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                          แก้ไข
-                        </button>
-                        <div style={{ borderTop: '1px solid var(--card-border)' }}/>
-                        <button
-                          onClick={() => { setCourtMenu(false); setConfirmDeleteCourt({ id: selectedCourt.id, name: selectedCourt.name }); }}
-                          className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left"
-                        >
-                          <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                          ลบสนาม
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {/* Add group card — first */}
-                <button
-                  onClick={() => onAddGroup(selectedCourt.id, selectedDay !== 'all' ? selectedDay : undefined)}
-                  className="min-h-[88px] border-2 border-dashed border-[var(--dashed)] rounded-2xl flex flex-col items-center justify-center gap-1 text-[var(--text-3)] hover:border-[var(--p)] hover:text-[var(--p)] transition-colors"
-                >
-                  <span className="text-2xl leading-none">+</span>
-                  <span className="text-xs font-medium">เพิ่มก๊วน</span>
-                </button>
-                {visibleGroups.map(group => (
-                  <GroupCard
-                    key={group.id}
-                    group={group}
-                    onDelete={() => onDeleteGroup(selectedCourt.id, group.id)}
-                    onEdit={() => onEditGroup(selectedCourt.id, group.id)}
-                    onSaveNote={(notes) => onAddReview(selectedCourt.id, group.id, notes)}
-                  />
-                ))}
-              </div>
+          {filteredCourts.length === 0 && (
+            <div className="text-center text-sm text-[var(--text-3)] py-10">
+              {q ? `ไม่พบ "${search}"` : 'ไม่มีสนามที่เปิดวันนี้'}
             </div>
           )}
+
+          {filteredCourts.map(court => (
+            <div key={court.id} ref={el => { sectionRefs.current[court.id] = el; }}>
+              <CourtSection
+                court={court}
+                expanded={isExpanded(court.id)}
+                selectedDay={selectedDay}
+                onToggle={() => toggleCollapse(court.id)}
+                onAddGroup={(defaultDay) => onAddGroup(court.id, defaultDay)}
+                onEditCourt={() => onRateCourt(court.id)}
+                onDeleteCourt={() => onDeleteCourt(court.id)}
+                onEditGroup={(groupId) => onEditGroup(court.id, groupId)}
+                onDeleteGroup={(groupId) => onDeleteGroup(court.id, groupId)}
+              />
+            </div>
+          ))}
+
+          {/* Add court FAB */}
+          <button
+            onClick={onAddCourt}
+            className="w-full border-2 border-dashed border-[var(--dashed)] rounded-2xl flex items-center justify-center gap-2 py-3 text-sm font-medium text-[var(--text-3)] hover:border-[var(--p-deep)] hover:text-[var(--p-deep)] transition-colors mt-1"
+          >
+            <span className="text-lg leading-none">+</span>
+            เพิ่มสนาม
+          </button>
         </>
       ))}
-
-      {confirmDeleteCourt && (
-        <ConfirmDialog
-          title="ลบสนาม"
-          message={`"${confirmDeleteCourt.name}" และก๊วนทั้งหมด`}
-          onConfirm={() => { onDeleteCourt(confirmDeleteCourt.id); setConfirmDeleteCourt(null); setSelectedCourtId(null); }}
-          onCancel={() => setConfirmDeleteCourt(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-function MiniStars({ val }: { val: number }) {
-  return (
-    <span className="text-sm leading-none">
-      <span className="text-yellow-400">{'★'.repeat(val)}</span>
-      <span className="text-[var(--dashed)]">{'★'.repeat(5 - val)}</span>
-    </span>
-  );
-}
-
-
-function GroupCard({ group, onDelete, onEdit, onSaveNote }: { group: Group; onDelete: () => void; onEdit: () => void; onSaveNote: (notes: string) => void }) {
-  const review = group.reviews[0];
-  const [confirming, setConfirming] = useState(false);
-  const [editingNote, setEditingNote] = useState(false);
-  const [noteText, setNoteText] = useState(review?.notes ?? '');
-  const [groupMenu, setGroupMenu] = useState(false);
-  const groupMenuRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!groupMenu) return;
-    const handler = (e: MouseEvent) => { if (groupMenuRef.current && !groupMenuRef.current.contains(e.target as Node)) setGroupMenu(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [groupMenu]);
-  const firstDay = (Object.keys(DAY_LABELS) as DayOfWeek[]).find(d => group.days.includes(d));
-
-  const commitNote = () => {
-    setEditingNote(false);
-    onSaveNote(noteText.trim());
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-[var(--card-border)]">
-      {group.image ? (
-        <div className="relative h-40 overflow-hidden rounded-t-2xl">
-          <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div ref={groupMenuRef} className="absolute top-2 right-2">
-            <button onClick={() => setGroupMenu(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors backdrop-blur-sm font-bold text-base leading-none">···</button>
-            {groupMenu && (
-              <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[140px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
-                <button onClick={() => { setGroupMenu(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  แก้ไข
-                </button>
-                <div style={{ borderTop: '1px solid var(--card-border)' }}/>
-                <button onClick={() => { setGroupMenu(false); setConfirming(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  ลบ
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
-            <p className="font-semibold text-white text-base leading-tight">{group.name}</p>
-            <p className="text-xs text-white/60 mt-0.5">{group.startTime} – {group.endTime} น.</p>
-          </div>
-        </div>
-      ) : (
-        <div className={`relative h-16 ${firstDay ? DAY_COLORS[firstDay].bg : 'bg-[var(--text-4)]'} overflow-visible rounded-t-2xl`}>
-          <span className="absolute -right-1 -top-2 text-6xl font-black text-white/20 leading-none select-none">{group.name.charAt(0)}</span>
-          <div ref={groupMenuRef} className="absolute top-2 right-2">
-            <button onClick={() => setGroupMenu(v => !v)} className="w-7 h-7 flex items-center justify-center rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors font-bold text-base leading-none">···</button>
-            {groupMenu && (
-              <div className="absolute right-0 top-9 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[140px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
-                <button onClick={() => { setGroupMenu(false); onEdit(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  แก้ไข
-                </button>
-                <div style={{ borderTop: '1px solid var(--card-border)' }}/>
-                <button onClick={() => { setGroupMenu(false); setConfirming(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  ลบ
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="px-3 pt-3 pb-3">
-        {!group.image && (
-          <>
-            <p className="font-semibold text-[var(--text-1)] text-base leading-tight">{group.name}</p>
-            <p className="text-xs text-[var(--text-3)] mt-0.5 mb-2">{group.startTime} – {group.endTime} น.</p>
-          </>
-        )}
-        <div className="flex items-center gap-1 flex-wrap mt-1 mb-2">
-          {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(day => group.days.includes(day)).map(day => (
-            <span key={day} className={`text-xs px-2 py-0.5 rounded-full font-bold ${DAY_COLORS[day].pill}`}>{DAY_LABELS[day]}</span>
-          ))}
-          {group.levels?.slice().sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).map(lv => (
-            <span key={lv} className="text-xs px-2 py-0.5 rounded-full font-semibold bg-[var(--chip-bg)] text-[var(--chip-t)]">{lv}</span>
-          ))}
-        </div>
-        {group.notes && <p className="text-xs text-[var(--text-3)] mb-2 leading-relaxed">{group.notes}</p>}
-        <div className="border-t border-[var(--card-border)] pt-2">
-          {editingNote ? (
-            <textarea
-              autoFocus
-              value={noteText}
-              onChange={e => setNoteText(e.target.value)}
-              onFocus={e => { const l = e.target.value.length; e.target.setSelectionRange(l, l); }}
-              onBlur={commitNote}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitNote(); } if (e.key === 'Escape') { setNoteText(review?.notes ?? ''); setEditingNote(false); } }}
-              placeholder="บันทึกความเห็น..."
-              rows={2}
-              className="w-full text-xs text-[var(--text-2)] border border-[var(--input-b)] rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[var(--input-f)]"
-              style={{ backgroundColor: 'var(--app-bg)' }}
-            />
-          ) : (
-            <button
-              onClick={() => { setNoteText(review?.notes ?? ''); setEditingNote(true); }}
-              className="w-full text-left"
-            >
-              {review?.notes
-                ? <p className="text-xs text-[var(--text-4)] leading-relaxed hover:text-[var(--text-2)] transition-colors">{review.notes}</p>
-                : <p className="text-xs text-[var(--dashed)] hover:text-[var(--text-3)] transition-colors">+ บันทึกความเห็น</p>
-              }
-            </button>
-          )}
-        </div>
-      </div>
-      {confirming && <ConfirmDialog title="ลบก๊วน" message={`"${group.name}"`} onConfirm={onDelete} onCancel={() => setConfirming(false)} />}
     </div>
   );
 }
