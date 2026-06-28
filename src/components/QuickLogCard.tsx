@@ -71,7 +71,7 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
           วันนี้ · {DAY_NAMES[dowIndex]}
         </span>
         <button onClick={onOpenFullForm} className="text-xs text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors">
-          บันทึกก๊วนอื่นๆ
+          บันทึกก๊วนอื่นๆ →
         </button>
       </div>
 
