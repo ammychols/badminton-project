@@ -11,6 +11,7 @@ import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
 import { LogCelebration } from './components/LogCelebration';
+import { GroupScorecard } from './components/GroupScorecard';
 import { calcStreak, thisMonthString, todayString } from './utils/date';
 import { Z } from './styles/overlay';
 
@@ -60,6 +61,7 @@ export default function App() {
   const [highlightCourtId, setHighlightCourtId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
+  const [viewGroupKey, setViewGroupKey] = useState<{ courtId: string; groupId: string } | null>(null);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -147,6 +149,7 @@ export default function App() {
             onEditGroup={(courtId, groupId) => openModal({ type: 'editGroup', courtId, groupId })}
             onRateCourt={courtId => openModal({ type: 'courtInfo', courtId })}
             onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toJSON() })}
+            onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
           />
         ) : (
           <SessionsView
@@ -170,6 +173,7 @@ export default function App() {
             }}
             onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
             onMobileTabChange={setMobileTab}
+            onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
           />
         )}
       </main>
@@ -211,6 +215,22 @@ export default function App() {
             .reduce((sum, s) => sum + s.gamesPlayed, 0)}
         />
       )}
+
+      {viewGroupKey && (() => {
+        const court = courts.find(c => c.id === viewGroupKey.courtId);
+        const group = court?.groups.find(g => g.id === viewGroupKey.groupId);
+        if (!court || !group) return null;
+        const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
+        return (
+          <GroupScorecard
+            group={group}
+            court={court}
+            sessions={groupSessions}
+            onClose={() => setViewGroupKey(null)}
+            onNavigateToCourt={() => { setViewGroupKey(null); setHighlightCourtId(court.id); switchTab('courts'); }}
+          />
+        );
+      })()}
 
       {modal?.type === 'addCourt' && (
         <AddCourtModal onClose={closeModal} onSave={data => {

@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
-import { GroupScorecard } from './GroupScorecard';
 import { QuickLogCard } from './QuickLogCard';
 import { ConfirmDialog } from './ConfirmDialog';
 import { btn, card, text, emptyState } from '../styles/tokens';
@@ -112,6 +111,7 @@ interface SessionsViewProps {
   onUpdatePhotos: (id: string, photos: string[]) => void;
   onNavigateToCourt: (courtId: string) => void;
   onMobileTabChange: (tab: 'feed' | 'stats') => void;
+  onViewGroup: (courtId: string, groupId: string) => void;
 }
 
 
@@ -278,11 +278,9 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
 
 
 
-export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onMobileTabChange }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onMobileTabChange, onViewGroup }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
-  const [viewGroupKey, setViewGroupKey] = useState<{ courtId: string; groupId: string } | null>(null);
   const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
@@ -395,7 +393,7 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
 
         {/* Col 2: Session feed */}
         <div className="flex-1 min-w-0">
-          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={(cId, gId) => setViewGroupKey({ courtId: cId, groupId: gId })} onOpenFullForm={onLogSession} />
+          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={onViewGroup} onOpenFullForm={onLogSession} />
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
@@ -438,7 +436,7 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={s => onViewGroup(s.courtId, s.groupId)} />
               )}
             </div>
           )}
@@ -484,7 +482,7 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
         {/* Feed tab */}
         {mobileTab === 'feed' && (
           <>
-          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={(cId, gId) => setViewGroupKey({ courtId: cId, groupId: gId })} onOpenFullForm={onLogSession} />
+          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={onViewGroup} onOpenFullForm={onLogSession} />
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
@@ -526,7 +524,7 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
               )}
               {viewedSessions.length > 0 && (
                 <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}
-                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={setViewInfoSession} />
+                  onEditSession={onEditSession} setConfirmDeleteId={setConfirmDeleteId} onUpdateNote={onUpdateNote} onUpdatePhotos={onUpdatePhotos} onViewInfo={s => onViewGroup(s.courtId, s.groupId)} />
               )}
             </div>
           )}
@@ -539,38 +537,6 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
         const court = courts.find(c => c.id === viewCourtId);
         if (!court) return null;
         return <CourtPanel court={court} onClose={() => setViewCourtId(null)} />;
-      })()}
-
-      {viewGroupKey && (() => {
-        const court = courts.find(c => c.id === viewGroupKey.courtId);
-        const group = court?.groups.find(g => g.id === viewGroupKey.groupId);
-        if (!court || !group) return null;
-        const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
-        return (
-          <GroupScorecard
-            group={group}
-            court={court}
-            sessions={groupSessions}
-            onClose={() => setViewGroupKey(null)}
-            onNavigateToCourt={() => { setViewGroupKey(null); onNavigateToCourt(court.id); }}
-          />
-        );
-      })()}
-
-      {viewInfoSession && (() => {
-        const court = courts.find(c => c.id === viewInfoSession.courtId);
-        const group = court?.groups.find(g => g.id === viewInfoSession.groupId);
-        if (!court || !group) return null;
-        const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
-        return (
-          <GroupScorecard
-            group={group}
-            court={court}
-            sessions={groupSessions}
-            onClose={() => setViewInfoSession(null)}
-            onNavigateToCourt={() => { setViewInfoSession(null); onNavigateToCourt(court.id); }}
-          />
-        );
       })()}
 
       {confirmDeleteId && (

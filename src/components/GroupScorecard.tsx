@@ -2,7 +2,7 @@ import React from 'react';
 import { Court, Group, Session, ALL_LEVELS } from '../types';
 import { DetailPanel } from './DetailPanel';
 import { formatDate } from '../utils/date';
-import { computeGroupStats, MIN_SESSIONS_FOR_AVG } from '../utils/groupStats';
+import { computeGroupStats } from '../utils/groupStats';
 
 interface Props {
   group: Group;
@@ -17,7 +17,6 @@ const MOOD_BAR_COLOR = ['#ef4444', '#f97316', '#fbbf24', '#a8d5b5', '#4a9e6e', '
 
 export function GroupScorecard({ group, court, sessions, onClose }: Props) {
   const stats = computeGroupStats(sessions);
-  const enough = stats.hasEnoughData;
 
   // Mood history — last 10 sessions sorted by date
   const sortedSessions = [...sessions].sort((a, b) => a.date.localeCompare(b.date));

@@ -15,6 +15,7 @@ interface CourtsViewProps {
   onEditGroup: (courtId: string, groupId: string) => void;
   onRateCourt: (courtId: string) => void;
   onAddReview: (courtId: string, groupId: string, notes: string) => void;
+  onViewGroup: (courtId: string, groupId: string) => void;
 }
 
 const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
@@ -56,10 +57,11 @@ function saveCollapsed(set: Set<string>) {
 
 // ---- GroupRow ----
 // Fix 3: menu renders with position:fixed via inline style so it escapes any overflow:hidden ancestor.
-function GroupRow({ group, onEdit, onDelete }: {
+function GroupRow({ group, onEdit, onDelete, onView }: {
   group: Group;
   onEdit: () => void;
   onDelete: () => void;
+  onView: () => void;
 }) {
   const [menu, setMenu] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -98,28 +100,31 @@ function GroupRow({ group, onEdit, onDelete }: {
 
   return (
     <div className="flex items-center gap-3 py-2.5 px-1">
-      {/* Avatar */}
-      <div
-        className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
-        style={{ backgroundColor: tint.bg, color: tint.fg }}
-      >
-        {group.image
-          ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
-          : initial}
-      </div>
+      {/* Tappable row body → opens GroupScorecard */}
+      <button className="flex items-center gap-3 flex-1 min-w-0 text-left" onClick={onView}>
+        {/* Avatar */}
+        <div
+          className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
+          style={{ backgroundColor: tint.bg, color: tint.fg }}
+        >
+          {group.image
+            ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+            : initial}
+        </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[var(--text-1)] truncate">{group.name}</p>
-        <p className="text-xs text-[var(--text-3)] truncate">{meta}</p>
-        {group.levels && group.levels.length > 0 && (
-          <div className="flex gap-1 flex-wrap mt-1">
-            {ALL_LEVELS.filter(l => group.levels!.includes(l)).map(lv => (
-              <span key={lv} className={`${chip.base} ${chip.gray}`}>{lv}</span>
-            ))}
-          </div>
-        )}
-      </div>
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-[var(--text-1)] truncate">{group.name}</p>
+          <p className="text-xs text-[var(--text-3)] truncate">{meta}</p>
+          {group.levels && group.levels.length > 0 && (
+            <div className="flex gap-1 flex-wrap mt-1">
+              {ALL_LEVELS.filter(l => group.levels!.includes(l)).map(lv => (
+                <span key={lv} className={`${chip.base} ${chip.gray}`}>{lv}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </button>
 
       {/* Menu — fixed-positioned dropdown so it escapes overflow:hidden */}
       <button
@@ -151,7 +156,7 @@ function GroupRow({ group, onEdit, onDelete }: {
 }
 
 // ---- CourtSection ----
-function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEditCourt, onDeleteCourt, onEditGroup, onDeleteGroup }: {
+function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEditCourt, onDeleteCourt, onEditGroup, onDeleteGroup, onViewGroup }: {
   court: Court;
   expanded: boolean;
   selectedDay: DayOfWeek | 'all';
@@ -161,6 +166,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
   onDeleteCourt: () => void;
   onEditGroup: (groupId: string) => void;
   onDeleteGroup: (groupId: string) => void;
+  onViewGroup: (groupId: string) => void;
 }) {
   const [menu, setMenu] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -278,6 +284,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                   group={group}
                   onEdit={() => onEditGroup(group.id)}
                   onDelete={() => onDeleteGroup(group.id)}
+                  onView={() => onViewGroup(group.id)}
                 />
               ))}
               {/* Quiet footer add link — below the rows, no tile/dashed circle */}
@@ -306,7 +313,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
 }
 
 // ---- CourtsView ----
-export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview: _onAddReview }: CourtsViewProps) {
+export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview: _onAddReview, onViewGroup }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [search, setSearch] = useState('');
@@ -425,6 +432,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
                 onDeleteCourt={() => onDeleteCourt(court.id)}
                 onEditGroup={(groupId) => onEditGroup(court.id, groupId)}
                 onDeleteGroup={(groupId) => onDeleteGroup(court.id, groupId)}
+                onViewGroup={(groupId) => onViewGroup(court.id, groupId)}
               />
             </div>
           ))}
