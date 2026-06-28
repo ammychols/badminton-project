@@ -2,6 +2,11 @@ import { Session } from '../types';
 
 export const MIN_SESSIONS_FOR_AVG = 3;
 
+/** Round average mood half-down: 4.5 → 4, 4.6 → 5. Clamped to 1–6. */
+export function moodLevel(avg: number): number {
+  return Math.min(6, Math.max(1, Math.ceil(avg - 0.5)));
+}
+
 export interface GroupStats {
   count: number;
   avgGames: number | null;

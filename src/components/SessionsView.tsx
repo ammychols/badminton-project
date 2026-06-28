@@ -104,7 +104,7 @@ interface SessionsViewProps {
   sessions: Session[];
   courts: Court[];
   onLogSession: () => void;
-  onQuickLog: (data: Omit<Session, 'id'>) => void;
+  onLogGroup: (courtId: string, groupId: string) => void;
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
@@ -278,10 +278,11 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
 
 
 
-export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onMobileTabChange }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onMobileTabChange }: SessionsViewProps) {
   const today = todayString();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewInfoSession, setViewInfoSession] = useState<Session | null>(null);
+  const [viewGroupKey, setViewGroupKey] = useState<{ courtId: string; groupId: string } | null>(null);
   const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
@@ -394,7 +395,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
 
         {/* Col 2: Session feed */}
         <div className="flex-1 min-w-0">
-          {!sessions.some(s => s.date === today) && <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />}
+          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={(cId, gId) => setViewGroupKey({ courtId: cId, groupId: gId })} onOpenFullForm={onLogSession} />
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
@@ -483,7 +484,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
         {/* Feed tab */}
         {mobileTab === 'feed' && (
           <>
-          {!sessions.some(s => s.date === today) && <QuickLogCard courts={courts} sessions={sessions} onQuickLog={onQuickLog} onOpenFullForm={onLogSession} />}
+          <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={(cId, gId) => setViewGroupKey({ courtId: cId, groupId: gId })} onOpenFullForm={onLogSession} />
           {sessions.length === 0 ? (
             <div className={emptyState.wrapper}>
               <div className={emptyState.icon}>🏸</div>
@@ -538,6 +539,22 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
         const court = courts.find(c => c.id === viewCourtId);
         if (!court) return null;
         return <CourtPanel court={court} onClose={() => setViewCourtId(null)} />;
+      })()}
+
+      {viewGroupKey && (() => {
+        const court = courts.find(c => c.id === viewGroupKey.courtId);
+        const group = court?.groups.find(g => g.id === viewGroupKey.groupId);
+        if (!court || !group) return null;
+        const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
+        return (
+          <GroupScorecard
+            group={group}
+            court={court}
+            sessions={groupSessions}
+            onClose={() => setViewGroupKey(null)}
+            onNavigateToCourt={() => { setViewGroupKey(null); onNavigateToCourt(court.id); }}
+          />
+        );
       })()}
 
       {viewInfoSession && (() => {

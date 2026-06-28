@@ -76,14 +76,14 @@ export default function App() {
   const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
-  // Show QuickLogCard only before the first log of the day.
-  // Once any session is logged today, switch to FAB only.
+  // Show QuickLogCard (today picker) when there are still unlogged groups today.
   const hasQuickLogCandidate = useMemo(() => {
     const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const today = todayString();
-    if (sessions.some(s => s.date === today)) return false;
     const dow = DOW_MAP[new Date(today + 'T00:00:00').getDay()];
-    return courts.some(c => c.groups.some(g => g.days.includes(dow)));
+    return courts.some(c => c.groups.some(g =>
+      g.days.includes(dow) && !sessions.some(s => s.groupId === g.id && s.date === today)
+    ));
   }, [courts, sessions]);
   const [justLogged, setJustLogged] = useState(false);
   const justLoggedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -153,7 +153,7 @@ export default function App() {
             sessions={sessions}
             courts={courts}
             onLogSession={() => openModal({ type: 'logSession' })}
-            onQuickLog={data => { addSession(data); triggerJustLogged(); }}
+            onLogGroup={(courtId, groupId) => openModal({ type: 'logSession', courtId, groupId })}
             onDeleteSession={deleteSession}
             onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
             onUpdateNote={(id, notes) => {
@@ -250,6 +250,7 @@ export default function App() {
           courts={courts}
           onClose={closeModal}
           initialSession={modal.sessionId ? sessions.find(s => s.id === modal.sessionId) : undefined}
+          prefill={!modal.sessionId ? { courtId: modal.courtId, groupId: modal.groupId } : undefined}
           onSave={data => {
             if (modal.sessionId) updateSession(modal.sessionId, data);
             else { addSession(data); triggerJustLogged(); }

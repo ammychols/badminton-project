@@ -9,6 +9,7 @@ interface LogSessionModalProps {
   onClose: () => void;
   onSave: (data: Omit<Session, 'id'>) => void;
   initialSession?: Session;
+  prefill?: { courtId?: string; groupId?: string; date?: string };
 }
 
 const MOOD_EMOJIS: Record<number, string> = { 1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥' };
@@ -151,17 +152,17 @@ function defaultTimes() {
   return { start: '00:00', end: '00:00' };
 }
 
-export function LogSessionModal({ courts, onClose, onSave, initialSession }: LogSessionModalProps) {
+export function LogSessionModal({ courts, onClose, onSave, initialSession, prefill }: LogSessionModalProps) {
   const { start: defaultStart, end: defaultEnd } = defaultTimes();
   const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-  const initDate = initialSession?.date ?? todayString();
+  const initDate = initialSession?.date ?? prefill?.date ?? todayString();
   const initDow = DOW_MAP[new Date(initDate + 'T00:00:00').getDay()];
   const defaultCourt = courts.find(c => c.groups.some(g => g.days.includes(initDow)));
   const defaultGroup = defaultCourt?.groups.find(g => g.days.includes(initDow));
 
   const [date, setDate] = useState(initDate);
-  const [courtId, setCourtId] = useState(initialSession?.courtId ?? defaultCourt?.id ?? '');
-  const [groupId, setGroupId] = useState(initialSession?.groupId ?? defaultGroup?.id ?? '');
+  const [courtId, setCourtId] = useState(initialSession?.courtId ?? prefill?.courtId ?? defaultCourt?.id ?? '');
+  const [groupId, setGroupId] = useState(initialSession?.groupId ?? prefill?.groupId ?? defaultGroup?.id ?? '');
   const [startTime, setStartTime] = useState(initialSession?.startTime ?? defaultStart);
   const [endTime, setEndTime] = useState(initialSession?.endTime ?? defaultEnd);
   const [gamesPlayed, setGamesPlayed] = useState(initialSession?.gamesPlayed ?? 0);

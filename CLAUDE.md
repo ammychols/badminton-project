@@ -40,7 +40,6 @@
 - สถิติจากข้อมูล < 3 ครั้ง: เลี่ยงคำว่า "เฉลี่ย/ส่วนใหญ่"
 
 ### Core loop components
-- **`QuickLogCard`** — การ์ดบันทึกเร็วบนหัวฟีด (เดาก๊วนจากตาราง `days`, บันทึกเวลาเป็น '00:00') — เจ้าของโปรเจกต์ปรับเองแล้ว (เกมเริ่มที่ 0 ไม่ prefill) อย่า revert
 - **`LogCelebration`** — toast ฉลองหลังบันทึก render ที่ App level ขับด้วย state `justLogged` (timer 5s)
 
 ## Architecture notes
@@ -64,6 +63,11 @@ Phase 1 + polish done. Key decisions:
 ## Group stats
 
 Per-group aggregates live in `src/utils/groupStats.ts` (`computeGroupStats(sessions)`), consumed by `GroupScorecard` and the upcoming today picker — don't recompute inline. Returns `count`, `avgGames`, `avgMinPerGame`, `avgMood`, `avgCost`/`costSampleSize`, `lastVisitDate`, `hasEnoughData`. `MIN_SESSIONS_FOR_AVG = 3` — averages and "ส่วนใหญ่เจอ" distribution are gated behind this; below threshold the scorecard shows only count + "ยังข้อมูลน้อย…". `GroupReviewModal` renamed to `GroupScorecard` (`src/components/GroupScorecard.tsx`). Cost surfaced as บาท/ครั้ง in the 2×2 overview grid.
+
+## Core loop components
+- **`QuickLogCard`** — now the **today picker**: side-by-side cards for each unlogged group scheduled today, each showing a `computeGroupStats` strip (นาที/เกม · เกม/ครั้ง · มู้ด · ต่อครั้ง) or a thin-data line. Tapping a card opens `GroupScorecard`; "บันทึกว่าไป" opens `LogSessionModal` prefilled to that group (add mode). Mood shown emoji-only via `moodLevel()` (halves round down). Orphaned `GroupReviewModal.tsx` deleted.
+- **`LogSessionModal`** has a new `prefill?: { courtId?, groupId?, date? }` prop for the picker path (no `initialSession` = add mode, title stays "บันทึกการตี"). `QuickLogCard` path removed.
+- **`LogCelebration`** — toast ฉลองหลังบันทึก render ที่ App level ขับด้วย state `justLogged` (timer 5s)
 
 ## Backlog (เรียงตามที่คุยกันไว้)
 
