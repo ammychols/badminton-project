@@ -47,6 +47,16 @@
 
 - Groups เก็บ nested ใน court document (Firestore) — มีแผน migrate เป็น subcollection ภายหลัง
 - `LogSessionModal` กรองสนาม/ก๊วนตามวันในสัปดาห์ (day filter) — **เจ้าของโปรเจกต์ตั้งใจคงไว้** อย่าปลดล็อกโดยไม่ถาม
+## CourtsView — current state
+
+Phase 1 + polish done. Key decisions:
+- **Add-court** is a fixed FAB (bottom-right, above nav, `z-45`) — global action with no contextual home; shown only in list mode when ≥1 court exists.
+- **Add-group** is context-aware: collapsed courts show nothing; empty expanded courts show a centered ghost "เพิ่มก๊วนแรก" invite; courts with groups show a quiet `--p-deep` text link *after* the rows (no tile/dashed circle). Shortcut also lives in the court `···` menu.
+- **Group-row `···` menu** uses `position:fixed` anchored via `getBoundingClientRect` so it escapes any `overflow:hidden` ancestor.
+- **Phase 2 flag**: drop per-row `···` entirely — tapping a row already opens edit, so move "ลบ" into the group edit modal. Eliminates the clipping class of bug at root and cleans up repeated `···` icons. Touches `AddGroupModal`, belongs in the modal/journey phase.
+- `--p-deep: #0d6e4a` added to `src/index.css` — readable green text on white for add-group affordances.
+- Collapse persisted in `localStorage['badminton.collapsedCourts']`; day filter auto-expands matching courts.
+
 ## Backlog (เรียงตามที่คุยกันไว้)
 
 1. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
