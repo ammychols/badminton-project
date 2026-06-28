@@ -238,12 +238,6 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
           >···</button>
           {menu && (
             <div className="absolute right-0 top-10 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
-              {/* Add group shortcut — primary action, lets user add without expanding */}
-              <button onClick={() => { setMenu(false); onAddGroup(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-medium hover:bg-[var(--hover-bg)] transition-colors text-left" style={{ color: 'var(--p-deep)' }}>
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                เพิ่มก๊วน
-              </button>
-              <div style={{ borderTop: '1px solid var(--card-border)' }} />
               <button onClick={() => { setMenu(false); onEditCourt(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
                 <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 แก้ไข
