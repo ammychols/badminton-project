@@ -216,7 +216,7 @@ export function SessionRow({
         </div>
 
         {/* Meta footer */}
-        {(hasTime || session.gamesPlayed > 0) && (
+        {(hasTime || session.gamesPlayed > 0 || session.cost != null) && (
           <div className="mt-3 pt-2.5 border-t border-[var(--card-border)] flex items-center flex-wrap gap-x-2 gap-y-1 text-xs">
             {hasTime && <span className="tabular-nums text-[var(--text-3)]">{session.startTime} – {session.endTime}</span>}
             {hasTime && durLabel && metaDivider}
@@ -225,6 +225,8 @@ export function SessionRow({
             {session.gamesPlayed > 0 && <span className="font-bold tabular-nums text-[var(--text-2)]">{session.gamesPlayed} เกม</span>}
             {minPerGame && metaDivider}
             {minPerGame && <span className="tabular-nums text-[var(--text-3)]">{minPerGame} นาที/เกม</span>}
+            {session.cost != null && metaDivider}
+            {session.cost != null && <span className="tabular-nums text-[var(--text-3)]">฿{session.cost}</span>}
           </div>
         )}
 
