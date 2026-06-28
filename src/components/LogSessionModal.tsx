@@ -169,7 +169,6 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
   const [intensities, setIntensities] = useState<Intensity[]>(
     initialSession?.intensity ? (Array.isArray(initialSession.intensity) ? initialSession.intensity : [initialSession.intensity]) : []
   );
-  const [waitMinutes, setWaitMinutes] = useState<number | undefined>(initialSession?.waitMinutes);
   const [cost, setCost] = useState<number | undefined>(initialSession?.cost);
   const [notes, setNotes] = useState(initialSession?.notes ?? '');
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -207,7 +206,7 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
     if (!courtId || !groupId || noCourtsToday || noGroupsToday) return;
     onClose();
     const intensity = intensities.length === 0 ? undefined : intensities.length === 1 ? intensities[0] : intensities;
-    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, waitMinutes, cost, notes: notes.trim() || undefined });
+    onSave({ courtId, groupId, date, startTime, endTime, gamesPlayed, mood, intensity, cost, notes: notes.trim() || undefined });
   };
 
   const saveButton = (
@@ -338,20 +337,12 @@ export function LogSessionModal({ courts, onClose, onSave, initialSession }: Log
         </div>
       </div>
 
-      {/* Wait + Cost */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div>
-          <label className={text.label}>รอคิว (นาที)</label>
-          <input type="number" inputMode="numeric" min={0} className={input.base}
-            value={waitMinutes ?? ''} placeholder="20"
-            onChange={e => { const n = parseInt(e.target.value, 10); setWaitMinutes(Number.isNaN(n) ? undefined : Math.max(0, n)); }} />
-        </div>
-        <div>
-          <label className={text.label}>ค่าใช้จ่าย (บาท)</label>
-          <input type="number" inputMode="numeric" min={0} className={input.base}
-            value={cost ?? ''} placeholder="120"
-            onChange={e => { const n = parseInt(e.target.value, 10); setCost(Number.isNaN(n) ? undefined : Math.max(0, n)); }} />
-        </div>
+      {/* Cost */}
+      <div className="mb-4">
+        <label className={text.label}>ค่าใช้จ่าย (บาท)</label>
+        <input type="number" inputMode="numeric" min={0} className={input.base}
+          value={cost ?? ''} placeholder="120"
+          onChange={e => { const n = parseInt(e.target.value, 10); setCost(Number.isNaN(n) ? undefined : Math.max(0, n)); }} />
       </div>
 
       {/* Notes */}
