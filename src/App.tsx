@@ -5,6 +5,7 @@ import { useSessions } from './hooks/useSessions';
 import { useProfile } from './hooks/useProfile';
 import { CourtsView } from './components/CourtsView';
 import { SessionsView } from './components/SessionsView';
+import { StatsView } from './components/StatsView';
 import { AddCourtModal } from './components/AddCourtModal';
 import { AddGroupModal } from './components/AddGroupModal';
 import { ReviewModal } from './components/ReviewModal';
@@ -17,7 +18,7 @@ import { Z } from './styles/overlay';
 
 import { Court, DayOfWeek } from './types';
 
-type Tab = 'courts' | 'sessions';
+type Tab = 'courts' | 'sessions' | 'stats';
 
 interface ModalState {
   type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'courtInfo' | 'logSession';
@@ -56,11 +57,13 @@ function LoginScreen({ onSignIn, error }: { onSignIn: () => void; error: string 
 
 export default function App() {
   const { user, loading, signIn, signOut, error } = useAuth();
-  const [tab, setTab] = useState<Tab>(() => (localStorage.getItem('activeTab') as Tab) ?? 'sessions');
+  const [tab, setTab] = useState<Tab>(() => {
+    const stored = localStorage.getItem('activeTab');
+    return (['courts', 'sessions', 'stats'] as Tab[]).includes(stored as Tab) ? (stored as Tab) : 'sessions';
+  });
   const switchTab = (t: Tab) => { setTab(t); localStorage.setItem('activeTab', t); };
   const [highlightCourtId, setHighlightCourtId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
-  const [mobileTab, setMobileTab] = useState<'feed' | 'stats'>('feed');
   const [viewGroupKey, setViewGroupKey] = useState<{ courtId: string; groupId: string } | null>(null);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -137,7 +140,7 @@ export default function App() {
       )}
 
       <main className="flex-1 pb-20">
-        {tab === 'courts' ? (
+        {tab === 'courts' && (
           <CourtsView
             courts={courts}
             highlightCourtId={highlightCourtId}
@@ -151,7 +154,9 @@ export default function App() {
             onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toJSON() })}
             onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
           />
-        ) : (
+        )}
+        {tab === 'stats' && <StatsView sessions={sessions} />}
+        {tab === 'sessions' && (
           <SessionsView
             sessions={sessions}
             courts={courts}
@@ -172,15 +177,14 @@ export default function App() {
               if (s) updateSession(id, { ...s, photos });
             }}
             onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
-            onMobileTabChange={setMobileTab}
             onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
           />
         )}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{ backgroundColor: 'var(--nav-bg)', borderTop: '1px solid var(--nav-border)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        {/* FAB — hidden when QuickLogCard is showing (card already has "บันทึกเลย" + "กรอกแบบละเอียด") */}
-        {tab === 'sessions' && (mobileTab === 'stats' || !hasQuickLogCandidate) && (
+        {/* FAB — บันทึก tab only, hidden when QuickLogCard has candidates */}
+        {tab === 'sessions' && !hasQuickLogCandidate && (
           <button
             onClick={() => openModal({ type: 'logSession' })}
             className="absolute w-14 h-14 rounded-full flex items-center justify-center transition-transform active:scale-95"
@@ -192,8 +196,9 @@ export default function App() {
         <div className="flex items-center h-14">
           {([
             { key: 'sessions', label: 'บันทึก', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> },
+            { key: 'stats', label: 'สถิติ', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="12" width="4" height="10" rx="1"/><rect x="9" y="7" width="4" height="15" rx="1"/><rect x="16" y="3" width="4" height="19" rx="1"/></svg> },
             { key: 'courts', label: 'สนาม', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M7 5v14M17 5v14" strokeWidth="1" strokeDasharray="2 2"/></svg> },
-          ] as { key: 'sessions' | 'courts'; label: string; icon: React.ReactNode }[]).map(({ key, label, icon }) => {
+          ] as { key: 'sessions' | 'stats' | 'courts'; label: string; icon: React.ReactNode }[]).map(({ key, label, icon }) => {
             const active = tab === key;
             return (
               <button key={key} onClick={() => switchTab(key)}

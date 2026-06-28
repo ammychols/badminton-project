@@ -69,10 +69,20 @@ Per-group aggregates live in `src/utils/groupStats.ts` (`computeGroupStats(sessi
 - **`LogSessionModal`** has a new `prefill?: { courtId?, groupId?, date? }` prop for the picker path (no `initialSession` = add mode, title stays "บันทึกการตี"). `QuickLogCard` path removed.
 - **`LogCelebration`** — toast ฉลองหลังบันทึก render ที่ App level ขับด้วย state `justLogged` (timer 5s)
 
+## Navigation & IA
+
+3 tabs ใน bottom nav (mobile + desktop, same layout ทุกหน้าจอ — ไม่มี desktop 2-column dashboard):
+- **บันทึก** (`'sessions'`, default) — `QuickLogCard` today picker + history feed + month filter. Component: `SessionsView`.
+- **สถิติ** (`'stats'`) — HeroCard + ActivityCard heatmap + วันที่ตีบ่อย. Component: `StatsView` (owns its own month-nav state).
+- **สนาม** (`'courts'`) — `CourtsView` unchanged.
+
+Tab key `'sessions'` สำหรับ บันทึก (ค่า localStorage เดิมยังใช้ได้); validate stored value ก่อน fallback to `'sessions'`.
+
+**FAB rule**: แสดงเฉพาะบน `tab === 'sessions' && !hasQuickLogCandidate` (picker มีปุ่มบันทึกของตัวเองเมื่อมีก๊วนวันนี้).
+
 ## Backlog (เรียงตามที่คุยกันไว้)
 
-1. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)
-2. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
+1. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)
 
 ## Assets
 
