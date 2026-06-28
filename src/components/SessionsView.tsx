@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
-import { GroupReviewModal } from './GroupReviewModal';
+import { GroupScorecard } from './GroupScorecard';
 import { QuickLogCard } from './QuickLogCard';
 import { ConfirmDialog } from './ConfirmDialog';
 import { btn, card, text, emptyState } from '../styles/tokens';
@@ -546,7 +546,7 @@ export function SessionsView({ sessions, courts, onLogSession, onQuickLog, onDel
         if (!court || !group) return null;
         const groupSessions = sessions.filter(s => s.courtId === court.id && s.groupId === group.id);
         return (
-          <GroupReviewModal
+          <GroupScorecard
             group={group}
             court={court}
             sessions={groupSessions}

@@ -59,7 +59,11 @@ Phase 1 + polish done. Key decisions:
 
 ## Session data model
 
-`Session` gained optional `waitMinutes` (avg queue wait, minutes) and `cost` (spend, THB). Captured only in the full `LogSessionModal` — placed after intensity, before notes. `QuickLogCard` intentionally skips them to stay fast. Blank inputs serialize to `undefined`, not `0`, so "not recorded" stays distinguishable from a real zero. These fields feed the upcoming Group scorecard and today picker.
+`Session` has optional `cost` (spend, THB). Captured only in the full `LogSessionModal` — placed after intensity, before notes. `QuickLogCard` intentionally skips it to stay fast. Blank inputs serialize to `undefined`, not `0`, so "not recorded" stays distinguishable from a real zero. `waitMinutes` removed (time-efficiency judged by นาที/เกม instead).
+
+## Group stats
+
+Per-group aggregates live in `src/utils/groupStats.ts` (`computeGroupStats(sessions)`), consumed by `GroupScorecard` and the upcoming today picker — don't recompute inline. Returns `count`, `avgGames`, `avgMinPerGame`, `avgMood`, `avgCost`/`costSampleSize`, `lastVisitDate`, `hasEnoughData`. `MIN_SESSIONS_FOR_AVG = 3` — averages and "ส่วนใหญ่เจอ" distribution are gated behind this; below threshold the scorecard shows only count + "ยังข้อมูลน้อย…". `GroupReviewModal` renamed to `GroupScorecard` (`src/components/GroupScorecard.tsx`). Cost surfaced as บาท/ครั้ง in the 2×2 overview grid.
 
 ## Backlog (เรียงตามที่คุยกันไว้)
 
