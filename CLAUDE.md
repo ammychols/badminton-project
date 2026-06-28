@@ -57,6 +57,10 @@ Phase 1 + polish done. Key decisions:
 - `--p-deep: #0d6e4a` added to `src/index.css` — readable green text on white for add-group affordances.
 - Collapse persisted in `localStorage['badminton.collapsedCourts']`; day filter auto-expands matching courts.
 
+## Session data model
+
+`Session` gained optional `waitMinutes` (avg queue wait, minutes) and `cost` (spend, THB). Captured only in the full `LogSessionModal` — placed after intensity, before notes. `QuickLogCard` intentionally skips them to stay fast. Blank inputs serialize to `undefined`, not `0`, so "not recorded" stays distinguishable from a real zero. These fields feed the upcoming Group scorecard and today picker.
+
 ## Backlog (เรียงตามที่คุยกันไว้)
 
 1. เปลี่ยน default tab แรกเป็น `'sessions'` (ตอนนี้ fallback เป็น `'courts'`)

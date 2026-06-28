@@ -82,6 +82,8 @@ export interface Session {
   gamesPlayed: number;
   mood: 1 | 2 | 3 | 4 | 5 | 6;
   intensity?: Intensity | Intensity[];
+  waitMinutes?: number;
+  cost?: number;
   notes?: string;
   image?: string;
   photos?: string[];
