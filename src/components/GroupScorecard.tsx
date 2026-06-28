@@ -97,33 +97,19 @@ export function GroupScorecard({ group, court, sessions, onClose }: Props) {
         <div className="rounded-[22px] p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)', boxShadow: '0 8px 28px rgba(0,0,0,.22)' }}>
           <div className="absolute rounded-full" style={{ top: -20, right: -10, width: 120, height: 120, background: 'rgba(255,255,255,0.12)', filter: 'blur(40px)' }} />
           <div className="relative" style={{ zIndex: 1 }}>
-            {enough ? (
-              /* ≥3 sessions: show 2×2 stat grid */
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                {([
-                  [stats.count, 'ครั้ง'],
-                  [stats.avgGames != null ? stats.avgGames.toFixed(1) : '—', 'เกม/ครั้ง'],
-                  [stats.avgMinPerGame ?? '—', 'นาที/เกม'],
-                  [stats.avgCost != null ? stats.avgCost : '—', 'บาท/ครั้ง'],
-                ] as [React.ReactNode, string][]).map(([v, l]) => (
-                  <div key={l}>
-                    <div className="font-extrabold text-white leading-none" style={{ fontSize: 28, letterSpacing: '-0.5px' }}>{v}</div>
-                    <div className="mt-1" style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{l}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              /* <3 sessions: count only + thin-data message */
-              <div>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="font-extrabold text-white leading-none" style={{ fontSize: 28, letterSpacing: '-0.5px' }}>{stats.count}</span>
-                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>ครั้ง</span>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              {([
+                [stats.count, 'ครั้ง'],
+                [stats.avgGames != null ? stats.avgGames.toFixed(1) : '—', 'เกม/ครั้ง'],
+                [stats.avgMinPerGame ?? '—', 'นาที/เกม'],
+                [stats.avgCost != null ? stats.avgCost : '—', 'บาท/ครั้ง'],
+              ] as [React.ReactNode, string][]).map(([v, l]) => (
+                <div key={l}>
+                  <div className="font-extrabold text-white leading-none" style={{ fontSize: 28, letterSpacing: '-0.5px' }}>{v}</div>
+                  <div className="mt-1" style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>{l}</div>
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
-                  ยังข้อมูลน้อย — ไปอีกสัก {Math.max(1, MIN_SESSIONS_FOR_AVG - stats.count)} ครั้งจะเห็นค่าเฉลี่ย
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -135,8 +121,7 @@ export function GroupScorecard({ group, court, sessions, onClose }: Props) {
             <div className="mb-3.5">
               <div className="flex items-center justify-between mb-4">
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)' }}>อารมณ์</span>
-                {/* "เฉลี่ย" emoji only when enough data */}
-                {enough && stats.avgMood != null && (
+                {stats.avgMood != null && (
                   <div className="flex items-center gap-1.5">
                     <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>เฉลี่ย</span>
                     <span style={{ fontSize: 30, lineHeight: 1 }}>{MOOD_EMOJI[Math.round(stats.avgMood)]}</span>
@@ -169,8 +154,7 @@ export function GroupScorecard({ group, court, sessions, onClose }: Props) {
                 </div>
               )}
 
-              {/* "ส่วนใหญ่เจอ" distribution — only when enough data */}
-              {enough && (
+              {moodCounts.length > 0 && (
                 <>
                   <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginBottom: 8 }}>ส่วนใหญ่เจอ</div>
                   <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 9, gap: 2 }}>
