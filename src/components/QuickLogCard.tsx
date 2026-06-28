@@ -71,7 +71,7 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
           วันนี้ · {DAY_NAMES[dowIndex]}
         </span>
         <button onClick={onOpenFullForm} className="text-xs text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors">
-          + บันทึกนอกตาราง
+          บันทึกก๊วนอื่นๆ
         </button>
       </div>
 
@@ -106,7 +106,7 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
               </div>
 
               {/* Stats strip */}
-              {stats.hasEnoughData ? (
+              {stats.count > 0 ? (
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-2.5">
                   {([
                     [stats.avgMinPerGame ?? '—', 'นาที/เกม'],
@@ -136,7 +136,7 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
                 onClick={e => { e.stopPropagation(); onLogGroup(court.id, group.id); }}
                 className="w-full py-2 rounded-xl text-sm font-semibold transition-colors bg-[var(--p)] text-[var(--p-text)] hover:bg-[var(--p-h)]"
               >
-                บันทึกว่าไป
+                บันทึก
               </button>
             </div>
           );
