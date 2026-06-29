@@ -13,6 +13,7 @@ import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
 import { LogCelebration } from './components/LogCelebration';
 import { GroupScorecard } from './components/GroupScorecard';
+import { InlineLogData, TodayLock } from './components/QuickLogCard';
 import { calcStreak, thisMonthString, todayString } from './utils/date';
 import { Z } from './styles/overlay';
 
@@ -65,6 +66,28 @@ export default function App() {
   const [highlightCourtId, setHighlightCourtId] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [viewGroupKey, setViewGroupKey] = useState<{ courtId: string; groupId: string } | null>(null);
+
+  // Today-lock: persists across reloads; auto-discarded when date changes
+  const [todayLock, setTodayLock] = useState<TodayLock | null>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('todayLock') ?? 'null') as TodayLock | null;
+      return stored?.date === todayString() ? stored : null;
+    } catch { return null; }
+  });
+  const lockGroup = (courtId: string, groupId: string) => {
+    const lock: TodayLock = { courtId, groupId, date: todayString() };
+    setTodayLock(lock);
+    localStorage.setItem('todayLock', JSON.stringify(lock));
+  };
+  const unlockGroup = () => {
+    setTodayLock(null);
+    localStorage.removeItem('todayLock');
+  };
+  const saveInline = (data: InlineLogData) => {
+    addSession(data);
+    triggerJustLogged();
+    unlockGroup();
+  };
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -161,7 +184,6 @@ export default function App() {
             sessions={sessions}
             courts={courts}
             onLogSession={() => openModal({ type: 'logSession' })}
-            onLogGroup={(courtId, groupId) => openModal({ type: 'logSession', courtId, groupId })}
             onDeleteSession={deleteSession}
             onEditSession={session => openModal({ type: 'logSession', sessionId: session.id })}
             onUpdateNote={(id, notes) => {
@@ -178,6 +200,10 @@ export default function App() {
             }}
             onNavigateToCourt={courtId => { setHighlightCourtId(courtId); switchTab('courts'); }}
             onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
+            lock={todayLock}
+            onLockGroup={lockGroup}
+            onUnlockGroup={unlockGroup}
+            onSaveInline={saveInline}
           />
         )}
       </main>

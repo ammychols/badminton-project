@@ -80,6 +80,14 @@ Tab key `'sessions'` สำหรับ บันทึก (ค่า localStora
 
 **FAB rule**: แสดงเฉพาะบน `tab === 'sessions' && !hasQuickLogCandidate` (picker มีปุ่มบันทึกของตัวเองเมื่อมีก๊วนวันนี้).
 
+## QuickLogCard — two modes
+
+`todayLock` (localStorage key, shape `{ courtId, groupId, date }`) drives which mode renders:
+- **No lock / stale lock** → comparison cards: 2×2 stat grid (always rendered; no-data cells show "—" in `--text-4`), last-visit line, full-width **"เลือก"** button → writes lock.
+- **Valid lock** → `LockedGroupForm` inline: header + เปลี่ยน button, hero zone (games stepper + mood picker), details zone (time nudgers ±15 min, intensity chips, cost input, notes textarea), **"บันทึก"** → `addSession` + clear lock.
+
+Exported from `QuickLogCard.tsx`: `InlineLogData`, `TodayLock`. `onLogGroup` removed; replaced by `onLockGroup`, `onUnlockGroup`, `onSaveInline`. All colours via CSS tokens (`--p-tint`+`--p` border for selected; `--hover-bg` for inset panels/fields; `--p-deep` text on tint chips).
+
 ## Backlog (เรียงตามที่คุยกันไว้)
 
 1. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)

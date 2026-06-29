@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
-import { QuickLogCard } from './QuickLogCard';
+import { QuickLogCard, InlineLogData, TodayLock } from './QuickLogCard';
 import { ConfirmDialog } from './ConfirmDialog';
 import { btn, emptyState, text } from '../styles/tokens';
 import { SessionRow } from './SessionRow';
@@ -94,7 +94,6 @@ interface SessionsViewProps {
   sessions: Session[];
   courts: Court[];
   onLogSession: () => void;
-  onLogGroup: (courtId: string, groupId: string) => void;
   onDeleteSession: (id: string) => void;
   onEditSession: (session: Session) => void;
   onUpdateNote: (id: string, notes: string | undefined) => void;
@@ -102,6 +101,10 @@ interface SessionsViewProps {
   onUpdatePhotos: (id: string, photos: string[]) => void;
   onNavigateToCourt: (courtId: string) => void;
   onViewGroup: (courtId: string, groupId: string) => void;
+  lock: TodayLock | null;
+  onLockGroup: (courtId: string, groupId: string) => void;
+  onUnlockGroup: () => void;
+  onSaveInline: (data: InlineLogData) => void;
 }
 
 function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConfirmDeleteId, onUpdateNote, onUpdatePhotos, onViewInfo }: {
@@ -151,7 +154,7 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
   );
 }
 
-export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onViewGroup }: SessionsViewProps) {
+export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onViewGroup, lock, onLockGroup, onUnlockGroup, onSaveInline }: SessionsViewProps) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -191,7 +194,16 @@ export function SessionsView({ sessions, courts, onLogSession, onLogGroup, onDel
         <h2 className={text.pageTitle}>บันทึกการตี</h2>
       </div>
 
-      <QuickLogCard courts={courts} sessions={sessions} onLogGroup={onLogGroup} onViewGroup={onViewGroup} onOpenFullForm={onLogSession} />
+      <QuickLogCard
+        courts={courts}
+        sessions={sessions}
+        lock={lock}
+        onLockGroup={onLockGroup}
+        onUnlockGroup={onUnlockGroup}
+        onSaveInline={onSaveInline}
+        onViewGroup={onViewGroup}
+        onOpenFullForm={onLogSession}
+      />
 
       {sessions.length === 0 ? (
         <div className={emptyState.wrapper}>
