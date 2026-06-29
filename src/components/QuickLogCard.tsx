@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Court, Group, Session, DayOfWeek } from '../types';
 import { todayString, DAY_NAMES } from '../utils/date';
-import { computeGroupStats, moodLevel, MIN_SESSIONS_FOR_AVG } from '../utils/groupStats';
+import { computeGroupStats, moodLevel } from '../utils/groupStats';
 
 const DOW_MAP: DayOfWeek[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MOOD_EMOJIS: Record<number, string> = { 1: '😡', 2: '😴', 3: '😐', 4: '🙂', 5: '😄', 6: '🔥' };
@@ -87,7 +87,7 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
             <div
               key={group.id}
               onClick={() => onViewGroup(court.id, group.id)}
-              className="border border-[var(--card-border)] rounded-2xl p-3 cursor-pointer hover:bg-[var(--hover-bg)] transition-colors active:scale-[0.98]"
+              className="border border-[var(--card-border)] rounded-2xl p-3 cursor-pointer hover:bg-[var(--hover-bg)] transition-colors active:scale-[0.98] flex flex-col"
             >
               {/* Avatar + name */}
               <div className="flex items-center gap-2.5 mb-2.5">
@@ -122,19 +122,21 @@ export function QuickLogCard({ courts, sessions, onLogGroup, onViewGroup, onOpen
                 </div>
               ) : (
                 <p className="text-[11px] text-[var(--text-3)] mb-2.5 leading-relaxed">
-                  ยังข้อมูลน้อย — ไปอีกสัก {Math.max(1, MIN_SESSIONS_FOR_AVG - stats.count)} ครั้งจะเห็นค่าเฉลี่ย
+                  ยังไม่มีข้อมูล
                 </p>
               )}
 
-              {/* Last visit */}
-              <p className="text-[11px] text-[var(--text-4)] mb-2.5">
-                {lastVisitLabel(stats.lastVisitDate, today)}
-              </p>
+              {/* Last visit — only when there's history */}
+              {stats.count > 0 && (
+                <p className="text-[11px] text-[var(--text-4)] mb-2.5">
+                  {lastVisitLabel(stats.lastVisitDate, today)}
+                </p>
+              )}
 
               {/* Log button */}
               <button
                 onClick={e => { e.stopPropagation(); onLogGroup(court.id, group.id); }}
-                className="w-full py-2 rounded-xl text-sm font-semibold transition-colors bg-[var(--p)] text-[var(--p-text)] hover:bg-[var(--p-h)]"
+                className="mt-auto w-full py-2 rounded-xl text-sm font-semibold transition-colors bg-[var(--p)] text-[var(--p-text)] hover:bg-[var(--p-h)]"
               >
                 บันทึก
               </button>
