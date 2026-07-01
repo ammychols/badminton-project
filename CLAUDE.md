@@ -88,6 +88,14 @@ Tab key `'sessions'` สำหรับ บันทึก (ค่า localStora
 
 Exported from `QuickLogCard.tsx`: `InlineLogData`, `TodayLock`. `onLogGroup` removed; replaced by `onLockGroup`, `onUnlockGroup`, `onSaveInline`. All colours via CSS tokens (`--p-tint`+`--p` border for selected; `--hover-bg` for inset panels/fields; `--p-deep` text on tint chips).
 
+## CourtsView — 1c Airy Band redesign (done)
+
+- Court header uses `--p-tint` bg with fixed 🏸 emoji icon (green circle, `--p` bg)
+- Collapsed state = compact horizontal row: icon + name + "N ก๊วน" + chevron-right; map icon and ··· menu hidden while collapsed
+- Expanded header shows map link + ··· menu; infoChips in `--p-deep` text
+- Groups area: white bg, group avatars 48 px (`w-12 h-12`), chip gap `mt-1.5`
+- "เพิ่มก๊วน" / "เพิ่มก๊วนแรก" are centered pill buttons with `--p` border + `--p-deep` text
+
 ## Backlog (เรียงตามที่คุยกันไว้)
 
 1. Loading/error states บน Firestore writes (ตอนนี้ fire-and-forget)

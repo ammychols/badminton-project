@@ -99,12 +99,12 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
   const meta = noTime ? days : `${group.startTime}–${group.endTime}${days ? ` · ${days}` : ''}`;
 
   return (
-    <div className="flex items-center gap-3 py-2.5 px-1">
+    <div className="flex items-center gap-3 py-3 px-1">
       {/* Tappable row body → opens GroupScorecard */}
       <button className="flex items-center gap-3 flex-1 min-w-0 text-left" onClick={onView}>
-        {/* Avatar */}
+        {/* Avatar — slightly larger, keep rounded-full */}
         <div
-          className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
+          className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
           style={{ backgroundColor: tint.bg, color: tint.fg }}
         >
           {group.image
@@ -117,7 +117,7 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
           <p className="text-sm font-semibold text-[var(--text-1)] truncate">{group.name}</p>
           <p className="text-xs text-[var(--text-3)] truncate">{meta}</p>
           {group.levels && group.levels.length > 0 && (
-            <div className="flex gap-1 flex-wrap mt-1">
+            <div className="flex gap-1 flex-wrap mt-1.5">
               {ALL_LEVELS.filter(l => group.levels!.includes(l)).map(lv => (
                 <span key={lv} className={`${chip.base} ${chip.gray}`}>{lv}</span>
               ))}
@@ -198,82 +198,103 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
   // Rounded corners come from the card's border-radius; bg-white fills correctly because
   // all children are transparent and inherit the card's background.
   return (
-    <div className="border border-[var(--card-border)] rounded-2xl bg-white shadow-sm mb-3">
-      {/* Section header */}
-      <div className="flex items-center gap-1 px-3 py-3">
-        {/* Collapse toggle — flex-1 takes remaining space */}
+    <div className="border border-[var(--card-border)] rounded-2xl bg-white shadow-sm mb-3 overflow-hidden">
+      {/* ── Court header — tinted background ── */}
+      <div className="flex items-center gap-2 px-3 py-3" style={{ backgroundColor: 'var(--p-tint)' }}>
+        {/* Tappable area: toggles expand/collapse */}
         <button
-          className="flex-1 min-w-0 flex items-center gap-2 text-left py-0.5"
+          className="flex-1 min-w-0 flex items-center gap-2.5 text-left"
           onClick={onToggle}
         >
-          <svg
-            className="flex-shrink-0 w-4 h-4 text-[var(--text-3)] transition-transform duration-150"
-            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          {/* Court icon — fixed shuttlecock emoji in green circle */}
+          <div
+            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base"
+            style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
           >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+            🏸
+          </div>
+
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-[var(--text-1)] truncate">{court.name}</p>
+            <p className="text-sm font-bold text-[var(--text-1)] truncate">{court.name}</p>
             {infoChips.length > 0 && (
               <div className="flex gap-1.5 flex-wrap mt-0.5">
                 {infoChips.map(c => (
-                  <span key={c} className="text-xs text-[var(--text-3)]">{c}</span>
+                  <span key={c} className="text-xs" style={{ color: 'var(--p-deep)' }}>{c}</span>
                 ))}
               </div>
             )}
           </div>
-          <span className="flex-shrink-0 text-xs text-[var(--text-4)] pl-1">{court.groups.length} ก๊วน</span>
+
+          {/* Collapsed state: show group count; expanded: count hidden (menu stays) */}
+          {!expanded && (
+            <span className="flex-shrink-0 text-xs text-[var(--text-3)] pr-1">
+              {court.groups.length} ก๊วน
+            </span>
+          )}
+          <svg
+            className="flex-shrink-0 w-4 h-4 transition-transform duration-200"
+            style={{
+              color: 'var(--p-deep)',
+              transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+            }}
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
 
-        {/* Map link — stopPropagation so it doesn't toggle section */}
-        {((court.lat && court.lng) || court.address) && (
+        {/* Map link — only show when expanded to keep collapsed row compact */}
+        {expanded && ((court.lat && court.lng) || court.address) && (
           <a
             href={court.lat && court.lng
               ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
               : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + (court.address ?? ''))}`}
             target="_blank" rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-white/40"
+            style={{ color: 'var(--p-deep)' }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </a>
         )}
 
-        {/* Court ··· menu — stopPropagation so it doesn't toggle section */}
-        <div className="relative flex-shrink-0" ref={menuRef}>
-          <button
-            onClick={e => { e.stopPropagation(); setMenu(v => !v); }}
-            className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
-          >···</button>
-          {menu && (
-            <div className="absolute right-0 top-10 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
-              <button onClick={() => { setMenu(false); onEditCourt(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                แก้ไข
-              </button>
-              <div style={{ borderTop: '1px solid var(--card-border)' }} />
-              <button onClick={() => { setMenu(false); setConfirmDelete(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
-                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                ลบสนาม
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Court ··· menu */}
+        {expanded && (
+          <div className="relative flex-shrink-0" ref={menuRef}>
+            <button
+              onClick={e => { e.stopPropagation(); setMenu(v => !v); }}
+              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg leading-none font-bold hover:bg-white/40"
+              style={{ color: 'var(--p-deep)' }}
+            >···</button>
+            {menu && (
+              <div className="absolute right-0 top-10 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
+                <button onClick={() => { setMenu(false); onEditCourt(); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-[var(--text-2)] hover:bg-[var(--hover-bg)] transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  แก้ไข
+                </button>
+                <div style={{ borderTop: '1px solid var(--card-border)' }} />
+                <button onClick={() => { setMenu(false); setConfirmDelete(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  ลบสนาม
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Groups — only shown when expanded */}
       {expanded && (
-        <div className="border-t border-[var(--card-border)] px-3 pb-2">
+        <div className="px-3 pt-2 pb-3">
           {courtIsEmpty ? (
-            /* Empty court — inviting centered affordance */
-            <div className="flex justify-center py-5">
+            /* Empty court */
+            <div className="flex justify-center py-4">
               <button
                 onClick={() => onAddGroup()}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full border border-[var(--dashed)] text-sm transition-colors hover:border-[var(--p-deep)] hover:bg-[var(--hover-bg)]"
-                style={{ color: 'var(--p-deep)' }}
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full border text-sm font-medium transition-colors hover:bg-[var(--hover-bg)]"
+                style={{ color: 'var(--p-deep)', borderColor: 'var(--p)' }}
               >
-                <span className="text-base leading-none font-medium">+</span> เพิ่มก๊วนแรก
+                <span className="text-base leading-none">+</span> เพิ่มก๊วนแรก
               </button>
             </div>
           ) : (
@@ -287,14 +308,16 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                   onView={() => onViewGroup(group.id)}
                 />
               ))}
-              {/* Quiet footer add link — below the rows, no tile/dashed circle */}
-              <button
-                onClick={() => onAddGroup()}
-                className="flex items-center gap-1 mt-0.5 mb-1 pl-1 py-1.5 text-xs font-medium transition-colors hover:opacity-70"
-                style={{ color: 'var(--p-deep)' }}
-              >
-                <span className="text-sm leading-none">+</span> เพิ่มก๊วน
-              </button>
+              {/* เพิ่มก๊วน — pill button centered */}
+              <div className="flex justify-center mt-2">
+                <button
+                  onClick={() => onAddGroup()}
+                  className="flex items-center gap-1.5 px-5 py-1.5 rounded-full border text-xs font-medium transition-colors hover:bg-[var(--hover-bg)]"
+                  style={{ color: 'var(--p-deep)', borderColor: 'var(--p)' }}
+                >
+                  <span className="text-sm leading-none">+</span> เพิ่มก๊วน
+                </button>
+              </div>
             </>
           )}
         </div>
