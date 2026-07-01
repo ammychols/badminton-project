@@ -199,51 +199,43 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
   // all children are transparent and inherit the card's background.
   return (
     <div className="border border-[var(--card-border)] rounded-2xl bg-white shadow-sm mb-3 overflow-hidden">
-      {/* ── Court header — tinted background ── */}
-      <div className="flex items-center gap-2 px-3 py-3" style={{ backgroundColor: 'var(--p-tint)' }}>
-        {/* Tappable area: toggles expand/collapse */}
-        <button
-          className="flex-1 min-w-0 flex items-center gap-2.5 text-left"
-          onClick={onToggle}
+      {/* ── Court header ── */}
+      <div
+        className="flex items-center gap-2 px-3 py-3"
+        style={expanded
+          ? { background: `linear-gradient(to bottom, var(--header-tint-from), var(--header-tint-to))`, borderBottom: '1px solid var(--header-tint-border)' }
+          : { backgroundColor: '#ffffff' }}
+      >
+        {/* Court icon */}
+        <div
+          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base"
+          style={expanded
+            ? { backgroundColor: 'var(--p)', color: 'var(--p-text)' }
+            : { backgroundColor: 'var(--chip-bg)', color: 'var(--text-3)' }}
         >
-          {/* Court icon — fixed shuttlecock emoji in green circle */}
-          <div
-            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base"
-            style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
-          >
-            🏸
-          </div>
+          🏸
+        </div>
 
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-[var(--text-1)] truncate">{court.name}</p>
-            {infoChips.length > 0 && (
-              <div className="flex gap-1.5 flex-wrap mt-0.5">
-                {infoChips.map(c => (
-                  <span key={c} className="text-xs" style={{ color: 'var(--p-deep)' }}>{c}</span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Collapsed state: show group count; expanded: count hidden (menu stays) */}
-          {!expanded && (
-            <span className="flex-shrink-0 text-xs text-[var(--text-3)] pr-1">
-              {court.groups.length} ก๊วน
-            </span>
+        {/* Name + meta — tappable, takes remaining space */}
+        <button className="flex-1 min-w-0 text-left" onClick={onToggle}>
+          <p className="text-sm font-bold text-[var(--text-1)] truncate">{court.name}</p>
+          {infoChips.length > 0 && (
+            <div className="flex gap-1.5 flex-wrap mt-0.5">
+              {infoChips.map(c => (
+                <span key={c} className="text-xs" style={{ color: expanded ? 'var(--header-meta)' : 'var(--text-3)' }}>{c}</span>
+              ))}
+            </div>
           )}
-          <svg
-            className="flex-shrink-0 w-4 h-4 transition-transform duration-200"
-            style={{
-              color: 'var(--p-deep)',
-              transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
-            }}
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
         </button>
 
-        {/* Map link — only show when expanded to keep collapsed row compact */}
+        {/* Collapsed: group count */}
+        {!expanded && (
+          <span className="flex-shrink-0 text-xs text-[var(--text-3)]">
+            {court.groups.length} ก๊วน
+          </span>
+        )}
+
+        {/* Map link — expanded only */}
         {expanded && ((court.lat && court.lng) || court.address) && (
           <a
             href={court.lat && court.lng
@@ -252,19 +244,19 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
             target="_blank" rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
             className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-white/40"
-            style={{ color: 'var(--p-deep)' }}
+            style={{ color: 'var(--header-meta)' }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </a>
         )}
 
-        {/* Court ··· menu */}
+        {/* Court ··· menu — expanded only */}
         {expanded && (
           <div className="relative flex-shrink-0" ref={menuRef}>
             <button
               onClick={e => { e.stopPropagation(); setMenu(v => !v); }}
               className="w-8 h-8 flex items-center justify-center rounded-full transition-colors text-lg leading-none font-bold hover:bg-white/40"
-              style={{ color: 'var(--p-deep)' }}
+              style={{ color: 'var(--header-meta)' }}
             >···</button>
             {menu && (
               <div className="absolute right-0 top-10 z-50 rounded-2xl overflow-hidden shadow-xl min-w-[170px]" style={{ backgroundColor: '#fff', border: '1px solid var(--card-border)' }}>
@@ -281,6 +273,17 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
             )}
           </div>
         )}
+
+        {/* Chevron — always at far right, toggles expand */}
+        <button onClick={onToggle} tabIndex={-1} aria-hidden="true" className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+          <svg
+            className="w-4 h-4 transition-transform duration-200"
+            style={{ color: expanded ? 'var(--header-icon)' : 'var(--text-4)', transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
       </div>
 
       {/* Groups — only shown when expanded */}
