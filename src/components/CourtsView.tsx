@@ -45,14 +45,14 @@ function tintFor(id: string) {
   return AVATAR_TINTS[h % AVATAR_TINTS.length];
 }
 
-const COLLAPSE_KEY = 'badminton.collapsedCourts';
+const EXPANDED_KEY = 'badminton.expandedCourts';
 
-function loadCollapsed(): Set<string> {
-  try { return new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '[]')); } catch { return new Set(); }
+function loadExpanded(): Set<string> {
+  try { return new Set(JSON.parse(localStorage.getItem(EXPANDED_KEY) ?? '[]')); } catch { return new Set(); }
 }
 
-function saveCollapsed(set: Set<string>) {
-  localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...set]));
+function saveExpanded(set: Set<string>) {
+  localStorage.setItem(EXPANDED_KEY, JSON.stringify([...set]));
 }
 
 // ---- GroupRow ----
@@ -340,29 +340,29 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [search, setSearch] = useState('');
-  const [collapsed, setCollapsed] = useState<Set<string>>(loadCollapsed);
+  const [expanded, setExpanded] = useState<Set<string>>(loadExpanded);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const dayFilterActive = selectedDay !== 'all';
 
   const toggleCollapse = (courtId: string) => {
-    setCollapsed(prev => {
+    setExpanded(prev => {
       const next = new Set(prev);
       if (next.has(courtId)) next.delete(courtId); else next.add(courtId);
-      saveCollapsed(next);
+      saveExpanded(next);
       return next;
     });
   };
 
-  const isExpanded = (courtId: string) => dayFilterActive || !collapsed.has(courtId);
+  const isExpanded = (courtId: string) => dayFilterActive || expanded.has(courtId);
 
   useEffect(() => {
     if (!highlightCourtId) return;
     setSelectedDay('all');
-    setCollapsed(prev => {
+    setExpanded(prev => {
       const next = new Set(prev);
-      next.delete(highlightCourtId);
-      saveCollapsed(next);
+      next.add(highlightCourtId);
+      saveExpanded(next);
       return next;
     });
     setTimeout(() => {
