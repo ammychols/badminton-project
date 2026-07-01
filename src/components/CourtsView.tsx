@@ -119,7 +119,7 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
           {group.levels && group.levels.length > 0 && (
             <div className="flex gap-1 flex-wrap mt-1.5">
               {ALL_LEVELS.filter(l => group.levels!.includes(l)).map(lv => (
-                <span key={lv} className={`${chip.base} ${chip.gray}`}>{lv}</span>
+                <span key={lv} className={`${chip.base} ${chip.outlined}`}>{lv}</span>
               ))}
             </div>
           )}

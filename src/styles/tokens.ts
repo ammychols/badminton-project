@@ -36,6 +36,7 @@ export const text = {
 export const chip = {
   base: 'text-xs px-2.5 py-1 rounded-full font-medium',
   gray: 'bg-[var(--chip-bg)] text-[var(--chip-t)]',
+  outlined: 'bg-white border border-[var(--card-border)] text-[var(--text-2)]',
 };
 
 export const emptyState = {
