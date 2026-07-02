@@ -209,12 +209,15 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
       >
         {/* Court icon */}
         <div
-          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-base"
+          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
           style={expanded
             ? { backgroundColor: 'var(--p)', color: 'var(--p-text)' }
             : { backgroundColor: 'var(--chip-bg)', color: 'var(--text-3)' }}
         >
-          🏸
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
         </div>
 
         {/* Name + meta — tappable, takes remaining space */}
@@ -296,7 +299,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
               <button
                 onClick={() => onAddGroup()}
                 className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-colors"
-                style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
+                style={{ backgroundColor: 'var(--p-tint)', color: 'var(--p-deep)', border: '1.5px solid var(--p)' }}
               >
                 + เพิ่มก๊วนแรก
               </button>
@@ -316,7 +319,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                 <button
                   onClick={() => onAddGroup()}
                   className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-colors"
-                  style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
+                  style={{ backgroundColor: 'var(--p-tint)', color: 'var(--p-deep)', border: '1.5px solid var(--p)' }}
                 >
                   + เพิ่มก๊วน
                 </button>
@@ -433,7 +436,12 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
 
       {viewMode === 'list' && (courts.length === 0 ? (
         <div className={emptyState.wrapper}>
-          <div className={emptyState.icon}>🏸</div>
+          <div className={emptyState.icon}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-4)' }}>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </div>
           <div className={emptyState.title}>เพิ่มสนามแบดมินตัน</div>
           <div className={emptyState.subtitle}>บันทึกสนามที่ชอบไปตีไว้ที่นี่</div>
           <button onClick={onAddCourt} className={btn.primaryLg}>+ เพิ่มสนามแรก</button>

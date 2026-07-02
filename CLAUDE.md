@@ -90,11 +90,12 @@ Exported from `QuickLogCard.tsx`: `InlineLogData`, `TodayLock`. `onLogGroup` rem
 
 ## CourtsView — 1c Airy Band redesign (done)
 
-- Court header uses `--p-tint` bg with fixed 🏸 emoji icon (green circle, `--p` bg)
+- Court header: gradient tint bg when expanded, white when collapsed; icon = SVG location pin (state-aware: `--p` bg expanded, `--chip-bg` collapsed)
 - Collapsed state = compact horizontal row: icon + name + "N ก๊วน" + chevron-right; map icon and ··· menu hidden while collapsed
-- Expanded header shows map link + ··· menu; infoChips in `--p-deep` text
-- Groups area: white bg, group avatars 48 px (`w-12 h-12`), chip gap `mt-1.5`
-- "เพิ่มก๊วน" / "เพิ่มก๊วนแรก" are centered pill buttons with `--p` border + `--p-deep` text
+- Expanded header shows map link + ··· menu; infoChips in `--header-meta` text; chevron always at far right as separate button
+- Groups area: white bg, group avatars 48 px (`w-12 h-12`), chip gap `mt-1.5`; level chips use `chip.outlined` (white bg + `--card-border` border)
+- "เพิ่มก๊วน" / "เพิ่มก๊วนแรก" are centered pill buttons — secondary style: `--p-tint` bg, `--p` border (1.5px), `--p-deep` text
+- Group avatar: shows initial letter when `group.image` is not a valid URL (http/data:)
 
 ## Backlog (เรียงตามที่คุยกันไว้)
 
