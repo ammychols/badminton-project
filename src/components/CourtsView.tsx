@@ -315,11 +315,11 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                   onView={() => onViewGroup(group.id)}
                 />
               ))}
-              <div className="flex justify-center mt-2">
+              <div className="flex justify-center mt-3 mb-1">
                 <button
                   onClick={() => onAddGroup()}
-                  className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-colors"
-                  style={{ backgroundColor: 'var(--p-tint)', color: 'var(--p-deep)', border: '1.5px solid var(--p)' }}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full border text-sm font-semibold transition-colors hover:bg-[var(--p-tint)] active:scale-[0.97]"
+                  style={{ backgroundColor: 'var(--add-pill-bg)', color: 'var(--p-deep)', borderColor: 'var(--add-pill-border)' }}
                 >
                   + เพิ่มก๊วน
                 </button>
