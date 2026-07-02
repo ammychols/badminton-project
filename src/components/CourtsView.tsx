@@ -359,7 +359,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
     });
   };
 
-  const isExpanded = (courtId: string) => dayFilterActive || expanded.has(courtId);
+  const isExpanded = (courtId: string) => expanded.has(courtId);
 
   useEffect(() => {
     if (!highlightCourtId) return;
