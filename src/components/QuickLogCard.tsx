@@ -130,7 +130,7 @@ function LockedGroupForm({ group, court, onUnlock, onSave }: {
           className="flex-shrink-0 w-12 h-12 rounded-[13px] flex items-center justify-center text-base font-bold overflow-hidden"
           style={{ backgroundColor: tint.bg, color: tint.fg }}
         >
-          {group.image
+          {(group.image?.startsWith('http') || group.image?.startsWith('data:'))
             ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
             : group.name.charAt(0).toUpperCase()}
         </div>

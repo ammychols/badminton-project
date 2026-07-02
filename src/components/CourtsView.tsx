@@ -94,6 +94,7 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
 
   const tint = tintFor(group.id);
   const initial = group.name.charAt(0).toUpperCase();
+  const imageUrl = group.image?.startsWith('http') || group.image?.startsWith('data:') ? group.image : undefined;
   const days = WEEK_ORDER.filter(d => group.days.includes(d)).map(d => DAY_LABELS[d]).join(' ');
   const noTime = group.startTime === '00:00' && group.endTime === '00:00';
   const meta = noTime ? days : `${group.startTime}–${group.endTime}${days ? ` · ${days}` : ''}`;
@@ -107,8 +108,8 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
           className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-base font-bold overflow-hidden"
           style={{ backgroundColor: tint.bg, color: tint.fg }}
         >
-          {group.image
-            ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+          {imageUrl
+            ? <img src={imageUrl} alt={group.name} className="w-full h-full object-cover" />
             : initial}
         </div>
 
