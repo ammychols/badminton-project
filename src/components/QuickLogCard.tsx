@@ -317,6 +317,8 @@ export function QuickLogCard({
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeDotIndex, setActiveDotIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const candidates = useMemo(() => {
@@ -339,12 +341,22 @@ export function QuickLogCard({
     setActiveDotIndex(0);
   }, [candidates.map(c => c.group.id).join(',')]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollRight(el.scrollWidth > el.clientWidth + 4);
+    setCanScrollLeft(false);
+  }, [candidates.map(c => c.group.id).join(',')]);
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const cardWidth = el.clientWidth / 2 + 10;
     const index = Math.round(el.scrollLeft / cardWidth);
     setActiveDotIndex(Math.max(0, Math.min(index, candidates.length - 1)));
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
   }, [candidates.length]);
 
   const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
@@ -352,6 +364,12 @@ export function QuickLogCard({
     if (!el) return;
     e.preventDefault();
     el.scrollLeft += e.deltaY !== 0 ? e.deltaY : e.deltaX;
+  }, []);
+
+  const scrollByCard = useCallback((dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * 290, behavior: 'smooth' });
   }, []);
 
   const lockedEntry = useMemo(() => {
@@ -389,7 +407,7 @@ export function QuickLogCard({
           ? {
               background: 'linear-gradient(180deg, var(--p-tint), #ffffff 60%)',
               border: '1.5px solid transparent',
-              boxShadow: '0 0 0 1.5px var(--p), 0 12px 26px -12px rgba(47,191,127,0.5)',
+              boxShadow: 'inset 0 0 0 1.5px var(--p), 0 6px 18px -8px rgba(47,191,127,0.35)',
             }
           : {
               border: '0.5px solid var(--card-border)',
@@ -488,21 +506,43 @@ export function QuickLogCard({
       {/* Multiple candidates — scrollable row */}
       {!lockedEntry && candidates.length >= 2 && (
         <div>
+          <div className="relative">
+          {canScrollLeft && (
+            <button
+              onClick={() => scrollByCard(-1)}
+              aria-label="ก่อนหน้า"
+              className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-9 h-9 rounded-full items-center justify-center bg-white transition-colors hover:bg-[var(--hover-bg)]"
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '0.5px solid var(--card-border)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+            </button>
+          )}
+          {canScrollRight && (
+            <button
+              onClick={() => scrollByCard(1)}
+              aria-label="ถัดไป"
+              className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-9 h-9 rounded-full items-center justify-center bg-white transition-colors hover:bg-[var(--hover-bg)]"
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '0.5px solid var(--card-border)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+            </button>
+          )}
           <div
             ref={scrollRef}
             onScroll={handleScroll}
             onWheel={handleWheel}
             className="candidate-scroll flex gap-2.5"
-            style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'auto', overflowY: 'visible', padding: '6px 6px 8px' }}
+            style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'auto', padding: '2px 0 8px' }}
           >
             {candidates.map(({ court, group, groupSessions }) => (
               <div
                 key={group.id}
-                style={{ minWidth: 'min(calc(50vw - 26px), 299px)', scrollSnapAlign: 'start', flexShrink: 0 }}
+                style={{ width: 280, flexShrink: 0, scrollSnapAlign: 'start' }}
               >
                 {renderCard(court, group, groupSessions)}
               </div>
             ))}
+          </div>
           </div>
 
           {candidates.length >= 3 && (
