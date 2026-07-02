@@ -79,9 +79,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
   const currentMonth = now.getMonth();
   const currentYM = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
 
-  const [viewYear, setViewYear] = useState(currentYear);
-  const [viewMonth, setViewMonth] = useState(currentMonth);
-  const viewYM = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
+  const [monthFilter, setMonthFilter] = useState<string | null>(null);
+  const [groupFilterId, setGroupFilterId] = useState<string | null>(null);
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -98,7 +97,11 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
 
   const q = search.trim().toLowerCase();
   const viewedSessions = sessions.filter(s => {
-    if (!s.date.startsWith(viewYM)) return false;
+    if (groupFilterId) {
+      if (s.groupId !== groupFilterId) return false;
+    } else if (monthFilter) {
+      if (!s.date.startsWith(monthFilter)) return false;
+    }
     if (!q) return true;
     return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
   });
@@ -118,6 +121,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
         onSaveInline={onSaveInline}
         onViewGroup={onViewGroup}
         onOpenFullForm={onLogSession}
+        onSelectionChange={(groupId) => { setGroupFilterId(groupId); if (groupId) setMonthFilter(null); }}
       />
 
       {sessions.length === 0 ? (
@@ -145,18 +149,25 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               )}
             </div>
             <select
-              value={viewYM}
-              onChange={e => { const [y, m] = e.target.value.split('-').map(Number); setViewYear(y); setViewMonth(m - 1); }}
+              value={monthFilter ?? 'all'}
+              onChange={e => {
+                const v = e.target.value;
+                setGroupFilterId(null);
+                setMonthFilter(v === 'all' ? null : v);
+              }}
               className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold border bg-white focus:outline-none"
               style={{ color: 'var(--text-1)', borderColor: 'var(--input-b)' }}
             >
+              <option value="all">ทั้งหมด</option>
               {availableMonths.map(({ ym, label, yearLabel }) => (
                 <option key={ym} value={ym}>{label}{yearLabel}</option>
               ))}
             </select>
           </div>
           {viewedSessions.length === 0 && (
-            <div className="text-center text-sm text-[var(--text-3)] py-8">{search ? `ไม่พบ "${search}"` : 'ไม่มีบันทึกในเดือนนี้'}</div>
+            <div className="text-center text-sm text-[var(--text-3)] py-8">
+              {search ? `ไม่พบ "${search}"` : groupFilterId ? 'ยังไม่มีบันทึกของก๊วนนี้' : monthFilter ? 'ไม่มีบันทึกในเดือนนี้' : 'ยังไม่มีบันทึก'}
+            </div>
           )}
           {viewedSessions.length > 0 && (
             <FeedList sessions={viewedSessions} getCourtName={getCourtName} getGroupName={getGroupName}

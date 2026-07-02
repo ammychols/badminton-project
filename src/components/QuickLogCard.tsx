@@ -304,18 +304,30 @@ interface QuickLogCardProps {
   onSaveInline: (data: InlineLogData) => void;
   onViewGroup: (courtId: string, groupId: string) => void;
   onOpenFullForm: () => void;
+  onSelectionChange?: (groupId: string | null) => void;
 }
 
 export function QuickLogCard({
   courts, sessions, lock,
   onLockGroup, onUnlockGroup, onSaveInline,
-  onViewGroup, onOpenFullForm,
+  onViewGroup, onOpenFullForm, onSelectionChange,
 }: QuickLogCardProps) {
   const today = todayString();
   const dowIndex = new Date(today + 'T00:00:00').getDay();
   const dow = DOW_MAP[dowIndex];
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const updateSelection = useCallback((next: string | null) => {
+    setSelectedId(next);
+    onSelectionChange?.(next);
+  }, [onSelectionChange]);
+  const toggleSelection = useCallback((id: string) => {
+    setSelectedId(prev => {
+      const next = prev === id ? null : id;
+      onSelectionChange?.(next);
+      return next;
+    });
+  }, [onSelectionChange]);
   const [activeDotIndex, setActiveDotIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -335,11 +347,10 @@ export function QuickLogCard({
     return list;
   }, [courts, sessions, dow, today]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setSelectedId(null);
+    updateSelection(null);
     setActiveDotIndex(0);
-  }, [candidates.map(c => c.group.id).join(',')]);
+  }, [candidates.map(c => c.group.id).join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -400,8 +411,8 @@ export function QuickLogCard({
         role="button"
         tabIndex={0}
         aria-pressed={isSelected}
-        onClick={() => setSelectedId(prev => prev === group.id ? null : group.id)}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(prev => prev === group.id ? null : group.id); }}
+        onClick={() => toggleSelection(group.id)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') toggleSelection(group.id); }}
         className="bg-white rounded-[18px] p-3 cursor-pointer flex flex-col active:scale-[0.985] transition-transform"
         style={isSelected
           ? {
@@ -451,22 +462,27 @@ export function QuickLogCard({
     );
   };
 
-  const renderConfirmButton = () => (
-    <button
-      aria-disabled={!selectedId}
-      onClick={() => {
-        if (!selectedId) return;
-        const picked = candidates.find(c => c.group.id === selectedId);
-        if (picked) onLockGroup(picked.court.id, picked.group.id);
-      }}
-      className="w-full py-3 rounded-2xl text-sm font-semibold mt-3 transition-colors"
-      style={selectedId
-        ? { background: 'var(--p)', color: 'var(--p-text)', cursor: 'pointer' }
-        : { background: 'var(--hover-bg)', color: 'var(--text-3)', cursor: 'not-allowed' }}
-    >
-      เลือก
-    </button>
-  );
+  const renderConfirmButton = () => {
+    const selectedGroup = selectedId ? candidates.find(c => c.group.id === selectedId)?.group : null;
+    return (
+      <button
+        aria-disabled={!selectedId}
+        onClick={() => {
+          if (!selectedId) return;
+          const picked = candidates.find(c => c.group.id === selectedId);
+          if (picked) onLockGroup(picked.court.id, picked.group.id);
+        }}
+        className="w-full py-3 rounded-2xl text-sm font-semibold mt-3 transition-colors"
+        style={selectedId
+          ? { background: 'var(--p)', color: 'var(--p-text)', cursor: 'pointer' }
+          : { background: 'var(--hover-bg)', color: 'var(--text-3)', cursor: 'not-allowed' }}
+      >
+        <span className="block truncate px-4">
+          {selectedGroup ? `เลือก ${selectedGroup.name}` : 'เลือก'}
+        </span>
+      </button>
+    );
+  };
 
   if (!lockedEntry && candidates.length === 0) return null;
 
