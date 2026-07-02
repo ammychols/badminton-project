@@ -498,7 +498,7 @@ export function QuickLogCard({
             {candidates.map(({ court, group, groupSessions }) => (
               <div
                 key={group.id}
-                style={{ flex: '0 0 min(calc(50vw - 22px), 296px)', scrollSnapAlign: 'start' }}
+                style={{ flex: '0 0 calc(50% - 5px)', scrollSnapAlign: 'start' }}
               >
                 {renderCard(court, group, groupSessions)}
               </div>
