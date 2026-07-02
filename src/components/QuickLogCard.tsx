@@ -492,7 +492,7 @@ export function QuickLogCard({
             ref={scrollRef}
             onScroll={handleScroll}
             onWheel={handleWheel}
-            className="candidate-scroll flex gap-2.5 py-2"
+            className="candidate-scroll flex gap-2.5 py-2 px-2 -mx-2"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'auto', overflowY: 'visible' }}
           >
             {candidates.map(({ court, group, groupSessions }) => (
