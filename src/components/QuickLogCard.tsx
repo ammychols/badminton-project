@@ -347,6 +347,13 @@ export function QuickLogCard({
     setActiveDotIndex(Math.max(0, Math.min(index, candidates.length - 1)));
   }, [candidates.length]);
 
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    e.preventDefault();
+    el.scrollLeft += e.deltaY !== 0 ? e.deltaY : e.deltaX;
+  }, []);
+
   const lockedEntry = useMemo(() => {
     if (!lock || lock.date !== today) return null;
     const court = courts.find(c => c.id === lock.courtId);
@@ -484,6 +491,7 @@ export function QuickLogCard({
           <div
             ref={scrollRef}
             onScroll={handleScroll}
+            onWheel={handleWheel}
             className="candidate-scroll flex gap-2.5 py-2"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none', overflowX: 'auto', overflowY: 'visible' }}
           >
