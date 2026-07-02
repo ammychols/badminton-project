@@ -162,15 +162,15 @@ export function SessionRow({
             })()}
           </div>
           {/* FIX: controls stay full-opacity on touch; hover-reveal only from sm up */}
-          <div className="flex items-center gap-0.5 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
-            <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" aria-label="เพิ่มรูป" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]">
+          <div className="flex items-center gap-1 opacity-100 sm:opacity-40 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+            <button onClick={() => photoInputRef.current?.click()} title="เพิ่มรูป" aria-label="เพิ่มรูป" className="text-[var(--text-3)] hover:text-[var(--p)] transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)]">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </button>
             <div ref={menuRef} className="relative">
-              <button onClick={() => setMenuOpen(v => !v)} aria-label="ตัวเลือก" className="p-1.5 rounded-lg hover:bg-[var(--chip-bg)] transition-colors" style={{ color: 'var(--text-3)' }}>
+              <button onClick={() => setMenuOpen(v => !v)} aria-label="ตัวเลือก" className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--hover-bg)] transition-colors" style={{ color: 'var(--text-3)' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></svg>
               </button>
               {menuOpen && (
