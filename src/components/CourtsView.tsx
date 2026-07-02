@@ -99,7 +99,7 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
   const meta = noTime ? days : `${group.startTime}–${group.endTime}${days ? ` · ${days}` : ''}`;
 
   return (
-    <div className="flex items-center gap-3 py-3 px-1">
+    <div className="flex items-center gap-3 py-3 px-2">
       {/* Tappable row body → opens GroupScorecard */}
       <button className="flex items-center gap-3 flex-1 min-w-0 text-left" onClick={onView}>
         {/* Avatar — slightly larger, keep rounded-full */}
@@ -130,7 +130,7 @@ function GroupRow({ group, onEdit, onDelete, onView }: {
       <button
         ref={btnRef}
         onClick={openMenu}
-        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
+        className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-[var(--text-3)] hover:bg-[var(--hover-bg)] transition-colors text-lg leading-none font-bold"
       >···</button>
       {menu && menuPos && (
         <div
@@ -201,14 +201,14 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
     <div className="border border-[var(--card-border)] rounded-2xl bg-white shadow-sm mb-3 overflow-hidden">
       {/* ── Court header ── */}
       <div
-        className="flex items-center gap-2 px-3 py-3"
+        className="flex items-center gap-3 px-3 py-3"
         style={expanded
           ? { background: `linear-gradient(to bottom, var(--header-tint-from), var(--header-tint-to))`, borderBottom: '1px solid var(--header-tint-border)' }
           : { backgroundColor: '#ffffff' }}
       >
         {/* Court icon */}
         <div
-          className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+          className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
           style={expanded
             ? { backgroundColor: 'var(--p)', color: 'var(--p-text)' }
             : { backgroundColor: 'var(--chip-bg)', color: 'var(--text-3)' }}
@@ -246,7 +246,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
               : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + (court.address ?? ''))}`}
             target="_blank" rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-white/40"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-white/20"
             style={{ color: 'var(--header-meta)' }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -278,7 +278,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
         )}
 
         {/* Chevron — always at far right, toggles expand */}
-        <button onClick={onToggle} tabIndex={-1} aria-hidden="true" className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+        <button onClick={onToggle} tabIndex={-1} aria-hidden="true" className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-[var(--hover-bg)]">
           <svg
             className="w-4 h-4 transition-transform duration-200"
             style={{ color: expanded ? 'var(--header-icon)' : 'var(--text-4)', transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
