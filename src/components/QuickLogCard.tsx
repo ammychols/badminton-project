@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Court, Group, Session, DayOfWeek, Intensity, ALL_INTENSITIES, INTENSITY_LABELS } from '../types';
 import { todayString, DAY_NAMES } from '../utils/date';
 import { computeGroupStats, moodLevel } from '../utils/groupStats';
@@ -315,6 +315,10 @@ export function QuickLogCard({
   const dowIndex = new Date(today + 'T00:00:00').getDay();
   const dow = DOW_MAP[dowIndex];
 
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeDotIndex, setActiveDotIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   const candidates = useMemo(() => {
     const list: { court: Court; group: Group; groupSessions: Session[] }[] = [];
     for (const c of courts) {
@@ -329,6 +333,20 @@ export function QuickLogCard({
     return list;
   }, [courts, sessions, dow, today]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setSelectedId(null);
+    setActiveDotIndex(0);
+  }, [candidates.map(c => c.group.id).join(',')]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.clientWidth / 2 + 10;
+    const index = Math.round(el.scrollLeft / cardWidth);
+    setActiveDotIndex(Math.max(0, Math.min(index, candidates.length - 1)));
+  }, [candidates.length]);
+
   const lockedEntry = useMemo(() => {
     if (!lock || lock.date !== today) return null;
     const court = courts.find(c => c.id === lock.courtId);
@@ -336,6 +354,94 @@ export function QuickLogCard({
     if (!court || !group) return null;
     return { court, group };
   }, [lock, today, courts]);
+
+  const renderCard = (court: Court, group: Group, groupSessions: Session[]) => {
+    const isSelected = selectedId === group.id;
+    const stats = computeGroupStats(groupSessions);
+    const tint = tintFor(group.id);
+    const noTime = group.startTime === '00:00' && group.endTime === '00:00';
+    const timeStr = noTime ? court.name : `${court.name} · ${group.startTime}–${group.endTime}`;
+
+    const dash = <span style={{ color: 'var(--text-4)' }}>—</span>;
+    const statRows: [React.ReactNode, string][] = [
+      [stats.avgMinPerGame != null ? stats.avgMinPerGame : dash, 'นาที/เกม'],
+      [stats.avgGames != null ? Math.round(stats.avgGames) : dash, 'เกม/ครั้ง'],
+      [stats.avgMood != null ? MOOD_EMOJIS[moodLevel(stats.avgMood)] : dash, 'มู้ดเฉลี่ย'],
+      [stats.avgCost != null ? `฿${stats.avgCost}` : dash, 'ต่อครั้ง'],
+    ];
+
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        aria-pressed={isSelected}
+        onClick={() => setSelectedId(group.id)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(group.id); }}
+        className="bg-white rounded-[18px] p-3 cursor-pointer flex flex-col active:scale-[0.985] transition-transform"
+        style={isSelected
+          ? {
+              background: 'linear-gradient(180deg, var(--p-tint), #ffffff 60%)',
+              border: '1.5px solid transparent',
+              boxShadow: '0 0 0 1.5px var(--p), 0 12px 26px -12px rgba(47,191,127,0.5)',
+            }
+          : {
+              border: '0.5px solid var(--card-border)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+            }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-3">
+          <div
+            className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold overflow-hidden"
+            style={{ backgroundColor: tint.bg, color: tint.fg, boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
+          >
+            {group.image
+              ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+              : group.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] font-medium text-[var(--text-1)] truncate">{group.name}</p>
+            <p className="text-[10px] text-[var(--text-3)] truncate">{timeStr}</p>
+          </div>
+        </div>
+
+        {/* Hairline divider */}
+        <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginBottom: 12 }} />
+
+        {/* 2×2 stat grid */}
+        <div className="grid grid-cols-2 gap-x-2 gap-y-3 mb-3">
+          {statRows.map(([v, l]) => (
+            <div key={l}>
+              <div className="text-[15px] font-medium text-[var(--text-1)] leading-none">{v}</div>
+              <div className="text-[10px] text-[var(--text-3)] mt-0.5">{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Last visit */}
+        <p className="text-[10px]" style={{ color: 'var(--text-4)' }}>
+          {lastVisitLabel(stats.lastVisitDate, today)}
+        </p>
+      </div>
+    );
+  };
+
+  const renderConfirmButton = () => (
+    <button
+      aria-disabled={!selectedId}
+      onClick={() => {
+        if (!selectedId) return;
+        const picked = candidates.find(c => c.group.id === selectedId);
+        if (picked) onLockGroup(picked.court.id, picked.group.id);
+      }}
+      className="w-full py-3 rounded-2xl text-sm font-semibold mt-3 transition-colors"
+      style={selectedId
+        ? { background: 'var(--p)', color: 'var(--p-text)', cursor: 'pointer' }
+        : { background: 'var(--hover-bg)', color: 'var(--text-3)', cursor: 'not-allowed' }}
+    >
+      เลือก
+    </button>
+  );
 
   if (!lockedEntry && candidates.length === 0) return null;
 
@@ -361,72 +467,54 @@ export function QuickLogCard({
         />
       )}
 
-      {/* Comparison cards */}
-      {!lockedEntry && (
-        <div className={candidates.length === 1 ? 'flex flex-col gap-2.5' : 'grid grid-cols-2 gap-2.5'}>
-          {candidates.map(({ court, group, groupSessions }) => {
-            const stats = computeGroupStats(groupSessions);
-            const tint = tintFor(group.id);
-            const noTime = group.startTime === '00:00' && group.endTime === '00:00';
-            const timeStr = noTime ? court.name : `${court.name} · ${group.startTime}–${group.endTime}`;
+      {/* Single candidate */}
+      {!lockedEntry && candidates.length === 1 && (() => {
+        const { court, group, groupSessions } = candidates[0];
+        return (
+          <div className="flex flex-col gap-2.5">
+            {renderCard(court, group, groupSessions)}
+            {renderConfirmButton()}
+          </div>
+        );
+      })()}
 
-            const dash = <span style={{ color: 'var(--text-4)' }}>—</span>;
-            const statRows: [React.ReactNode, string][] = [
-              [stats.avgMinPerGame != null ? stats.avgMinPerGame : dash, 'นาที/เกม'],
-              [stats.avgGames != null ? Math.round(stats.avgGames) : dash, 'เกม/ครั้ง'],
-              [stats.avgMood != null ? MOOD_EMOJIS[moodLevel(stats.avgMood)] : dash, 'มู้ดเฉลี่ย'],
-              [stats.avgCost != null ? `฿${stats.avgCost}` : dash, 'ต่อครั้ง'],
-            ];
-
-            return (
+      {/* Multiple candidates — scrollable row */}
+      {!lockedEntry && candidates.length >= 2 && (
+        <div>
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="candidate-scroll flex gap-2.5 overflow-x-auto -mx-4 px-4 pb-1"
+            style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {candidates.map(({ court, group, groupSessions }) => (
               <div
                 key={group.id}
-                onClick={() => onViewGroup(court.id, group.id)}
-                className="bg-white rounded-[18px] p-3 cursor-pointer flex flex-col active:scale-[0.985] transition-transform"
-                style={{ border: '0.5px solid var(--card-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)' }}
+                style={{ flex: '0 0 calc(50vw - 22px)', scrollSnapAlign: 'start' }}
               >
-                {/* Header */}
-                <div className="flex items-center gap-2 mb-3">
-                  <div
-                    className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold overflow-hidden"
-                    style={{ backgroundColor: tint.bg, color: tint.fg }}
-                  >
-                    {group.image
-                      ? <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
-                      : group.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[var(--text-1)] truncate">{group.name}</p>
-                    <p className="text-[10px] text-[var(--text-3)] truncate">{timeStr}</p>
-                  </div>
-                </div>
-
-                {/* 2×2 stat grid — always rendered */}
-                <div className="grid grid-cols-2 gap-x-2 gap-y-3 mb-3">
-                  {statRows.map(([v, l]) => (
-                    <div key={l}>
-                      <div className="text-[15px] font-medium text-[var(--text-1)] leading-none">{v}</div>
-                      <div className="text-[10px] text-[var(--text-3)] mt-0.5">{l}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Last visit */}
-                <p className="text-[10px] mb-3" style={{ color: 'var(--text-4)' }}>
-                  {lastVisitLabel(stats.lastVisitDate, today)}
-                </p>
-
-                {/* Select button */}
-                <button
-                  onClick={e => { e.stopPropagation(); onLockGroup(court.id, group.id); }}
-                  className="mt-auto w-full py-2 rounded-xl text-sm font-semibold transition-colors"
-                  style={{ background: 'var(--p)', color: 'var(--p-text)' }}
-                >
-                  เลือก
-                </button>
+                {renderCard(court, group, groupSessions)}
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {candidates.length >= 3 && (
+            <div className="flex justify-center gap-1 mt-2.5">
+              {candidates.map((c, i) => (
+                <div
+                  key={c.group.id}
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    backgroundColor: i === activeDotIndex ? 'var(--p)' : '#d6d7da',
+                    transition: 'background-color 0.2s',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {renderConfirmButton()}
         </div>
       )}
     </div>

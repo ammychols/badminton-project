@@ -97,3 +97,7 @@ html {
 .animate-insight-in {
   animation: insight-in 0.3s ease-out;
 }
+
+.candidate-scroll::-webkit-scrollbar {
+  display: none;
+}
