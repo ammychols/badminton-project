@@ -61,11 +61,6 @@ export interface Review {
   notes?: string;
 }
 
-export interface TodayGroup {
-  court: Court;
-  group: Group;
-  averageScore: number;
-}
 
 export type Intensity = 'light' | 'medium' | 'heavy';
 export const INTENSITY_LABELS: Record<Intensity, string> = { light: 'เบา', medium: 'ปานกลาง', heavy: 'หนัก' };

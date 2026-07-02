@@ -8,7 +8,6 @@ import { SessionsView } from './components/SessionsView';
 import { StatsView } from './components/StatsView';
 import { AddCourtModal } from './components/AddCourtModal';
 import { AddGroupModal } from './components/AddGroupModal';
-import { ReviewModal } from './components/ReviewModal';
 import { CourtInfoModal } from './components/CourtInfoModal';
 import { LogSessionModal } from './components/LogSessionModal';
 import { LogCelebration } from './components/LogCelebration';
@@ -22,7 +21,7 @@ import { Court, DayOfWeek } from './types';
 type Tab = 'courts' | 'sessions' | 'stats';
 
 interface ModalState {
-  type: 'addCourt' | 'addGroup' | 'editGroup' | 'review' | 'courtInfo' | 'logSession';
+  type: 'addCourt' | 'addGroup' | 'editGroup' | 'courtInfo' | 'logSession';
   courtId?: string;
   groupId?: string;
   defaultDay?: DayOfWeek;
@@ -101,7 +100,7 @@ export default function App() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [showUserMenu]);
-  const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup, addReview } = useCourts(user?.uid ?? '');
+  const { courts, addCourt, deleteCourt, addGroup, updateGroup, updateCourt, deleteGroup } = useCourts(user?.uid ?? '');
   const { sessions, addSession, deleteSession, updateSession } = useSessions(user?.uid ?? '');
 
   // Show QuickLogCard (today picker) when there are still unlogged groups today.
@@ -174,7 +173,6 @@ export default function App() {
             onDeleteGroup={deleteGroup}
             onEditGroup={(courtId, groupId) => openModal({ type: 'editGroup', courtId, groupId })}
             onRateCourt={courtId => openModal({ type: 'courtInfo', courtId })}
-            onAddReview={(courtId, groupId, notes) => addReview(courtId, groupId, { fun: 0, arrangement: 0, notes: notes || undefined, date: new Date().toJSON() })}
             onViewGroup={(courtId, groupId) => setViewGroupKey({ courtId, groupId })}
           />
         )}
@@ -286,14 +284,6 @@ export default function App() {
           onClose={closeModal}
           isNewCourt={modal.isNewCourt}
           onSave={data => { closeModal(); updateCourt(modal.courtId!, { info: data }); }}
-        />
-      )}
-      {modal?.type === 'review' && modal.courtId && modal.groupId && activeCourt && (
-        <ReviewModal
-          court={activeCourt}
-          groupId={modal.groupId}
-          onClose={closeModal}
-          onSave={data => { closeModal(); addReview(modal.courtId!, modal.groupId!, data); }}
         />
       )}
       {modal?.type === 'logSession' && (

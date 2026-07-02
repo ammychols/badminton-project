@@ -1,94 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Court, Group, Session, ALL_LEVELS, DAY_LABELS, DayOfWeek, FLOOR_LABELS, AIR_LABELS, PARKING_LABELS } from '../types';
+import { Court, Session } from '../types';
 import { QuickLogCard, InlineLogData, TodayLock } from './QuickLogCard';
 import { ConfirmDialog } from './ConfirmDialog';
 import { btn, emptyState, text } from '../styles/tokens';
 import { SessionRow } from './SessionRow';
-import { DetailPanel } from './DetailPanel';
 import { MONTH_SHORT, formatDate } from '../utils/date';
-
-// ── Court slide-over panel (triggered from session feed) ──────────────────────
-function CourtPanel({ court, onClose }: { court: Court; onClose: () => void }) {
-  const [panelDay, setPanelDay] = useState<DayOfWeek | 'all'>('all');
-  const visibleGroups = panelDay === 'all' ? court.groups : court.groups.filter(g => g.days.includes(panelDay));
-
-  const mapsUrl = court.lat && court.lng
-    ? `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(court.name + ' ' + court.address)}`;
-
-  const DAY_TABS: { key: DayOfWeek | 'all'; label: string }[] = [
-    { key: 'all', label: 'ทั้งหมด' },
-    { key: 'MON', label: 'จ' }, { key: 'TUE', label: 'อ' }, { key: 'WED', label: 'พ' },
-    { key: 'THU', label: 'พฤ' }, { key: 'FRI', label: 'ศ' }, { key: 'SAT', label: 'ส' }, { key: 'SUN', label: 'อา' },
-  ];
-
-  const mapsAction = (
-    <a href={mapsUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-      className="flex-shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl transition-colors"
-      style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
-      นำทาง
-    </a>
-  );
-
-  return (
-    <DetailPanel title={court.name} subtitle={court.address} action={mapsAction} onClose={onClose}>
-      <div className="px-4 py-3.5 flex flex-col gap-3 pb-8">
-        {(court.info?.floor || court.info?.air || court.info?.parking || court.info?.notes) && (
-          <div className="flex gap-2 flex-wrap">
-            {court.info.floor && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{FLOOR_LABELS[court.info.floor]}</span>}
-            {court.info.air && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{AIR_LABELS[court.info.air]}</span>}
-            {court.info.parking && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{PARKING_LABELS[court.info.parking]}</span>}
-            {court.info.notes && <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-t)' }}>{court.info.notes}</span>}
-          </div>
-        )}
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
-          {DAY_TABS.map(({ key, label }) => (
-            <button key={key} onClick={() => setPanelDay(key)}
-              className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
-              style={{ background: panelDay === key ? 'var(--p)' : 'var(--chip-bg)', color: panelDay === key ? 'var(--p-text)' : 'var(--chip-t)' }}>
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">ก๊วนในสนามนี้</div>
-        {visibleGroups.length === 0 ? (
-          <div className="text-sm text-[var(--text-3)] text-center py-6">ไม่มีก๊วนในวันนี้</div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {visibleGroups.map(group => <PanelGroupRow key={group.id} group={group} />)}
-          </div>
-        )}
-      </div>
-    </DetailPanel>
-  );
-}
-
-function PanelGroupRow({ group }: { group: Group }) {
-  return (
-    <div className="bg-white rounded-2xl p-3.5" style={{ boxShadow: '0 2px 8px rgba(0,0,0,.06)' }}>
-      {group.image && (
-        <div className="relative h-28 rounded-xl overflow-hidden mb-3">
-          <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        </div>
-      )}
-      <div className="font-bold text-[#0f172a] text-sm">{group.name}</div>
-      {group.startTime && group.endTime && (
-        <div className="text-xs text-[#64748b] mt-0.5">{group.startTime} – {group.endTime} น.</div>
-      )}
-      <div className="flex gap-1.5 flex-wrap mt-2">
-        {(Object.keys(DAY_LABELS) as DayOfWeek[]).filter(d => group.days.includes(d)).map(d => (
-          <span key={d} className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: '#f1f5f9', color: '#475569' }}>{DAY_LABELS[d]}</span>
-        ))}
-        {group.levels?.slice().sort((a, b) => ALL_LEVELS.indexOf(a) - ALL_LEVELS.indexOf(b)).map(lv => (
-          <span key={lv} className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#f1f5f9', color: '#475569' }}>{lv}</span>
-        ))}
-      </div>
-      {group.notes && <p className="text-xs text-[#94a3b8] mt-2 leading-relaxed">{group.notes}</p>}
-    </div>
-  );
-}
 
 interface SessionsViewProps {
   sessions: Session[];
@@ -156,7 +72,6 @@ function FeedList({ sessions, getCourtName, getGroupName, onEditSession, setConf
 
 export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, onEditSession, onUpdateNote, onUpdatePhoto, onUpdatePhotos, onNavigateToCourt, onViewGroup, lock, onLockGroup, onUnlockGroup, onSaveInline }: SessionsViewProps) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [viewCourtId, setViewCourtId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   const now = new Date();
@@ -249,12 +164,6 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
           )}
         </div>
       )}
-
-      {viewCourtId && (() => {
-        const court = courts.find(c => c.id === viewCourtId);
-        if (!court) return null;
-        return <CourtPanel court={court} onClose={() => setViewCourtId(null)} />;
-      })()}
 
       {confirmDeleteId && (
         <ConfirmDialog

@@ -14,7 +14,6 @@ interface CourtsViewProps {
   onDeleteGroup: (courtId: string, groupId: string) => void;
   onEditGroup: (courtId: string, groupId: string) => void;
   onRateCourt: (courtId: string) => void;
-  onAddReview: (courtId: string, groupId: string, notes: string) => void;
   onViewGroup: (courtId: string, groupId: string) => void;
 }
 
@@ -342,7 +341,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
 }
 
 // ---- CourtsView ----
-export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onAddReview: _onAddReview, onViewGroup }: CourtsViewProps) {
+export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCourt, onAddGroup, onDeleteCourt, onDeleteGroup, onEditGroup, onRateCourt, onViewGroup }: CourtsViewProps) {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek | 'all'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [search, setSearch] = useState('');
@@ -437,7 +436,7 @@ export function CourtsView({ courts, highlightCourtId, onHighlightClear, onAddCo
       {viewMode === 'list' && (courts.length === 0 ? (
         <div className={emptyState.wrapper}>
           <div className={emptyState.icon}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-4)' }}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'white' }}>
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
               <circle cx="12" cy="9" r="2.5"/>
             </svg>
