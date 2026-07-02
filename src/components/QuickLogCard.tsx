@@ -375,8 +375,8 @@ export function QuickLogCard({
         role="button"
         tabIndex={0}
         aria-pressed={isSelected}
-        onClick={() => setSelectedId(group.id)}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(group.id); }}
+        onClick={() => setSelectedId(prev => prev === group.id ? null : group.id)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(prev => prev === group.id ? null : group.id); }}
         className="bg-white rounded-[18px] p-3 cursor-pointer flex flex-col active:scale-[0.985] transition-transform"
         style={isSelected
           ? {
@@ -484,13 +484,13 @@ export function QuickLogCard({
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="candidate-scroll flex gap-2.5 overflow-x-auto -mx-4 px-4 pb-1"
+            className="candidate-scroll flex gap-2.5 overflow-x-auto pb-1"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {candidates.map(({ court, group, groupSessions }) => (
               <div
                 key={group.id}
-                style={{ flex: '0 0 calc(50vw - 22px)', scrollSnapAlign: 'start' }}
+                style={{ flex: '0 0 min(calc(50vw - 22px), 296px)', scrollSnapAlign: 'start' }}
               >
                 {renderCard(court, group, groupSessions)}
               </div>
