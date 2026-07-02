@@ -294,10 +294,10 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
             <div className="flex justify-center py-4">
               <button
                 onClick={() => onAddGroup()}
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full border text-sm font-medium transition-colors hover:bg-[var(--hover-bg)]"
-                style={{ color: 'var(--p-deep)', borderColor: 'var(--p)' }}
+                className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-colors"
+                style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
               >
-                <span className="text-base leading-none">+</span> เพิ่มก๊วนแรก
+                + เพิ่มก๊วนแรก
               </button>
             </div>
           ) : (
@@ -311,14 +311,13 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                   onView={() => onViewGroup(group.id)}
                 />
               ))}
-              {/* เพิ่มก๊วน — pill button centered */}
               <div className="flex justify-center mt-2">
                 <button
                   onClick={() => onAddGroup()}
-                  className="flex items-center gap-1.5 px-5 py-1.5 rounded-full border text-xs font-medium transition-colors hover:bg-[var(--hover-bg)]"
-                  style={{ color: 'var(--p-deep)', borderColor: 'var(--p)' }}
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={{ backgroundColor: 'var(--p)', color: 'var(--p-text)' }}
                 >
-                  <span className="text-sm leading-none">+</span> เพิ่มก๊วน
+                  + เพิ่มก๊วน
                 </button>
               </div>
             </>
