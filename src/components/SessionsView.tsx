@@ -81,6 +81,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
 
   const [monthFilter, setMonthFilter] = useState<string | null>(null);
   const [groupFilterId, setGroupFilterId] = useState<string | null>(null);
+  const [moodFilter, setMoodFilter] = useState<number | null>(null);
 
   const getCourtName = (courtId: string) => courts.find(c => c.id === courtId)?.name ?? 'ไม่พบสนาม';
   const getGroupName = (courtId: string, groupId: string) =>
@@ -102,6 +103,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
     } else if (monthFilter) {
       if (!s.date.startsWith(monthFilter)) return false;
     }
+    if (moodFilter !== null && s.mood !== moodFilter) return false;
     if (!q) return true;
     return getCourtName(s.courtId).toLowerCase().includes(q) || getGroupName(s.courtId, s.groupId).toLowerCase().includes(q);
   });
@@ -164,9 +166,29 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               ))}
             </select>
           </div>
+          {/* Mood filter chips */}
+          <div className="flex gap-1.5">
+            {([1,2,3,4,5,6] as const).map(m => {
+              const emojis: Record<number,string> = {1:'😡',2:'😴',3:'😐',4:'🙂',5:'😄',6:'🔥'};
+              const active = moodFilter === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMoodFilter(active ? null : m)}
+                  className="flex-1 py-1.5 rounded-xl text-base transition-all"
+                  style={active
+                    ? { background: 'var(--p-tint)', border: '1.5px solid var(--p)', transform: 'scale(1.08)' }
+                    : { background: 'var(--hover-bg)', border: '1.5px solid transparent' }}
+                >
+                  {emojis[m]}
+                </button>
+              );
+            })}
+          </div>
+
           {viewedSessions.length === 0 && (
             <div className="text-center text-sm text-[var(--text-3)] py-8">
-              {search ? `ไม่พบ "${search}"` : groupFilterId ? 'ยังไม่มีบันทึกของก๊วนนี้' : monthFilter ? 'ไม่มีบันทึกในเดือนนี้' : 'ยังไม่มีบันทึก'}
+              {search ? `ไม่พบ "${search}"` : moodFilter !== null ? 'ไม่มีบันทึกที่มู้ดนี้' : groupFilterId ? 'ยังไม่มีบันทึกของก๊วนนี้' : monthFilter ? 'ไม่มีบันทึกในเดือนนี้' : 'ยังไม่มีบันทึก'}
             </div>
           )}
           {viewedSessions.length > 0 && (
