@@ -270,7 +270,7 @@ function CourtSection({ court, expanded, selectedDay, onToggle, onAddGroup, onEd
                 <div style={{ borderTop: '1px solid var(--card-border)' }} />
                 <button onClick={() => { setMenu(false); setConfirmDelete(true); }} className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors text-left">
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                  ลบสนาม
+                  ลบ
                 </button>
               </div>
             )}
