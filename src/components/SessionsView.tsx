@@ -136,13 +136,17 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
       ) : (
         <div className="flex flex-col gap-2">
           <div className="flex gap-2 items-center">
+            {/* Search */}
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--dashed)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 111 11a6 6 0 0116 0z" />
               </svg>
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
                 placeholder="ค้นหาก๊วน หรือสนาม..."
-                className="w-full pl-9 pr-3 py-2.5 text-sm bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                className="w-full pl-9 pr-3 py-2 bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
               />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
@@ -150,6 +154,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 </button>
               )}
             </div>
+            {/* Month filter */}
             <select
               value={monthFilter ?? 'all'}
               onChange={e => {
@@ -157,38 +162,47 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 setGroupFilterId(null);
                 setMonthFilter(v === 'all' ? null : v);
               }}
-              className="flex-shrink-0 px-3 py-2 rounded-2xl text-xs font-semibold border bg-white focus:outline-none"
-              style={{ color: 'var(--text-1)', borderColor: 'var(--input-b)' }}
+              className="flex-shrink-0 px-3 py-2 rounded-2xl font-semibold border bg-white focus:outline-none"
+              style={{ color: monthFilter ? 'var(--p-deep)' : 'var(--text-1)', borderColor: monthFilter ? 'var(--p)' : 'var(--input-b)', backgroundColor: monthFilter ? 'var(--p-tint)' : 'white' }}
             >
-              <option value="all">ทั้งหมด</option>
+              <option value="all">เดือน</option>
               {availableMonths.map(({ ym, label, yearLabel }) => (
                 <option key={ym} value={ym}>{label}{yearLabel}</option>
               ))}
             </select>
-          </div>
-          {/* Mood filter chips */}
-          <div className="flex gap-1.5">
-            {([1,2,3,4,5,6] as const).map(m => {
-              const emojis: Record<number,string> = {1:'😡',2:'😴',3:'😐',4:'🙂',5:'😄',6:'🔥'};
-              const active = moodFilter === m;
-              return (
-                <button
-                  key={m}
-                  onClick={() => setMoodFilter(active ? null : m)}
-                  className="flex-1 py-1.5 rounded-xl text-base transition-all"
-                  style={active
-                    ? { background: 'var(--p-tint)', border: '1.5px solid var(--p)', transform: 'scale(1.08)' }
-                    : { background: 'var(--hover-bg)', border: '1.5px solid transparent' }}
-                >
-                  {emojis[m]}
-                </button>
-              );
-            })}
+            {/* Mood filter */}
+            <select
+              value={moodFilter ?? 'all'}
+              onChange={e => {
+                const v = e.target.value;
+                setMoodFilter(v === 'all' ? null : Number(v));
+              }}
+              className="flex-shrink-0 px-3 py-2 rounded-2xl font-semibold border focus:outline-none"
+              style={{ color: moodFilter !== null ? 'var(--p-deep)' : 'var(--text-1)', borderColor: moodFilter !== null ? 'var(--p)' : 'var(--input-b)', backgroundColor: moodFilter !== null ? 'var(--p-tint)' : 'white' }}
+            >
+              <option value="all">มู้ด</option>
+              <option value="1">😡 เดือด</option>
+              <option value="2">😴 เหนื่อย</option>
+              <option value="3">😐 ปกติ</option>
+              <option value="4">🙂 ดี</option>
+              <option value="5">😄 สนุก</option>
+              <option value="6">🔥 เยี่ยม</option>
+            </select>
           </div>
 
           {viewedSessions.length === 0 && (
             <div className="text-center text-sm text-[var(--text-3)] py-8">
-              {search ? `ไม่พบ "${search}"` : moodFilter !== null ? 'ไม่มีบันทึกที่มู้ดนี้' : groupFilterId ? 'ยังไม่มีบันทึกของก๊วนนี้' : monthFilter ? 'ไม่มีบันทึกในเดือนนี้' : 'ยังไม่มีบันทึก'}
+              {search
+                ? `ไม่พบ "${search}"`
+                : groupFilterId
+                  ? 'ยังไม่มีบันทึกของก๊วนนี้'
+                  : monthFilter && moodFilter !== null
+                    ? 'ไม่มีบันทึกที่ตรงกัน'
+                    : moodFilter !== null
+                      ? 'ไม่มีบันทึกที่มู้ดนี้'
+                      : monthFilter
+                        ? 'ไม่มีบันทึกในเดือนนี้'
+                        : 'ยังไม่มีบันทึก'}
             </div>
           )}
           {viewedSessions.length > 0 && (
