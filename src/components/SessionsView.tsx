@@ -181,12 +181,12 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
               style={{ color: moodFilter !== null ? 'var(--p-deep)' : 'var(--text-1)', borderColor: moodFilter !== null ? 'var(--p)' : 'var(--input-b)', backgroundColor: moodFilter !== null ? 'var(--p-tint)' : 'white' }}
             >
               <option value="all">มู้ด</option>
-              <option value="1">😡 เดือด</option>
-              <option value="2">😴 เหนื่อย</option>
-              <option value="3">😐 ปกติ</option>
-              <option value="4">🙂 ดี</option>
-              <option value="5">😄 สนุก</option>
-              <option value="6">🔥 เยี่ยม</option>
+              <option value="1">😡</option>
+              <option value="2">😴</option>
+              <option value="3">😐</option>
+              <option value="4">🙂</option>
+              <option value="5">😄</option>
+              <option value="6">🔥</option>
             </select>
           </div>
 
