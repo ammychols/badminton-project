@@ -27,7 +27,7 @@
 - **ห้าม** hardcode hex ใหม่ (เช่น `#84cc16`, `#f1f5f9`) — ถ้าจำเป็นต้องมีสีใหม่ ให้เพิ่มเป็น CSS variable ก่อน
 - Primary colour: `--p: #2fbf7f` — ข้อความบน `var(--p)` ต้องใช้ `text-[var(--p-text)]` หรือ `color: 'var(--p-text)'` เสมอ (**ห้ามใช้ `text-white`** บนพื้น `var(--p)`)
 - `--p-tint: #e2f7ed` — ใช้สำหรับ selected state แบบ ring+tint (เช่น mood button ที่เลือก): `bg-[var(--p-tint)] shadow-[0_0_0_2px_var(--p)]`
-- **Filter-bar form controls** (search input + `<select>` filters on one row): standardise on `h-11 text-base leading-none` so `<input>` and native `<select>` render the same height. `text-base` (16px) is the iOS no-zoom floor — never `text-sm`. Cancel the inherited `body { line-height: 1.7 }` with `leading-none` on the control. Filter weight = `font-medium` (match the search input; don't out-weight the primary control with `font-semibold`).
+- **Filter-bar form controls** (search input + `<select>` filters on one row): match the `input` token shape — `rounded-xl px-3 py-2 text-base focus:ring-2` — do **not** hand-roll `rounded-2xl`/`h-11` (that drifts bigger + more rounded than every other input in the app). Add `leading-none` to cancel the inherited `body { line-height: 1.7 }`. `text-base` (16px) is the iOS no-zoom floor — never `text-sm`. Filter `<select>` weight = `font-medium` (don't out-weight the search input with `font-semibold`). Search + both selects share one className shape so they render the same height.
 - `BACKDROP_LIGHTBOX` จาก `src/styles/overlay.ts` (`rgba(1, 1, 32, 0.85)`) — ใช้เป็น scrim สำหรับ lightbox เท่านั้น
 - การ์ดเด่น/gradient ใช้โทน hero: `linear-gradient(135deg, var(--hero-from) 0%, #0f172a 55%, var(--hero-to) 100%)` 
 

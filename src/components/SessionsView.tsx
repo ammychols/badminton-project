@@ -145,8 +145,8 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="ค้นหาก๊วน หรือสนาม..."
-                className="w-full h-11 pl-9 pr-3 text-base leading-none bg-white border border-[var(--input-b)] rounded-2xl focus:outline-none focus:ring-1 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
+                placeholder="ค้นหา"
+                className="w-full py-2 pl-9 pr-3 text-base leading-none bg-white border border-[var(--input-b)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--input-f)] placeholder-[var(--dashed)]"
               />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dashed)] hover:text-[var(--text-3)]">
@@ -162,7 +162,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 setGroupFilterId(null);
                 setMonthFilter(v === 'all' ? null : v);
               }}
-              className="flex-shrink-0 h-11 px-3 text-base leading-none font-medium rounded-2xl border focus:outline-none"
+              className="flex-shrink-0 py-2 px-3 text-base leading-none font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-[var(--input-f)]"
               style={{ color: monthFilter ? 'var(--p-deep)' : 'var(--text-1)', borderColor: monthFilter ? 'var(--p)' : 'var(--input-b)', backgroundColor: monthFilter ? 'var(--p-tint)' : 'white' }}
             >
               <option value="all">เดือน</option>
@@ -177,7 +177,7 @@ export function SessionsView({ sessions, courts, onLogSession, onDeleteSession, 
                 const v = e.target.value;
                 setMoodFilter(v === 'all' ? null : Number(v));
               }}
-              className="flex-shrink-0 h-11 px-3 text-base leading-none font-medium rounded-2xl border focus:outline-none"
+              className="flex-shrink-0 py-2 px-3 text-base leading-none font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-[var(--input-f)]"
               style={{ color: moodFilter !== null ? 'var(--p-deep)' : 'var(--text-1)', borderColor: moodFilter !== null ? 'var(--p)' : 'var(--input-b)', backgroundColor: moodFilter !== null ? 'var(--p-tint)' : 'white' }}
             >
               <option value="all">มู้ด</option>
